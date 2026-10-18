@@ -95,6 +95,23 @@ button,select,input,textarea{font:inherit;color:inherit}
 .vis{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);background:rgb(0 0 0 / .18);padding:3px 8px;border-radius:999px}
 .vis svg{width:11px;height:11px}
 .stack{display:flex}
+.nm .fr-tag{display:inline-flex;align-items:center;gap:5px;margin:0;overflow:visible;white-space:nowrap;font-size:12px;color:var(--muted);text-overflow:clip}
+.nm .fr-tag .av{display:grid;place-items:center;width:20px;height:20px;font-size:8.5px;margin:0;border:0;overflow:visible;white-space:nowrap}
+.also-fr{align-items:center}
+.lately li:has(>button){display:block}
+.lately li button{all:unset;cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:center;width:100%}
+.lately li button:focus-visible{outline:2px solid var(--text);outline-offset:3px;border-radius:8px}
+.lately .both{color:var(--text)}
+.lately-strip h2{display:flex;justify-content:space-between;align-items:center}
+.tab[data-new]::after,.bottom-nav [data-new]::after{content:attr(data-new);display:inline-block;min-width:16px;height:16px;line-height:16px;margin-left:6px;border-radius:8px;background:var(--accent,#ff6a3d);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:0 4px;vertical-align:middle}
+.starter{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 2px}
+.acct-box{margin-top:14px;padding:14px;border-radius:14px;background:var(--raise)}
+.acct-box h3{margin:0 0 4px;font-size:15px}.acct-box p{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.acct-box input{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;margin-bottom:10px}
+.pill.danger-solid{background:#d9453b;color:#fff}.pill[disabled]{opacity:.4;cursor:not-allowed}
+.share-img{width:100%;border-radius:14px;display:block;margin:6px 0 12px}
+.match-row{display:flex;align-items:center;gap:12px;width:100%;background:var(--raise);border:0;border-radius:14px;padding:10px 12px;margin-bottom:8px;cursor:pointer;color:var(--text);text-align:left}
+.match-row b{flex:1}.match-row .pct{font-weight:700;font-size:18px}
 .stack .av{width:22px;height:22px;font-size:9px;border:2px solid var(--card)}
 .stack .av + .av{margin-left:-7px}
 .rows{list-style:none;margin:0;padding:0}
@@ -306,7 +323,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 <main id="view" class="wrap gutter"></main>
 
 <footer class="wrap gutter">
-  <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="signout">Sign out</button></div>
+  <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="account">Account</button><button class="pill ghost" data-act="signout">Sign out</button></div>
   <p class="credit">Artwork from Wikipedia, Apple, AniList and Open Library.</p>
 </footer>
 
@@ -4538,8 +4555,66 @@ async function loadFriends(){
   for(const r of (sh.data||[])){ const f=by[r.user_id]; if(!f||!CAT[r.cat]) continue; const sn=snapAt(r.years,CURRENT); if(!sn) continue; f.shelves[r.cat]=sn; ups.push([f.id,r.cat,r.updated_at]); }
   FRIENDS.sort((a,b)=>a.name.localeCompare(b.name));
   ups.sort((a,b)=>new Date(b[2])-new Date(a[2]));
-  UPDATES=ups.slice(0,6).map(([id,c,t])=>[id,`updated <b>${esc(CAT[c].name)}</b>`,ago(t)]);
+  UPDATES=ups.slice(0,8).map(([id,c,t])=>({id,c,t}));
   for(const p of (ph.data||[])) shared[pkey(p.cat,p.name)]={src:p.url,h:p.h||0,s:p.s||30};
+}
+function updateLine(u){
+  const f=FRIENDS.find(x=>x.id===u.id); if(!f) return null; const sh=f.shelves[u.c]; if(!sh) return null;
+  const names=sh.top.slice(0,2).map(i=>i.n), mine=eff(u.c,CURRENT), both=mine?sh.top.find(i=>mine.snap.top.some(m=>m.n===i.n)):null;
+  return {f,c:u.c,html:`updated <b>${esc(CAT[u.c].name)}</b>: ${esc(names.join(', '))}${sh.top.length>2?'…':''}`+(both?` · <span class="both">you both have <b>${esc(both.n)}</b></span>`:''),when:ago(u.t)};
+}
+function lateList(n){ return UPDATES.map(updateLine).filter(Boolean).slice(0,n).map(l=>`<li><button data-act="open-friend" data-f="${l.f.id}" data-cat="${l.c}">${av(l.f,'s')}<p><b>${esc(first(l.f))}</b> ${l.html} · ${l.when}</p></button></li>`).join(''); }
+const seenKey = KEY+'-seen';
+function unreadUpdates(){ let seen=0; try{ seen=+localStorage.getItem(seenKey)||0; if(!seen){ localStorage.setItem(seenKey,String(Date.now())); seen=Date.now(); } }catch(e){} return UPDATES.filter(u=>new Date(u.t)>seen).length; }
+function showWelcome(name){
+  sheet(`<div class="sheet-head"><div><h2>You're in ${esc(name)}'s circle</h2><p>Rank a few favorites and see how you match.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <p class="muted" style="margin:0 0 14px">Pick three things in any topic. It takes about a minute, and you do not need to fill every spot.</p>
+  <div class="starter">${['artists','movies','albums','tv','games'].filter(id=>CAT[id]).map(id=>`<button class="pk" data-act="pick-cat" data-cat="${id}">${esc(CAT[id].name)}</button>`).join('')}</div>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="close">Later</button><button class="pill" data-act="quick">Walk me through it</button></div></div>`,'welcome');
+}
+const matchKey = KEY+'-matched';
+function maybeShowMatch(){
+  try{ if(localStorage.getItem(matchKey)) return false; }catch(e){}
+  if(!FRIENDS.length || shelfList(CURRENT).length<3) return false;
+  const rows=FRIENDS.map(f=>({f,...compat(f)})).filter(r=>r.pct>0).sort((a,b)=>b.pct-a.pct).slice(0,4); if(!rows.length) return false;
+  try{ localStorage.setItem(matchKey,'1'); }catch(e){}
+  sheet(`<div class="sheet-head"><div><h2>Your taste match</h2><p>Based on the shelves you both filled in.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  ${rows.map(r=>`<button class="match-row" data-act="compare" data-f="${r.f.id}">${av(r.f)}<b>${esc(r.f.name)}</b><span class="pct">${r.pct}%</span></button>`).join('')}
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Keep going</button></div></div>`,'match');
+  return true;
+}
+function openAccount(){
+  sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="acct-box"><h3>Wipe my data</h3><p>Deletes all your shelves, photos and custom items. Your account and friends stay, so you can start over fresh. This cannot be undone.</p>
+    <input id="wipe-in" placeholder='Type WIPE to confirm' autocomplete="off" aria-label="Type WIPE to confirm"><button class="pill danger-solid" id="wipe-btn" data-act="wipe" disabled>Wipe my data</button></div>
+  <div class="acct-box"><h3>Delete my account</h3><p>Permanently deletes your account, shelves, photos and friendships. You will be signed out. This cannot be undone.</p>
+    <input id="del-in" placeholder='Type DELETE to confirm' autocomplete="off" aria-label="Type DELETE to confirm"><button class="pill danger-solid" id="del-btn" data-act="delete-account" disabled>Delete my account</button></div>
+  <div style="height:18px"></div>`,'account');
+}
+async function removeMyFiles(){ try{ const {data}=await sb.storage.from('photos').list(me.id,{limit:1000}); if(data&&data.length) await sb.storage.from('photos').remove(data.map(f=>me.id+'/'+f.name)); }catch(e){ console.warn(e); } }
+async function wipeData(){
+  const btn=$('#wipe-btn'); if(btn) btn.disabled=true; toast('Wiping…');
+  try{
+    clearTimeout(pushT);
+    let r=await sb.from('shelves').delete().eq('user_id',me.id); if(r.error) throw r.error;
+    r=await sb.from('item_photos').delete().eq('user_id',me.id); if(r.error) throw r.error;
+    r=await sb.from('user_settings').upsert({user_id:me.id,custom:{}},{onConflict:'user_id'}); if(r.error) throw r.error;
+    await removeMyFiles();
+    state={name:state.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
+    synced.shelves={}; synced.photos={}; synced.custom='{}'; buildCatalog(); applyCustom();
+    try{ localStorage.removeItem(matchKey); }catch(e){}
+    ui.tab='me'; ui.year=CURRENT; ui.view='me'; closeSheet(); render(); toast('All your data was wiped');
+  }catch(e){ console.error(e); toast("Couldn't wipe everything. Try again."); if(btn) btn.disabled=false; }
+}
+async function deleteAccount(){
+  const btn=$('#del-btn'); if(btn) btn.disabled=true; toast('Deleting…');
+  try{
+    clearTimeout(pushT);
+    await removeMyFiles();
+    const r=await sb.rpc('delete_my_account'); if(r.error) throw r.error;
+    try{ localStorage.clear(); }catch(e){}
+    await sb.auth.signOut().catch(()=>{}); location.reload();
+  }catch(e){ console.error(e); toast(/delete_my_account|function/i.test(String(e.message||e))?'Run supabase/delete_account.sql in Supabase first.':"Couldn't delete the account. Try again."); if(btn) btn.disabled=false; }
 }
 const inviteLink = () => location.origin + location.pathname.replace(/index\.html$/,'') + '?join=' + (me?me.invite:'');
 
@@ -4623,9 +4698,10 @@ async function enter(user){
     await loadFriends();
     $('#acct').textContent=`Signed in as ${me.name}`;
     document.body.classList.add('in');
-    if(joined){ ui.tab='friends'; ui.compare=null; }
+    const fresh = joined && !joined.err && !shelfList(CURRENT).length;
+    if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
     render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); }
-    if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
+    if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
 
@@ -4766,6 +4842,29 @@ async function pokeList(){
   return POKE_LIST;
 }
 const pokeName = slug => ({'mr-mime':'Mr. Mime','mime-jr':'Mime Jr.','mr-rime':'Mr. Rime','farfetchd':"Farfetch'd",'sirfetchd':"Sirfetch'd",'nidoran-f':'Nidoran♀','nidoran-m':'Nidoran♂','type-null':'Type: Null','ho-oh':'Ho-Oh','porygon-z':'Porygon-Z','jangmo-o':'Jangmo-o','hakamo-o':'Hakamo-o','kommo-o':'Kommo-o'}[slug] || slug.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '));
+async function robloxWikiImage(c,n,sub){
+  if(c!=='games' || !/^roblox/i.test(sub||'')) return null; await gate('wiki',120);
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(n+' Roblox'));
+  const want=normT(n);
+  for(const pg of Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99))){ const t=normT(pg.title);
+    if(pg.thumbnail && /roblox|video game/i.test(pg.description||'') && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want))) return pg.thumbnail.source; }
+  return null;
+}
+async function robloxFandomImage(c,n,sub){
+  if(c!=='games' || !/^roblox/i.test(sub||'')) return null; await gate('fandom',300);
+  const j=await getJSON('https://roblox.fandom.com/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=300&titles='+encodeURIComponent(n));
+  for(const pg of Object.values((j.query&&j.query.pages)||{})) if(pg.thumbnail && normT(pg.title)===normT(n) && /^https:\/\/static\.wikia\.nocookie\.net\//.test(pg.thumbnail.source)) return pg.thumbnail.source;
+  return null;
+}
+async function robloxCandidates(n){
+  await gate('roblox',400);
+  const j=await getJSON('https://apis.roproxy.com/search-api/omni-search?pageType=all&sessionId='+Math.random().toString(36).slice(2)+'&searchQuery='+encodeURIComponent(n));
+  const games=[]; for(const g of (j.searchResults||[])) for(const x of (g.contents||[])) if(x.contentType==='Game' && games.length<6) games.push(x);
+  if(!games.length) return [];
+  const t=await getJSON('https://thumbnails.roproxy.com/v1/games/icons?returnPolicy=PlaceHolder&size=256x256&format=Png&universeIds='+games.map(g=>g.universeId).join(','));
+  const by=Object.fromEntries((t.data||[]).map(d=>[d.targetId,d.imageUrl]));
+  return games.filter(g=>/^https:\/\/[a-z0-9]+\.rbxcdn\.com\//.test(by[g.universeId]||'')).map(g=>({img:by[g.universeId],full:by[g.universeId],label:g.name+' · Roblox'}));
+}
 /* Roblox games: Wikipedia has no pictures for most of them. Roblox's own icon service is tried through a public mirror that allows browsers. */
 async function robloxImage(c,n,sub){
   if(c!=='games' || !/^roblox/i.test(sub||'')) return null; await gate('roblox',400);
@@ -4794,6 +4893,7 @@ async function altCandidates(c,n,sub){
       const q=[n,cfg.sub?firstPart(sub):'',cfg.w].filter(Boolean).join(' ');
       const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
       Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail) add(pg.thumbnail.source,pg.thumbnail.source,[pg.title,pg.description].filter(Boolean).join(' · ')); }); })().catch(()=>{}),
+    c==='games' ? robloxCandidates(n).then(r=>r.forEach(x=>add(x.img,x.full,x.label))).catch(()=>{}) : null,
     nat && LANG_OF(nat) ? (async()=>{ const x=await nativeWikiImage(c,n,sub); if(x) add(x,x,nat); })().catch(()=>{}) : null
   ].filter(Boolean);
   await Promise.all(jobs);
@@ -4882,7 +4982,7 @@ async function sampleTint(url){
 async function resolveOne(c,n,subHint){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
-  const order=[['pokeapi',pokemonImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
+  const order=[['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
   for(const [name,fn] of order){
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
     if(url){ src=name; break; }
@@ -4944,9 +5044,10 @@ function meDyn(){
   let note='';
   if(view!=='me') note=`<div class="note"><span>This is what ${view==='close'?'close friends':'friends'} see</span><button class="pill soft sm" data-act="view" data-v="me">Back to my view</button></div>`;
   else if(y<CURRENT) note=`<div class="note"><span>Your shelves in ${y}</span><button class="pill soft sm" data-act="year-now">Back to ${CURRENT}</button></div>`;
-  if(view==='me' && y===CURRENT && !shelfList(CURRENT).length) note=`<div class="note"><span>Start with a few shelves. Quick start walks you through the most popular ones, with suggestions.</span><button class="pill sm" data-act="quick">Quick start</button></div>`;
+  if(view==='me' && y===CURRENT && !shelfList(CURRENT).length) note=`<div class="panel"><h2>Start with 3 favorites</h2><p class="muted" style="margin:0">Pick a topic, add a few things you love, and you will instantly see how you match your friends. You do not need to fill all five spots.</p><div class="starter">${['artists','movies','albums','tv','games'].filter(id=>CAT[id]).map(id=>`<button class="pk" data-act="pick-cat" data-cat="${id}">${esc(CAT[id].name)}</button>`).join('')}</div><div style="margin-top:10px"><button class="pill sm" data-act="quick">Walk me through it</button></div></div>`;
   const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${CATS.length-shelfList(CURRENT).length} categories to choose from</small></button>` : '';
-  return note + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
+  const strip=(view==='me' && y===CURRENT && UPDATES.length && lateList(3)) ? `<div class="panel lately-strip"><h2>Friends lately <button class="pill ghost sm" data-act="tab" data-tab="friends">See all</button></h2><ul class="lately">${lateList(3)}</ul></div>` : '';
+  return note + strip + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
 }
 function viewMe(){
   const y=ui.year;
@@ -4985,7 +5086,7 @@ function viewFriends(){
   const list = rows.length
     ? `<div class="panel">${rows.map(r=>`<button class="friend" data-act="compare" data-f="${r.f.id}">${av(r.f)}<div class="nm"><b>${esc(r.f.name)}${r.f.close?' <span class="muted" style="font-weight:500;font-size:13px">· close</span>':''}</b><span>${r.per.length} shelves in common</span></div><span class="pct">${r.pct}%</span></button>`).join('')}</div>`
     : `<div class="panel"><p class="empty-note">No friends yet. Send your link to someone and you will see how your tastes compare.</p></div>`;
-  const lately = UPDATES.length ? `<div class="panel"><h2>Lately</h2><ul class="lately">${UPDATES.map(([id,txt,when])=>{const f=FRIENDS.find(x=>x.id===id);return f?`<li>${av(f,'s')}<p><b>${esc(first(f))}</b> ${txt} · ${when}</p></li>`:'';}).join('')}</ul></div>` : '';
+  const lately = UPDATES.length ? `<div class="panel"><h2>Lately</h2><ul class="lately">${lateList(8)}</ul></div>` : '';
   return `<section class="head"><h1>Friends</h1></section>
   <div class="friends">${list}<div>${invitePanel()}${lately?'<div style="height:12px"></div>'+lately:''}</div></div>`;
 }
@@ -5055,6 +5156,51 @@ function closeSheet(){ $('#sheet-root').innerHTML=''; document.body.style.overfl
 function frTags(c){ return it=>{ const sh=sharers(c,it.n); return (sh.length?`<div class="also-fr">${sh.map(x=>`<span class="fr-tag">${av(x.f)}${esc(first(x.f))} ${x.label}</span>`).join('')}</div>`:'') + (it.why?`<p class="why">${esc(it.why)}</p>`:''); }; }
 function photoBtn(c,n,size){ return `<button type="button" class="art-btn" data-act="photo" data-cat="${c}" data-n="${esc(n)}" aria-label="${photo(c,n)?'Change':'Add'} photo for ${esc(n)}">${art(n,c,size)}<span class="hint">${photo(c,n)?'Edit':'+ Photo'}</span></button>`; }
 
+let shareBlob=null, shareUrl=null;
+async function shareImg(url,c){
+  const tries=[dispSrc(c,url), 'https://wsrv.nl/?w=300&h=300&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(url)];
+  for(const t of tries){ try{ return await loadImg(t); }catch(e){} } return null;
+}
+function fitText(ctx,t,max){ t=String(t||''); if(ctx.measureText(t).width<=max) return t; while(t.length>1 && ctx.measureText(t+'…').width>max) t=t.slice(0,-1); return t+'…'; }
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+async function makeShareImage(c){
+  const y=ui.year, e=eff(c,y); if(!e) return null; const top=e.snap.top.slice(0,5);
+  const W=1080, H=1350, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
+  const font=getComputedStyle(document.body).fontFamily||'system-ui,sans-serif';
+  const p0=photo(c,top[0].n), h=p0?p0.h:hue(top[0].n);
+  const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,`hsl(${h} 42% 24%)`); g.addColorStop(1,'#0c0c0e'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  x.fillStyle='rgba(255,255,255,.9)'; x.font=`800 44px ${font}`; x.textBaseline='alphabetic'; x.fillText('palate',70,100);
+  x.textAlign='right'; x.fillStyle='rgba(255,255,255,.55)'; x.font=`600 32px ${font}`; x.fillText(String(y),W-70,100); x.textAlign='left';
+  x.fillStyle='#fff'; x.font=`800 84px ${font}`; x.fillText(fitText(x,CAT[c].name,W-140),70,230);
+  x.fillStyle='rgba(255,255,255,.6)'; x.font=`500 34px ${font}`; x.fillText(`${state.name}'s top ${top.length}`,70,285);
+  const imgs=await Promise.all(top.map(it=>{ const p=photo(c,it.n); return p?shareImg(p.src,c):Promise.resolve(null); }));
+  const rowH=Math.min(172,Math.floor(900/Math.max(top.length,1))), art=rowH-32, y0=345, shape=CAT[c].shape;
+  top.forEach((it,i)=>{
+    const ry=y0+i*rowH, ax=150, ay=ry+8;
+    x.fillStyle='rgba(255,255,255,.5)'; x.font=`700 54px ${font}`; x.textAlign='center'; x.fillText(String(i+1),95,ay+art/2+18); x.textAlign='left';
+    x.save(); if(shape==='round'){ x.beginPath(); x.arc(ax+art/2,ay+art/2,art/2,0,Math.PI*2); x.closePath(); } else rr(x,ax,ay,art,art,22); x.clip();
+    const im=imgs[i];
+    if(im){ const m=Math.min(im.naturalWidth,im.naturalHeight), sx=(im.naturalWidth-m)/2, sy=shape==='round'?(im.naturalHeight-m)*.22:(im.naturalHeight-m)/2; x.drawImage(im,sx,sy,m,m,ax,ay,art,art); }
+    else { x.fillStyle=`hsl(${hue(it.n)} 45% 40%)`; x.fillRect(ax,ay,art,art); x.fillStyle='rgba(255,255,255,.9)'; x.font=`700 ${Math.round(art/3)}px ${font}`; x.textAlign='center'; x.fillText(initials(it.n),ax+art/2,ay+art/2+art/9); x.textAlign='left'; }
+    x.restore();
+    const tx=ax+art+34, mw=W-tx-70;
+    x.fillStyle='#fff'; x.font=`700 46px ${font}`; x.fillText(fitText(x,it.n,mw),tx,ay+art/2-4);
+    x.fillStyle='rgba(255,255,255,.55)'; x.font=`500 30px ${font}`; x.fillText(fitText(x,it.s||'',mw),tx,ay+art/2+40);
+  });
+  x.textAlign='center'; x.fillStyle='rgba(255,255,255,.55)'; x.font=`600 30px ${font}`;
+  x.fillText('Rank yours with friends · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),W/2,H-60); x.textAlign='left';
+  return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
+}
+async function openShare(c){
+  toast('Making your image…');
+  let blob=null; try{ blob=await makeShareImage(c); }catch(e){ console.error(e); }
+  if(!blob){ toast("Couldn't make the image. Try again in a moment."); return; }
+  if(shareUrl) URL.revokeObjectURL(shareUrl); shareBlob=blob; shareUrl=URL.createObjectURL(blob);
+  const canShare=!!(navigator.canShare && navigator.canShare({files:[new File([blob],'x.png',{type:'image/png'})]}));
+  sheet(`<div class="sheet-head"><div><h2>Share ${esc(CAT[c].name)}</h2><p>Save it or send it to a friend.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <img class="share-img" src="${shareUrl}" alt="Your ${esc(CAT[c].name)} shelf as a picture">
+  <div class="sheet-foot"><span></span><div class="foot-right">${canShare?`<button class="pill" data-act="share-send" data-cat="${c}">Share</button>`:''}<a class="pill ${canShare?'soft':''}" href="${shareUrl}" download="palate-${c}.png" style="text-decoration:none">Download</a></div></div>`,'share');
+}
 function openDetail(c, fid){
   detailArgs=[c,fid];
   let s, prev=null, who, y, own=!fid;
@@ -5066,7 +5212,7 @@ function openDetail(c, fid){
   sheet(`<div class="sheet-head"><div><h2>${esc(CAT[c].name)}</h2><p>${esc(who)} · ${y}${own?' · '+VIS[visOf(c)]:''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <ol class="rows detail">${rows}</ol>
   ${s.hm.length?`<p class="also">Also · ${s.hm.map(h=>esc(h.n)).join(', ')}</p>`:''}
-  <div class="sheet-foot">${editable?`<label class="confirm" for="vis-d">Who sees this <select id="vis-d" data-vis="${c}" style="background:var(--raise);border:0;border-radius:10px;padding:7px 10px">${Object.entries(VIS).map(([k,l])=>`<option value="${k}" ${visOf(c)===k?'selected':''}>${l}</option>`).join('')}</select></label>`:'<span></span>'}${editable?`<div class="foot-right"><button class="pill" data-act="edit" data-cat="${c}">Edit</button></div>`:''}</div>`, 'detail');
+  <div class="sheet-foot">${editable?`<label class="confirm" for="vis-d">Who sees this <select id="vis-d" data-vis="${c}" style="background:var(--raise);border:0;border-radius:10px;padding:7px 10px">${Object.entries(VIS).map(([k,l])=>`<option value="${k}" ${visOf(c)===k?'selected':''}>${l}</option>`).join('')}</select></label>`:'<span></span>'}${own?`<div class="foot-right"><button class="pill soft" data-act="share" data-cat="${c}">Share</button>${editable?`<button class="pill" data-act="edit" data-cat="${c}">Edit</button>`:''}</div>`:''}</div>`, 'detail');
   setTimeout(()=>$('.sheet .x')?.focus(),20);
 }
 
@@ -5280,7 +5426,7 @@ function saveEditor(next){
   const c=ed.cat, flow=ed.flow; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(!state.order.includes(c)) state.order=[...state.order, c];
   save(); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
-  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); toast('Saved'); }
+  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(!maybeShowMatch()) toast('Saved'); }
 }
 function removeShelf(){
   const c=ed.cat, sh=state.shelves[c];
@@ -5420,6 +5566,9 @@ function render(){
   $('#view').innerHTML = ui.tab==='friends'?viewFriends():ui.tab==='recap'?viewRecap():viewMe();
   document.querySelectorAll('.tab[data-tab], .bottom-nav [data-tab]').forEach(b=>{ if(b.dataset.tab===ui.tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   try{ localStorage.setItem(KEY+'-tab',ui.tab); }catch(e){}
+  if(ui.tab==='friends'){ try{ localStorage.setItem(seenKey,String(Date.now())); }catch(e){} }
+  const nu = ui.tab==='friends' ? 0 : unreadUpdates();
+  document.querySelectorAll('[data-tab="friends"]').forEach(b=>{ if(nu) b.dataset.new=nu; else b.removeAttribute('data-new'); });
 }
 
 
@@ -5430,10 +5579,13 @@ document.addEventListener('click',e=>{
   switch(a){
     case 'tab': ui.tab=el.dataset.tab; ui.compare=null; render(); window.scrollTo(0,0); break;
     case 'view': ui.view=el.dataset.v; render(); break;
+    case 'compare-m': break;
     case 'open': openDetail(el.dataset.cat); break;
     case 'open-friend': openDetail(el.dataset.cat, el.dataset.f); break;
     case 'edit': openEditor(el.dataset.cat); break;
     case 'add-shelf': ui.view='me'; if(ui.tab==='me' && ui.year!==CURRENT) ui.year=CURRENT; if(ui.tab==='me') render(); openPicker(); break;
+    case 'share': openShare(el.dataset.cat); break;
+    case 'share-send': { try{ const f=new File([shareBlob],'palate-'+el.dataset.cat+'.png',{type:'image/png'}); navigator.share({files:[f],text:'My '+CAT[el.dataset.cat].name.toLowerCase()+' on Palate',url:inviteLink()}).catch(()=>{}); }catch(e){} break; }
     case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
@@ -5461,6 +5613,9 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'account': openAccount(); break;
+    case 'wipe': wipeData(); break;
+    case 'delete-account': deleteAccount(); break;
     case 'signout': sb.auth.signOut().finally(()=>location.reload()); break;
     case 'reload': location.reload(); break;
     case 'auth-mode': showAuth(authMode==='in'?'up':'in'); break;
@@ -5487,6 +5642,8 @@ document.addEventListener('toggle',e=>{ const d=e.target; if(d.classList&&d.clas
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='year') setYear(+t.value);
+  else if(t.id==='wipe-in'){ $('#wipe-btn').disabled=t.value.trim()!=='WIPE'; }
+  else if(t.id==='del-in'){ $('#del-btn').disabled=t.value.trim()!=='DELETE'; }
   else if(t.id==='ed-q'){ ed.query=t.value; queueLive(); $('#ed-results').innerHTML=results(); }
   else if(t.classList.contains('why-in')){ const s=ed.slots[+t.dataset.i]; if(s) s.why=t.value; }
   else if(t.id==='pk-q'){ pk.q=t.value; $('#pk-list').innerHTML=pickerList(); }
