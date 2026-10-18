@@ -3273,7 +3273,7 @@ const photo = (c,n) => state.photos[pkey(c,n)] || shared[pkey(c,n)] || AUTO.map[
 const cssUrl = u => String(u).replace(/'/g,'%27').replace(/[()"\\\s]/g, ch=>encodeURIComponent(ch));
 function art(name, cat, size, noh){
   const shape=CAT[cat]?.shape||'square', p=photo(cat,name);
-  if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${cssUrl(p.src)}')" role="img" aria-label="${esc(name)}"></span>`;
+  if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${cssUrl(dispSrc(cat,p.src))}')" role="img" aria-label="${esc(name)}"></span>`;
   return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
@@ -3307,7 +3307,7 @@ function emptyRow(i){ return `<li class="row empty"><span class="rk">${i+1}</spa
    A result is saved once to a shared table, so everyone after that gets it instantly. Your own uploads always win. */
 const AUTO = {map:{}, tried:new Set(), pending:[], flushT:null};
 const IMG_TIMEOUT = CFG.imgTimeout || 7000;
-const NOIMG_KEY = 'palate-noimg', NOIMG_DAYS = 14;
+const NOIMG_KEY = 'palate-noimg2', NOIMG_DAYS = 14;
 let noimg = {}; try{ noimg = JSON.parse(localStorage.getItem(NOIMG_KEY)||'{}'); }catch(e){}
 function rememberNone(k){ noimg[k]=Date.now(); try{ localStorage.setItem(NOIMG_KEY, JSON.stringify(noimg)); }catch(e){} }
 const recentNone = k => noimg[k] && (Date.now()-noimg[k] < NOIMG_DAYS*864e5);
@@ -3318,12 +3318,26 @@ const IMG_SRC = {
   movies:{i:'movie',w:'film'}, tv:{i:'tv',w:'TV series'}, anime:{a:'ANIME',w:'anime'}, kdramas:{w:'South Korean TV series'}, characters:{w:'character',sub:1}, musicals:{w:'musical'},
   celebrities:{w:''}, actors:{w:'actor'}, influencers:{w:''}, athletes:{w:''}, comedians:{w:'comedian'}, painters:{w:'painter'},
   games:{w:'video game'}, mobilegames:{i:'app',w:'video game'}, boardgames:{w:'game'}, pokemon:{w:'Pokémon'},
-  fastfood:{w:''}, restaurants:{w:'restaurant',sub:1}, cafes:{w:''}, snacks:{w:''}, drinks:{w:''}, cuisines:{w:'cuisine'}, desserts:{w:'dessert'}, icecream:{w:'ice cream flavor'}, breakfast:{w:''}, cereal:{w:'breakfast cereal'}, fruits:{w:'fruit'}, pizza:{w:'pizza topping'}, sauces:{w:'sauce'},
+  fastfood:{w:'restaurant chain',sub:1}, restaurants:{w:'restaurant',sub:1}, cafes:{w:'coffeehouse chain',sub:1}, snacks:{w:''}, drinks:{w:''}, cuisines:{w:'cuisine'}, desserts:{w:'dessert'}, icecream:{w:'ice cream flavor'}, breakfast:{w:''}, cereal:{w:'breakfast cereal'}, fruits:{w:'fruit'}, pizza:{w:'pizza topping'}, sauces:{w:'sauce'},
   countries:{w:'country'}, cities:{w:'city',sub:1}, themeparks:{w:'theme park'},
-  books:{o:1,w:'book'}, authors:{w:'author'}, manga:{a:'MANGA',w:'manga'}, podcasts:{w:'podcast'},
+  books:{o:1,w:'novel',sub:1}, authors:{w:'author'}, manga:{a:'MANGA',w:'manga'}, podcasts:{w:'podcast'},
   clubs:{w:'football club'}, teams:{w:''}, sports:{w:'sport'}, brands:{w:'brand'}, sneakers:{w:''}, fragrances:{w:'perfume'}, watches:{w:'watch'}, cars:{w:'car'}, tech:{w:''}, apps:{i:'app',w:'app'},
   hobbies:{w:'hobby'}, subjects:{w:'academic discipline'}, holidays:{w:'holiday'}, seasons:{w:'season'}, animals:{w:'animal'}, dogs:{w:'dog breed'}
 };
+const PERSON_CATS = new Set(['artists','celebrities','actors','influencers','athletes','comedians','painters','authors']);
+/* Wikipedia pages must describe the right kind of thing, so "Chipotle" the spice or "Hades" the god never beat the restaurant or the game. */
+const IMG_DESC = {
+  artists:/singer|rapper|musician|band|group|duo|trio|songwriter|producer|\bDJ\b|disc jockey|vocalist|composer|drummer|guitarist|pianist|performer|entertainer|recording artist|boy band|girl group|rock|pop|hip.?hop|r&b|k-pop/i,
+  games:/video game|game|franchise|series|software|roblox/i,
+  fastfood:/restaurant|fast.?food|chain|franchise|company|corporation|brand|pizzeria|bakery|caf[eé]|coffee|chicken|burger|sandwich|taco|mexican grill/i,
+  restaurants:/restaurant|chain|franchise|company|group|bistro|caf[eé]|steakhouse|pizzeria|diner|eatery|bar and grill|grill/i,
+  cafes:/coffee|caf[eé]|chain|company|bakery|tea|roaster|brand|franchise/i,
+  books:/novel|book|memoir|fiction|nonfiction|non-fiction|autobiography|biography|poem|play|series|fantasy|science fiction|self-help|story|stories|young adult|romance|thriller|epic|treatise|essay|trilogy|manual|guide/i,
+  brands:/company|brand|manufacturer|retailer|chain|corporation|label|conglomerate|maker|business|marque|fashion|house/i
+};
+const badImg = (c,u) => PERSON_CATS.has(c) && /logo|wordmark|\.svg|symbol|signature|autograph|emblem/i.test(u||'');
+/* Faces: Wikipedia portraits are often wide shots, so those are re-cropped around the most prominent part of the picture. */
+const dispSrc = (c,u) => (PERSON_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=400&h=400&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(u) : u;
 const normT = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim().replace(/^the /,'');
 const firstPart = sub => String(sub||'').split(/\s*[·\/]\s*/)[0];
 
@@ -3363,23 +3377,26 @@ async function robloxImage(c,n,sub){
 }
 async function wikiTitleImage(c,n){
   const cfg=IMG_SRC[c]||{}; if(!cfg.w) return null; await gate('wiki',120);
-  const game=c==='games'||c==='mobilegames';
-  const titles=[n+' ('+cfg.w+')', game?n+' (video game)':'', n].filter((v,i,a)=>v&&a.indexOf(v)===i).join('|');
-  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=400&pilicense=any&titles='+encodeURIComponent(titles));
-  const want=normT(n), STRICT=/^(video game|album|song|film|TV series|anime|manga|book|musical|podcast|game|app|South Korean TV series|character)$/.test(cfg.w);
-  const hits=Object.values((j.query&&j.query.pages)||{}).filter(pg=>pg.thumbnail && normT(pg.title)===want);
-  hits.sort((x,y)=>(/\(/.test(y.title)?1:0)-(/\(/.test(x.title)?1:0));   /* "Hades (video game)" beats the god "Hades" */
-  const best=hits.find(pg=>/\(/.test(pg.title)) || (STRICT?null:hits[0]);
+  const game=c==='games'||c==='mobilegames', book=c==='books';
+  const cands=[n+' ('+cfg.w+')', game?n+' (video game)':'', book?n+' (book)':'', book?n+' (memoir)':'', book?n+' (novel series)':'', n].filter((v,i,a)=>v&&a.indexOf(v)===i);
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&titles='+encodeURIComponent(cands.join('|')));
+  const want=normT(n), df=IMG_DESC[c], STRICT=/^(video game|album|song|film|TV series|anime|manga|book|novel|musical|podcast|game|app|South Korean TV series|character)$/.test(cfg.w);
+  const via=new Set(((j.query&&j.query.redirects)||[]).filter(r=>normT(r.from)===want).map(r=>r.to));   /* "1984" redirects to "Nineteen Eighty-Four" */
+  const hits=Object.values((j.query&&j.query.pages)||{}).filter(pg=>pg.thumbnail && !badImg(c,pg.thumbnail.source) && (normT(pg.title)===want || via.has(pg.title)) && (!df || df.test(pg.description||'')));
+  hits.sort((x,y)=>(/\(/.test(y.title)||via.has(y.title)?1:0)-(/\(/.test(x.title)||via.has(x.title)?1:0));   /* "Hades (video game)" beats the god "Hades" */
+  const best=hits.find(pg=>/\(/.test(pg.title)||via.has(pg.title)) || (STRICT&&!df?null:hits[0]);
   return best?best.thumbnail.source:null;
 }
 async function wikiImage(c,n,sub){
   const cfg=IMG_SRC[c]||{}; await gate('wiki',120);
   const q=[n, cfg.sub?sub:'', cfg.w].filter(Boolean).join(' ');
-  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
   const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
   const want=normT(n);
   const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh)$/;   /* "Nike, Inc." counts as "Nike" */
-  for(const pg of pages){ const t=normT(pg.title); if(!pg.thumbnail) continue;
+  const df=IMG_DESC[c];
+  for(const pg of pages){ const t=normT(pg.title); if(!pg.thumbnail || badImg(c,pg.thumbnail.source)) continue;
+    if(df){ if(df.test(pg.description||'') && (t===want || t.startsWith(want+' ') || want.startsWith(t+' '))) return pg.thumbnail.source; continue; }
     if(t===want || (t.startsWith(want+' ') && CORP.test(t.slice(want.length+1).split(' ')[0]))) return pg.thumbnail.source; }
   return wikiTitleImage(c,n);
 }
@@ -3400,10 +3417,12 @@ async function itunesImage(c,n,sub){
 async function anilistImage(c,n){
   const type=(IMG_SRC[c]||{}).a; if(!type) return null; await gate('anilist',800);
   const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
-    body:JSON.stringify({query:'query($s:String,$t:MediaType){Page(perPage:6){media(search:$s,type:$t,sort:SEARCH_MATCH){title{romaji english native}coverImage{large}}}}',variables:{s:n,t:type}})});
+    body:JSON.stringify({query:'query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,sort:SEARCH_MATCH){title{romaji english native}synonyms coverImage{large}}}}',variables:{s:n,t:type}})});
   if(!r.ok) throw new Error('http '+r.status);
   const list=((await r.json()).data||{}).Page?.media||[]; const want=normT(n);
-  for(const m of list){ const ts=[m.title.english,m.title.romaji,m.title.native].map(normT); if(m.coverImage && ts.includes(want)) return m.coverImage.large; }
+  const names=m=>[m.title.english,m.title.romaji,m.title.native,...(m.synonyms||[])].filter(Boolean).map(normT);
+  for(const m of list){ if(m.coverImage && names(m).includes(want)) return m.coverImage.large; }
+  for(const m of list){ if(m.coverImage && names(m).some(t=>t.startsWith(want+' '))) return m.coverImage.large; }   /* "Demon Slayer" -> "Demon Slayer: Kimetsu no Yaiba" */
   return null;
 }
 async function openLibImage(c,n,sub){
@@ -3424,10 +3443,11 @@ async function sampleTint(url){
   }
   return null;
 }
-async function resolveOne(c,n){
+async function resolveOne(c,n,subHint){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
-  const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||''; let url=null, src='', failed=false;
-  for(const [name,fn] of [['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['openlibrary',openLibImage],['roblox',robloxImage],['wikipedia',wikiImage]]){
+  const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
+  const order=[['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['wikipedia',wikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
+  for(const [name,fn] of order){
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
     if(url){ src=name; break; }
   }
@@ -3457,7 +3477,7 @@ function scheduleRerender(){ clearTimeout(rerenderT); rerenderT=setTimeout(funct
 function applyImg(c,n){
   const p=photo(c,n); if(!p) return;
   document.querySelectorAll('.art[data-n]:not(.photo)').forEach(el=>{ if(el.dataset.c===c && el.dataset.n===n){
-    el.classList.add('photo'); el.style.backgroundImage=`url('${cssUrl(p.src)}')`; el.textContent=''; el.setAttribute('role','img'); el.setAttribute('aria-label',n); el.removeAttribute('aria-hidden'); } });
+    el.classList.add('photo'); el.style.backgroundImage=`url('${cssUrl(dispSrc(c,p.src))}')`; el.textContent=''; el.setAttribute('role','img'); el.setAttribute('aria-label',n); el.removeAttribute('aria-hidden'); } });
   scheduleRerender();
 }
 function hydrate(){
@@ -3624,7 +3644,7 @@ function openEditor(c, flow){
 }
 function hl(n,q){ const i=n.toLowerCase().indexOf(q); if(i<0) return esc(n); return esc(n.slice(0,i))+'<mark>'+esc(n.slice(i,i+q.length))+'</mark>'+esc(n.slice(i+q.length)); }
 function resArt(it){
-  if(it.img){ const shape=CAT[ed.cat]?.shape||'square'; return `<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(it.img)}')" role="img" aria-label="${esc(it.n)}"></span>`; }
+  if(it.img){ const shape=CAT[ed.cat]?.shape||'square'; return `<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,it.img))}')" role="img" aria-label="${esc(it.n)}"></span>`; }
   return art(it.n,ed.cat,'sm',true);
 }
 function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}">${resArt(it)}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
@@ -3639,6 +3659,7 @@ const DESC_OK = {
   countries:/country|state in|republic|kingdom|island nation/i, cities:/city|town|capital|municipality|metropolis|borough|commune/i,
   brands:/company|brand|manufacturer|retailer|chain|corporation|label|conglomerate/i, pokemon:/pok[eé]mon/i, dogs:/dog breed|breed of/i,
   clubs:/football club|soccer club|association football|sports club/i, themeparks:/theme park|amusement park|water park|resort/i,
+  fastfood:/restaurant|fast.?food|chain|franchise|company|brand|mexican grill/i, restaurants:/restaurant|chain|bistro|grill|diner/i, cafes:/coffee|caf[eé]|chain|bakery/i,
   podcasts:/podcast/i, musicals:/musical/i, boardgames:/game/i, cars:/car|automobile|vehicle|sedan|suv|coupe|truck/i, sports:/sport|game/i
 };
 const LIVE = new Map();
@@ -3681,7 +3702,7 @@ async function liveSearch(c,q){
     await gate('wiki',120);
     const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=prefixsearch&gpslimit=10&gpsnamespace=0&prop=pageimages|description&piprop=thumbnail&pithumbsize=300&pilicense=any&gpssearch='+encodeURIComponent(q));
     const ok=DESC_OK[c], pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
-    for(const pg of pages){ if(!pg.thumbnail||/disambiguation|^list of/i.test((pg.description||'')+pg.title)) continue; if(ok && !ok.test(pg.description||'')) continue;
+    for(const pg of pages){ if(!pg.thumbnail||badImg(c,pg.thumbnail.source)||/disambiguation|^list of/i.test((pg.description||'')+pg.title)) continue; if(ok && !ok.test(pg.description||'')) continue;
       out.push({n:pg.title.replace(/\s*\([^)]*\)\s*$/,''),s:String(pg.description||'').replace(/^./,m=>m.toUpperCase()).slice(0,48),img:pg.thumbnail.source,full:pg.thumbnail.source,src:'wikipedia'}); }
   }
   return out.slice(0,8);
@@ -3764,7 +3785,11 @@ function addItem(it){
   let k=ed.slots.findIndex((s,i)=>i<5&&!s); if(k<0) k=ed.slots.findIndex((s,i)=>i>=5&&!s);
   if(k<0){ toast('Full. Remove one first.'); return; }
   ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; ed.live=[]; ed.liveQ='';
-  if(it.full && !photo(ed.cat,it.n)) adoptImage(ed.cat,it.n,it.full,it.src||'live').catch(()=>{});   /* the photo loads now, because you picked it */
+  if(!photo(ed.cat,it.n)){                                                                     /* the photo loads now, because you picked it */
+    const cat=ed.cat;
+    if(cat==='books'){ resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); }); }
+    else if(it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{});
+  }
   renderEditor();
   setTimeout(()=>$('#ed-q')?.focus(),20);
 }
