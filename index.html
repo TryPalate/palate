@@ -122,6 +122,12 @@ button,select,input,textarea{font:inherit;color:inherit}
 .art b{font-weight:700;font-size:calc(var(--ht) * .32);letter-spacing:-.03em;text-transform:uppercase}
 .sh-round{border-radius:50%}
 .art.photo.sh-round{background-position:50% 22%}
+.alt-panel{grid-column:1/-1;background:var(--raise);border-radius:14px;padding:10px 12px;margin-top:8px}
+.alt-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}
+.alt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
+.alt-opt{background:none;border:0;padding:4px;border-radius:12px;cursor:pointer;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.alt-opt:hover{background:var(--card)}
+.alt-opt small{font-size:11.5px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sz-row{--w:52px;--ht:52px}.sz-row.sh-poster{--w:38px;--ht:54px}.sz-row.sh-wide{--w:58px;--ht:42px}
 .sz-sm{--w:38px;--ht:38px}.sz-sm.sh-poster{--w:28px;--ht:40px}.sz-sm.sh-wide{--w:44px;--ht:32px}
 .sz-lg{--w:180px;--ht:180px;border-radius:14px}.sz-lg.sh-poster{--w:140px;--ht:200px}.sz-lg.sh-wide{--w:220px;--ht:150px}.sz-lg.sh-round{border-radius:50%}
@@ -4686,6 +4692,7 @@ const IMG_DESC = {
   restaurants:/restaurant|chain|franchise|company|group|bistro|caf[eé]|steakhouse|pizzeria|diner|eatery|bar and grill|grill/i,
   cafes:/coffee|caf[eé]|chain|company|bakery|tea|roaster|brand|franchise/i,
   books:/novel|book|memoir|fiction|nonfiction|non-fiction|autobiography|biography|poem|play|series|fantasy|science fiction|self-help|story|stories|young adult|romance|thriller|epic|treatise|essay|trilogy|manual|guide/i,
+  actors:/actor|actress|film|television|filmmaker|performer|presenter|comedian|singer|entertainer|model/i, comedians:/comedian|humorist|actor|writer|presenter|entertainer/i,
   brands:/company|brand|manufacturer|retailer|chain|corporation|label|conglomerate|maker|business|marque|fashion|house/i,
   cocktails:/cocktail|drink|beverage|highball|shot/i, aircraft:/aircraft|airliner|fighter|bomber|jet|helicopter|airplane|plane|airship|transport|spaceplane|reconnaissance|attack/i,
   civilizations:/civili[sz]ation|empire|kingdom|dynasty|culture|ancient|people|period|state|republic|city.?state|caliphate/i, dinosaurs:/dinosaur|theropod|sauropod|ceratops|genus|reptile|pterosaur/i,
@@ -4764,6 +4771,29 @@ async function nativeWikiImage(c,n,sub){
   for(const pg of Object.values((j.query&&j.query.pages)||{})) if(pg.thumbnail && !badImg(c,pg.thumbnail.source)) return pg.thumbnail.source;
   return null;
 }
+/* Every candidate picture we can find for a name, so you can choose the right one yourself. */
+async function altCandidates(c,n,sub){
+  const cfg=IMG_SRC[c]||{}; const out=[], seen=new Set();
+  const add=(img,full,label)=>{ if(!img||seen.has(full||img)||badImg(c,full||img)) return; seen.add(full||img); out.push({img,full:full||img,label}); };
+  const nat=natives(n,sub)[0];
+  const jobs=[
+    liveSearch1(c,n).then(r=>r.forEach(x=>add(x.img,x.full,[x.n,x.s].filter(Boolean).join(' · ')))).catch(()=>{}),
+    (async()=>{ await gate('wiki',120);
+      const q=[n,cfg.sub?firstPart(sub):'',cfg.w].filter(Boolean).join(' ');
+      const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
+      Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail) add(pg.thumbnail.source,pg.thumbnail.source,[pg.title,pg.description].filter(Boolean).join(' · ')); }); })().catch(()=>{}),
+    nat && LANG_OF(nat) ? (async()=>{ const x=await nativeWikiImage(c,n,sub); if(x) add(x,x,nat); })().catch(()=>{}) : null
+  ].filter(Boolean);
+  await Promise.all(jobs);
+  const exact=x=>x.label.split(' · ')[0].toLowerCase()===String(n).toLowerCase()?0:1;
+  return out.sort((a,b)=>exact(a)-exact(b)).slice(0,12);   /* the page named exactly like the item comes first */
+}
+function altPanel(){
+  const a=ed.alt; if(!a) return '';
+  const body = !a.list ? '<p class="muted">Looking for pictures…</p>' : !a.list.length ? '<p class="muted">Nothing else found. Tap the picture to upload your own.</p>'
+    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.label.split(' · ')[0])}</small></button>`).join('')}</div>`;
+  return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div>${body}</div>`;
+}
 async function wikiTitleImage(c,n){
   const cfg=IMG_SRC[c]||{}; if(!cfg.w) return null; await gate('wiki',120);
   const game=c==='games'||c==='mobilegames', book=c==='books';
@@ -4784,6 +4814,7 @@ async function wikiImage(c,n,sub){
   const want=normT(n);
   const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh)$/;   /* "Nike, Inc." counts as "Nike" */
   const df=IMG_DESC[c];
+  if(PERSON_CATS.has(c)){ const ex=pages.find(pg=>pg.thumbnail && !badImg(c,pg.thumbnail.source) && pg.title.toLowerCase()===String(n).toLowerCase() && (!df||df.test(pg.description||''))); if(ex) return ex.thumbnail.source; }
   for(const pg of pages){ const t=normT(pg.title); if(!pg.thumbnail || badImg(c,pg.thumbnail.source)) continue;
     if(df){ if(df.test(pg.description||'') && (t===want || t.startsWith(want+' ') || t.endsWith(' '+want) || want.startsWith(t+' '))) return pg.thumbnail.source; continue; }
     if(t===want || (t.startsWith(want+' ') && CORP.test(t.slice(want.length+1).split(' ')[0]))) return pg.thumbnail.source; }
@@ -5183,9 +5214,9 @@ function slotRow(i){
   const it=ed.slots[i], label=i<5?String(i+1):'·';
   if(!it) return `<li class="slot empty dz-item" data-slot="${i}"><span class="rk">${label}</span><span>Empty</span></li>`;
   const p=photo(ed.cat,it.n);
-  return `<li class="slot dz-item" data-slot="${i}"><span class="rk">${label}</span>${photoBtn(ed.cat,it.n,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${p?`<button type="button" class="linkish" data-act="photo-rm" data-n="${esc(it.n)}">Remove photo</button>`:''}</div>
+  return `<li class="slot dz-item" data-slot="${i}"><span class="rk">${label}</span>${photoBtn(ed.cat,it.n,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${p?`<button type="button" class="linkish" data-act="photo-rm" data-n="${esc(it.n)}">Remove photo</button> `:''}<button type="button" class="linkish" data-act="alt-photo" data-n="${esc(it.n)}">Wrong photo?</button></div>
     <div class="ctl"><button type="button" class="ib" data-act="rm" data-i="${i}" aria-label="Remove ${esc(it.n)}">✕</button>${grip(it.n)}</div>
-    ${i<5?`<textarea class="why-in" id="why-${i}" data-i="${i}" rows="1" aria-label="Why ${esc(it.n)}" placeholder="Why this one? (optional)">${esc(it.why||'')}</textarea>`:''}</li>`;
+    ${i<5?`<textarea class="why-in" id="why-${i}" data-i="${i}" rows="1" aria-label="Why ${esc(it.n)}" placeholder="Why this one? (optional)">${esc(it.why||'')}</textarea>`:''}${ed.alt&&ed.alt.n===it.n?altPanel():''}</li>`;
 }
 function nextCat(){ const free=c=>!eff(c.id,CURRENT) && c.id!==ed?.cat; return (CATS.find(c=>c.popular&&free(c))||CATS.find(free))?.id; }
 function renderEditor(){
@@ -5397,6 +5428,12 @@ document.addEventListener('click',e=>{
     case 'compare': ui.tab='friends'; ui.compare=el.dataset.f; render(); window.scrollTo(0,0); break;
     case 'back-friends': ui.compare=null; render(); break;
     case 'year-now': $('#year').value=CURRENT; setYear(CURRENT); break;
+    case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
+      altCandidates(cat,n,it.s).then(list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n){ ed.alt.list=list; renderEditor(); } }).catch(()=>{ if(ed&&ed.alt){ ed.alt.list=[]; renderEditor(); } }); break; }
+    case 'alt-close': ed.alt=null; renderEditor(); break;
+    case 'alt-pick': { const x=ed.alt&&ed.alt.list&&ed.alt.list[+el.dataset.i]; if(!x) break; const k=pkey(ed.cat,ed.alt.n), old=state.photos[k];
+      state.photos[k]={src:x.full,h:hue(ed.alt.n),s:34}; if(old) dropFile(old.src); const cat=ed.cat, n=ed.alt.n; ed.alt=null; save(); render(); renderEditor(); toast('Photo changed');
+      sampleTint(x.full).then(tn=>{ if(tn && state.photos[k] && state.photos[k].src===x.full){ state.photos[k].h=tn.h; state.photos[k].s=tn.s; save(); render(); } }); break; }
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
