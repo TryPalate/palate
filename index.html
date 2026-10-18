@@ -94,6 +94,24 @@ button,select,input,textarea{font:inherit;color:inherit}
 .meta{display:flex;align-items:center;gap:8px;flex:none;color:var(--muted);font-size:12.5px}
 .vis{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);background:rgb(0 0 0 / .18);padding:3px 8px;border-radius:999px}
 .vis svg{width:11px;height:11px}
+.card-share{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:50%;background:rgb(255 255 255 / .12);color:inherit;cursor:pointer;padding:0}
+.card-share svg{width:16px;height:16px}.card-share:hover{background:rgb(255 255 255 / .22)}
+#story-root{position:fixed;inset:0;z-index:200}
+.sty-view{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.story-x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgb(255 255 255 / .16);color:#fff;font-size:17px;cursor:pointer}
+.story-stage{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center}
+.story-stage img{max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;border-radius:22px;box-shadow:0 20px 60px rgb(0 0 0 / .5);transition:opacity .2s}
+.busy .story-stage img{opacity:.35}
+.story-busy{position:absolute;color:#fff;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}.busy .story-busy{opacity:1}
+.story-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:480px;flex-wrap:wrap}
+.story-sw{display:flex;align-items:center;gap:10px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;user-select:none}
+.story-sw.off{opacity:.45;cursor:not-allowed}
+.story-sw input{position:absolute;opacity:0;pointer-events:none}
+.story-sw .knob{width:44px;height:26px;border-radius:13px;background:rgb(255 255 255 / .25);position:relative;transition:background .15s}
+.story-sw .knob::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.story-sw input:checked+.knob{background:var(--good)}.story-sw input:checked+.knob::after{transform:translateX(18px)}
+.story-sw input:focus-visible+.knob{outline:2px solid #fff;outline-offset:2px}
+.story-actions{display:flex;gap:8px}.story-hint{margin:0;color:rgb(255 255 255 / .6);font-size:13px;min-height:16px;text-align:center}
 .stack{display:flex}
 .nm .fr-tag{display:inline-flex;align-items:center;gap:5px;margin:0;overflow:visible;white-space:nowrap;font-size:12px;color:var(--muted);text-overflow:clip}
 .nm .fr-tag .av{display:grid;place-items:center;width:20px;height:20px;font-size:8.5px;margin:0;border:0;overflow:visible;white-space:nowrap}
@@ -345,6 +363,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 const CURRENT = new Date().getFullYear();
 const yy = y => "'" + String(y).slice(2);
 const LOCK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 7V5a4 4 0 1 1 8 0v2h1v8H3V7h1Zm2 0h4V5a2 2 0 1 0-4 0v2Z"/></svg>';
+const SHARE_ICON = '<svg viewBox="0 0 20 20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M10 12.5V3m0 0L6.5 6.5M10 3l3.5 3.5M5 10v5.5A1.5 1.5 0 0 0 6.5 17h7a1.5 1.5 0 0 0 1.5-1.5V10"/></svg>';
 const PEOPLE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5.5 8a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Zm5.5 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4ZM0 14c0-2.5 2.5-4.5 5.5-4.5S11 11.5 11 14H0Zm12 0c0-1.6-.6-3-1.6-4 2.9 0 5.6 1.6 5.6 4h-4Z"/></svg>';
 
 /* ---------- Categories (photo: people usually add their own photo) ---------- */
@@ -5000,30 +5019,51 @@ async function heroFilmImage(c,n){
   const p=await filmPosters(film); return p?p.full:null;
 }
 /* Logos: the logo file on the company's Wikipedia page, shown in a circle. Never a photo of a storefront. */
+async function commonsInfo(host,titles){   /* File: titles -> picture URLs on upload.wikimedia.org */
+  if(!titles.length) return {};
+  const ii=await getJSON('https://'+host+'/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&iiurlwidth=300&titles='+encodeURIComponent(titles.join('|')));
+  const by={}; for(const p of Object.values((ii.query&&ii.query.pages)||{})){ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) by[String(p.title).replace(/_/g,' ')]=u; }
+  return by;
+}
 async function logoFiles(c,n,sub){
   if(!LOGO_CATS.has(c)) return []; await gate('wiki',120);
-  const cfg=IMG_SRC[c]||{}, q=[n,cfg.sub?sub:'',cfg.w].filter(Boolean).join(' '), want=normT(n), df=IMG_DESC[c];
-  const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh|fc|afc|cf)$/;
-  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description&gsrsearch='+encodeURIComponent(q));
-  const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
-  let pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); });
-  if(!pg){ const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=description&titles='+encodeURIComponent(n));
-    pg=Object.values((t.query&&t.query.pages)||{}).find(p=>p.pageid && (!df||df.test(p.description||''))); }
-  if(!pg) return [];
-  const im=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&imlimit=60&titles='+encodeURIComponent(pg.title));
-  const files=[]; for(const p of Object.values((im.query&&im.query.pages)||{})) for(const f of (p.images||[])) files.push(f.title);
-  const tokens=want.split(' ').filter(x=>x.length>2);
-  const JUNK=/\b(flag|map|commons|wikimedia|wikiquote|wikidata|ambox|edit|question|folder|padlock|increase|decrease|steady|symbol support|portal|stub|crystal|nuvola)\b/i;
-  const OLD=/\b(old|former|history|historic|protest|store|building|headquarters|stadium|truck|plane|aircraft|livery|boycott|interior|exterior|menu|food|drive.?thru)\b/i;
-  const cands=files.filter(f=>/\.(svg|png|jpg|jpeg)$/i.test(f) && !JUNK.test(f) && !OLD.test(f));
-  const scored=cands.map(f=>{ const fn=normT(f.replace(/^File:/i,'').replace(/\.[a-z]+$/i,'')); const hasName=tokens.length&&tokens.every(t=>fn.includes(t)), isLogo=LOGO_NAME.test(f);
-      return {f,sc:(hasName?4:0)+(isLogo?3:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\b(19[0-9]\d|200\d)\b/.test(f)?-1:0)+(/\b(202\d)\b/.test(f)?0.5:0)}; })
-    .filter(x=>x.sc>=4 || (x.sc>=3&&LOGO_NAME.test(x.f)))   /* the company's name in the file name, or a file called logo/icon/symbol */
-    .sort((a,b)=>b.sc-a.sc).slice(0,5);
-  if(!scored.length) return [];
-  const ii=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&iiurlwidth=300&titles='+encodeURIComponent(scored.map(x=>x.f).join('|')));
-  const by={}; for(const p of Object.values((ii.query&&ii.query.pages)||{})){ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) by[p.title]=u; }
-  return scored.map(x=>({url:by[x.f]||by[x.f.replace(/_/g,' ')],label:pg.title+' · '+x.f.replace(/^File:/i,'')})).filter(x=>x.url);
+  const cfg=IMG_SRC[c]||{}, want=normT(n), df=IMG_DESC[c], tokens=want.split(' ').filter(x=>x.length>2);
+  const JUNK=/\b(flag|map|commons|wikimedia|wikiquote|wikidata|ambox|edit|question|folder|padlock|increase|decrease|steady|portal|stub|crystal|nuvola)\b/i;
+  const OLD=/\b(old|former|history|historic|protest|store|building|headquarters|stadium|truck|plane|aircraft|livery|boycott|interior|exterior|menu|food|drive.?thru|restaurant)\b/i;
+  const out=[], seen=new Set(); const add=(url,label)=>{ if(url&&!seen.has(url)){ seen.add(url); out.push({url,label}); } };
+  const fileOk=f=>/\.(svg|png|jpg|jpeg)$/i.test(f) && !JUNK.test(f) && !OLD.test(f);
+  const score=f=>{ const fn=normT(String(f).replace(/^File:/i,'').replace(/\.[a-z]+$/i,'')); return (tokens.length&&tokens.every(t=>fn.includes(t))?4:0)+(LOGO_NAME.test(f)?3:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\b(19[0-9]\d|200\d)\b/.test(f)?-1:0)+(/\b202\d\b/.test(f)?.5:0); };
+  const good=f=>fileOk(f) && score(f)>=4;
+  /* 1. find the Wikipedia page */
+  let pg=null;
+  try{
+    const q=[n,cfg.sub?sub:'',cfg.w].filter(Boolean).join(' ');
+    const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description|pageprops&ppprop=wikibase_item&gsrsearch='+encodeURIComponent(q));
+    const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+    pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); })||null;
+    if(!pg){ const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=description|pageprops&ppprop=wikibase_item&titles='+encodeURIComponent(n));
+      pg=Object.values((t.query&&t.query.pages)||{}).find(p=>p.pageid && (!df||df.test(p.description||'')))||null; }
+  }catch(e){}
+  /* 2. Wikidata's "logo image" for that page: the cleanest source */
+  try{
+    const qid=pg&&pg.pageprops&&pg.pageprops.wikibase_item;
+    if(qid){ const w=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity='+qid+'&property=P154');
+      const names=((w.claims||{}).P154||[]).map(x=>x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value).filter(Boolean).map(v=>'File:'+v).filter(f=>!JUNK.test(f)).slice(0,3);
+      const by=await commonsInfo('commons.wikimedia.org',names); names.forEach(f=>add(by[f],(pg.title)+' · '+f.replace(/^File:/i,''))); }
+  }catch(e){}
+  /* 3. logo files used on the page itself */
+  try{
+    if(pg){ const im=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&imlimit=500&titles='+encodeURIComponent(pg.title));
+      const files=[]; for(const p of Object.values((im.query&&im.query.pages)||{})) for(const f of (p.images||[])) files.push(f.title);
+      const top=files.filter(good).sort((a,b)=>score(b)-score(a)).slice(0,4);
+      const by=await commonsInfo('en.wikipedia.org',top); top.forEach(f=>add(by[f],pg.title+' · '+f.replace(/^File:/i,''))); }
+  }catch(e){}
+  /* 4. search Wikimedia Commons directly for "<name> logo" */
+  if(!out.length){ try{
+    const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url&iiurlwidth=300&gsrsearch='+encodeURIComponent(n+' logo'));
+    Object.values((j.query&&j.query.pages)||{}).filter(p=>good(p.title)&&LOGO_NAME.test(p.title)).sort((a,b)=>score(b.title)-score(a.title)).slice(0,4).forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,p.title.replace(/^File:/i,'')); });
+  }catch(e){} }
+  return out.slice(0,6);
 }
 async function logoImage(c,n,sub){ const l=await logoFiles(c,n,sub); return l[0]?l[0].url:null; }
 /* Fictional characters: AniList has a close-up portrait for most anime and manga characters. */
@@ -5155,7 +5195,7 @@ function shelfCard(c,y,view){
   const s=eff(c,y).snap, prev=prevFor(c,y), fs=shelfSharers(c,s);
   const rows=s.top.slice(0,5).map((it,i)=>row(it,i,c,prev)).join('');   /* only the picks you made, no empty slots */
   return `<article class="card tap" style="${tint(c,s.top[0].n)}" role="button" tabindex="0" data-act="open" data-cat="${c}" aria-label="${esc(CAT[c].name)}">
-    <div class="card-head"><h2>${esc(CAT[c].name)}</h2><div class="meta">${view==='me'?visTag(c):''}${fs.length?`<span class="stack" title="Friends who share picks here">${fs.slice(0,3).map(f=>av(f)).join('')}</span>`:''}</div></div>
+    <div class="card-head"><h2>${esc(CAT[c].name)}</h2><div class="meta">${view==='me'?visTag(c):''}${view==='me'?`<button class="card-share" data-act="share" data-cat="${c}" aria-label="Share ${esc(CAT[c].name)} as a picture" title="Share as a picture">${SHARE_ICON}</button>`:''}${fs.length?`<span class="stack" title="Friends who share picks here">${fs.slice(0,3).map(f=>av(f)).join('')}</span>`:''}</div></div>
     <ol class="rows">${rows}</ol>
     <p class="also">${s.hm.length?'Also · '+s.hm.map(h=>esc(h.n)).join(', '):''}</p>
   </article>`;
@@ -5173,7 +5213,7 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv()}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div></div>
+    <div class="who">${meAv()}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
       ${minYear()<CURRENT?`<div class="years"><label for="year" class="vh">Year</label><input type="range" id="year" min="${minYear()}" max="${CURRENT}" step="1" value="${y}" aria-valuetext="${y}"><output id="year-out" for="year">${y}</output></div>`:''}
@@ -5277,51 +5317,120 @@ function closeSheet(){ $('#sheet-root').innerHTML=''; document.body.style.overfl
 function frTags(c){ return it=>{ const sh=sharers(c,it.n); return (sh.length?`<div class="also-fr">${sh.map(x=>`<span class="fr-tag">${av(x.f)}${esc(first(x.f))} ${x.label}</span>`).join('')}</div>`:'') + (it.why?`<p class="why">${esc(it.why)}</p>`:''); }; }
 function photoBtn(c,n,size){ return `<button type="button" class="art-btn" data-act="photo" data-cat="${c}" data-n="${esc(n)}" aria-label="${photo(c,n)?'Change':'Add'} photo for ${esc(n)}">${art(n,c,size)}<span class="hint">${photo(c,n)?'Edit':'+ Photo'}</span></button>`; }
 
-let shareBlob=null, shareUrl=null;
-async function shareImg(url,c){
-  const tries=[dispSrc(c,url), 'https://wsrv.nl/?w=300&h=300&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(url)];
+/* ---------- Story pictures: 1080x1920 (Instagram story size), in the style of Apple Music Replay ---------- */
+const SW=1080, SH=1920;
+let sty=null;
+const notesPref = () => { try{ return localStorage.getItem('palate-story-notes')!=='0'; }catch(e){ return true; } };
+function fitText(ctx,t,max){ t=String(t||''); if(ctx.measureText(t).width<=max) return t; while(t.length>1 && ctx.measureText(t+'…').width>max) t=t.slice(0,-1); return t.trimEnd()+'…'; }
+function wrapLines(ctx,t,max,maxLines){
+  const words=String(t||'').split(/\s+/).filter(Boolean), lines=[]; let cur='';
+  for(const w of words){ const nx=cur?cur+' '+w:w; if(ctx.measureText(nx).width<=max) cur=nx; else { if(cur) lines.push(cur); cur=w; } }
+  if(cur) lines.push(cur);
+  if(lines.length>maxLines){ const keep=lines.slice(0,maxLines); keep[maxLines-1]=fitText(ctx,lines.slice(maxLines-1).join(' '),max); return keep; }
+  return lines;
+}
+function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+async function storyImg(c,p){
+  if(!p) return null;
+  const tries=[...new Set([dispSrc(c,p.src),'https://wsrv.nl/?w=500&h=500&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(p.src)])];
   for(const t of tries){ try{ return await loadImg(t); }catch(e){} } return null;
 }
-function fitText(ctx,t,max){ t=String(t||''); if(ctx.measureText(t).width<=max) return t; while(t.length>1 && ctx.measureText(t+'…').width>max) t=t.slice(0,-1); return t+'…'; }
-function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-async function makeShareImage(c){
-  const y=ui.year, e=eff(c,y); if(!e) return null; const top=e.snap.top.slice(0,5);
-  const W=1080, H=1350, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
-  const font=getComputedStyle(document.body).fontFamily||'system-ui,sans-serif';
-  const p0=photo(c,top[0].n), h=p0?p0.h:hue(top[0].n);
-  const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,`hsl(${h} 42% 24%)`); g.addColorStop(1,'#0c0c0e'); x.fillStyle=g; x.fillRect(0,0,W,H);
-  x.fillStyle='rgba(255,255,255,.9)'; x.font=`800 44px ${font}`; x.textBaseline='alphabetic'; x.fillText('palate',70,100);
-  x.textAlign='right'; x.fillStyle='rgba(255,255,255,.55)'; x.font=`600 32px ${font}`; x.fillText(String(y),W-70,100); x.textAlign='left';
-  x.fillStyle='#fff'; x.font=`800 84px ${font}`; x.fillText(fitText(x,CAT[c].name,W-140),70,230);
-  x.fillStyle='rgba(255,255,255,.6)'; x.font=`500 34px ${font}`; x.fillText(`${state.name}'s top ${top.length}`,70,285);
-  const imgs=await Promise.all(top.map(it=>{ const p=photo(c,it.n); return p?shareImg(p.src,c):Promise.resolve(null); }));
-  const rowH=Math.min(172,Math.floor(900/Math.max(top.length,1))), art=rowH-32, y0=345, shape=CAT[c].shape;
-  top.forEach((it,i)=>{
-    const ry=y0+i*rowH, ax=150, ay=ry+8;
-    x.fillStyle='rgba(255,255,255,.5)'; x.font=`700 54px ${font}`; x.textAlign='center'; x.fillText(String(i+1),95,ay+art/2+18); x.textAlign='left';
-    x.save(); if(shape==='round'){ x.beginPath(); x.arc(ax+art/2,ay+art/2,art/2,0,Math.PI*2); x.closePath(); } else rr(x,ax,ay,art,art,22); x.clip();
-    const im=imgs[i];
-    if(im){ const m=Math.min(im.naturalWidth,im.naturalHeight), sx=(im.naturalWidth-m)/2, sy=shape==='round'?(im.naturalHeight-m)*.22:(im.naturalHeight-m)/2; x.drawImage(im,sx,sy,m,m,ax,ay,art,art); }
-    else { x.fillStyle=`hsl(${hue(it.n)} 45% 40%)`; x.fillRect(ax,ay,art,art); x.fillStyle='rgba(255,255,255,.9)'; x.font=`700 ${Math.round(art/3)}px ${font}`; x.textAlign='center'; x.fillText(initials(it.n),ax+art/2,ay+art/2+art/9); x.textAlign='left'; }
-    x.restore();
-    const tx=ax+art+34, mw=W-tx-70;
-    x.fillStyle='#fff'; x.font=`700 46px ${font}`; x.fillText(fitText(x,it.n,mw),tx,ay+art/2-4);
-    x.fillStyle='rgba(255,255,255,.55)'; x.font=`500 30px ${font}`; x.fillText(fitText(x,it.s||'',mw),tx,ay+art/2+40);
+function drawArt(x,im,name,c,cx,ay,shape,H){
+  const aw = shape==='wide'?Math.round(H*1.5) : shape==='poster'?Math.round(H*.67) : H, ax=cx-aw/2;
+  x.save(); x.beginPath(); if(shape==='round') x.arc(ax+aw/2,ay+H/2,aw/2,0,Math.PI*2); else rr(x,ax,ay,aw,H,shape==='poster'?18:26); x.clip();
+  if(im){ const ar=aw/H, ir=im.naturalWidth/im.naturalHeight; let sw,sh; if(ir>ar){ sh=im.naturalHeight; sw=sh*ar; } else { sw=im.naturalWidth; sh=sw/ar; }
+    const face=PERSON_CATS.has(c)||c==='characters'; x.drawImage(im,(im.naturalWidth-sw)/2,face?(im.naturalHeight-sh)*.18:(im.naturalHeight-sh)/2,sw,sh,ax,ay,aw,H); }
+  else { const g=x.createLinearGradient(ax,ay,ax+aw,ay+H); g.addColorStop(0,`hsl(${hue(name)} 50% 46%)`); g.addColorStop(1,`hsl(${(hue(name)+40)%360} 45% 30%)`); x.fillStyle=g; x.fillRect(ax,ay,aw,H);
+    x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 ${Math.round(H/3)}px ${sty.font}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(initials(name),ax+aw/2,ay+H/2+3); x.textAlign='left'; x.textBaseline='alphabetic'; }
+  x.restore();
+  x.save(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=2; x.beginPath(); if(shape==='round') x.arc(ax+aw/2,ay+H/2,aw/2-1,0,Math.PI*2); else rr(x,ax+1,ay+1,aw-2,H-2,shape==='poster'?18:26); x.stroke(); x.restore();
+}
+function drawStoryBg(x,h1,h2){
+  x.fillStyle='#09090b'; x.fillRect(0,0,SW,SH);
+  const g=x.createLinearGradient(0,0,0,SH); g.addColorStop(0,`hsl(${h1} 30% 8%)`); g.addColorStop(.55,`hsl(${h1} 34% 16%)`); g.addColorStop(1,`hsl(${h2} 38% 22%)`); x.fillStyle=g; x.fillRect(0,0,SW,SH);
+  let r=x.createRadialGradient(SW*.95,SH*.88,0,SW*.95,SH*.88,SW*1.05); r.addColorStop(0,`hsla(${(h2+25)%360},60%,44%,.5)`); r.addColorStop(1,`hsla(${h2},60%,40%,0)`); x.fillStyle=r; x.fillRect(0,0,SW,SH);
+  r=x.createRadialGradient(SW*.05,SH*.3,0,SW*.05,SH*.3,SW*.9); r.addColorStop(0,`hsla(${h1},55%,40%,.28)`); r.addColorStop(1,`hsla(${h1},55%,40%,0)`); x.fillStyle=r; x.fillRect(0,0,SW,SH);
+}
+function drawHeader(x,yr,font){
+  x.fillStyle='#fff'; x.font=`800 54px ${font}`; x.textAlign='left'; x.fillText('palate',90,262);
+  const w=x.measureText('palate').width; x.fillStyle='rgba(255,255,255,.6)'; x.font=`700 54px ${font}`; x.fillText('’'+String(yr).slice(2),90+w+8,262);
+  x.font=`700 38px ${font}`; const nm=fitText(x,state.name,330), tw=x.measureText(nm).width, r=30, cxp=SW-90-tw-18-r;
+  const hh=hue(state.name), g=x.createLinearGradient(cxp-r,230,cxp+r,290); g.addColorStop(0,`hsl(${hh} 65% 58%)`); g.addColorStop(1,`hsl(${(hh+50)%360} 55% 42%)`);
+  x.fillStyle=g; x.beginPath(); x.arc(cxp,258,r,0,Math.PI*2); x.fill();
+  x.fillStyle='#fff'; x.font=`700 30px ${font}`; x.textAlign='center'; x.fillText((state.name[0]||'?').toUpperCase(),cxp,269); x.textAlign='left';
+  x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 38px ${font}`; x.fillText(nm,SW-90-tw,271);
+}
+function drawRows(x,rows,font,notes,y0,avail){
+  const n=rows.length, rowH=Math.min(250,Math.floor(avail/Math.max(n,1))), H=Math.min(172,rowH-44);
+  rows.forEach((r,i)=>{
+    const ry=y0+i*rowH, shape=r.shape, cx=shape==='wide'?260:shape==='poster'?218:230, aw=shape==='wide'?Math.round(H*1.5):shape==='poster'?Math.round(H*.67):H, tx=Math.max(cx+aw/2,230+H/2)+44, mw=SW-tx-80;
+    x.fillStyle='rgba(255,255,255,.72)'; x.font=`700 66px ${font}`; x.textAlign='center'; x.textBaseline='middle'; if(r.rank) x.fillText(String(r.rank),110,ry+rowH/2+2); x.textAlign='left'; x.textBaseline='alphabetic';
+    drawArt(x,r.im,r.n,r.c,cx,ry+(rowH-H)/2,shape,H);
+    x.font=`700 54px ${font}`; const name=fitText(x,r.n,mw);
+    x.font=`500 34px ${font}`; const sub=r.s?fitText(x,r.s,mw):'';
+    let lines=[]; if(notes&&r.why){ x.font=`italic 500 32px ${font}`; lines=wrapLines(x,'“'+r.why+'”',mw,2); }
+    const bh=54+(sub?46:0)+(lines.length?lines.length*40+12:0); let ty=ry+(rowH-bh)/2+46;
+    x.fillStyle='#fff'; x.font=`700 54px ${font}`; x.fillText(name,tx,ty); ty+=44;
+    if(sub){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`500 34px ${font}`; x.fillText(sub,tx,ty); ty+=12; }
+    if(lines.length){ x.fillStyle='rgba(255,255,255,.82)'; x.font=`italic 500 32px ${font}`; ty+=(sub?24:12); lines.forEach((l,k)=>x.fillText(l,tx,ty+k*40)); }
   });
-  x.textAlign='center'; x.fillStyle='rgba(255,255,255,.55)'; x.font=`600 30px ${font}`;
-  x.fillText('Rank yours with friends · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),W/2,H-60); x.textAlign='left';
+}
+async function makeStory(){
+  const st=sty, y=ui.year===undefined?CURRENT:ui.year, font=st.font=(getComputedStyle(document.body).fontFamily||'system-ui,sans-serif');
+  try{ await document.fonts.ready; }catch(e){}
+  const cv=document.createElement('canvas'); cv.width=SW; cv.height=SH; const x=cv.getContext('2d');
+  let rows, title, subtitle, also='', h1, h2, yr=CURRENT;
+  if(st.kind==='shelf'){
+    const c=st.cat, e=eff(c,y); if(!e) return null; yr=e.year===undefined?y:y; const top=e.snap.top.slice(0,5);
+    rows=top.map((it,i)=>({n:it.n,s:it.s,why:it.why,c,shape:CAT[c].shape,rank:i+1,p:photo(c,it.n)}));
+    title=CAT[c].name; subtitle=`${state.name}’s top ${top.length}`; if(e.snap.hm.length) also='Also · '+e.snap.hm.map(h=>h.n).join(', ');
+  } else {
+    const list=shelfList(CURRENT,'friends').slice(0,6);
+    rows=list.map(c=>{ const it=eff(c,CURRENT).snap.top[0]; return {n:it.n,s:CAT[c].name+' · #1',why:it.why,c,shape:CAT[c].shape,rank:0,p:photo(c,it.n)}; });
+    title='Top picks'; subtitle=`${shelfList(CURRENT,'friends').length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}`;
+  }
+  const hasNotes=rows.some(r=>r.why); st.hasNotes=hasNotes;
+  rows.forEach(r=>{ r.im=null; }); await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); }));
+  h1=rows[0]&&rows[0].p?rows[0].p.h:hue(title); h2=rows[1]&&rows[1].p?rows[1].p.h:(h1+60)%360;
+  drawStoryBg(x,h1,h2); drawHeader(x,yr,font);
+  x.fillStyle='#fff'; x.font=`800 92px ${font}`; x.fillText(fitText(x,title,SW-180),90,410);
+  x.fillStyle='rgba(255,255,255,.55)'; x.font=`700 54px ${font}`; x.fillText(fitText(x,subtitle,SW-180),90,480);
+  drawRows(x,rows,font,st.notes&&hasNotes,560,also?1000:1090);
+  if(also){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`500 34px ${font}`; x.fillText(fitText(x,also,SW-180),90,1620); }
+  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Rank yours with friends · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
   return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
 }
-async function openShare(c){
-  toast('Making your image…');
-  let blob=null; try{ blob=await makeShareImage(c); }catch(e){ console.error(e); }
-  if(!blob){ toast("Couldn't make the image. Try again in a moment."); return; }
-  if(shareUrl) URL.revokeObjectURL(shareUrl); shareBlob=blob; shareUrl=URL.createObjectURL(blob);
-  const canShare=!!(navigator.canShare && navigator.canShare({files:[new File([blob],'x.png',{type:'image/png'})]}));
-  sheet(`<div class="sheet-head"><div><h2>Share ${esc(CAT[c].name)}</h2><p>Save it or send it to a friend.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <img class="share-img" src="${shareUrl}" alt="Your ${esc(CAT[c].name)} shelf as a picture">
-  <div class="sheet-foot"><span></span><div class="foot-right">${canShare?`<button class="pill" data-act="share-send" data-cat="${c}">Share</button>`:''}<a class="pill ${canShare?'soft':''}" href="${shareUrl}" download="palate-${c}.png" style="text-decoration:none">Download</a></div></div>`,'share');
+async function renderStory(){
+  const st=sty; if(!st) return; const tok=st.tok=(st.tok||0)+1; const box=$('#story-root'); if(box) box.classList.add('busy');
+  let blob=null; try{ blob=await makeStory(); }catch(e){ console.error(e); }
+  if(sty!==st||st.tok!==tok) return;
+  if(!blob){ toast("Couldn't make the picture. Try again."); closeStory(); return; }
+  if(st.url) URL.revokeObjectURL(st.url); st.blob=blob; st.url=URL.createObjectURL(blob);
+  const img=$('#story-img'); if(img) img.src=st.url; if(box) box.classList.remove('busy');
+  const sw=$('#story-notes'); if(sw){ sw.disabled=!st.hasNotes; sw.checked=st.notes&&st.hasNotes; const l=$('#story-notes-l'); if(l) l.classList.toggle('off',!st.hasNotes); const h=$('#story-hint'); if(h) h.textContent=st.hasNotes?'':'No notes yet. Add a “why” when you edit a shelf.'; }
 }
+function openStory(kind,c){
+  if(kind==='shelf' && !eff(c,ui.year===undefined?CURRENT:ui.year)) return;
+  closeSheet(); sty={kind,cat:c,notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
+  let box=$('#story-root'); if(!box){ box=document.createElement('div'); box.id='story-root'; document.body.appendChild(box); }
+  box.className='busy'; document.body.style.overflow='hidden';
+  box.innerHTML=`<div class="sty" role="dialog" aria-modal="true" aria-label="Share picture">
+    <button class="story-x" data-act="story-close" aria-label="Close">✕</button>
+    <div class="story-stage"><img id="story-img" alt="Your picture to share"><div class="story-busy">Making your picture…</div></div>
+    <div class="story-bar">
+      <label class="story-sw" id="story-notes-l"><input type="checkbox" id="story-notes" ${sty.notes?'checked':''}><span class="knob"></span><span>Show my notes</span></label>
+      <div class="story-actions"><button class="pill soft" data-act="story-save">Save</button><button class="pill" data-act="story-share">Share</button></div>
+    </div><p id="story-hint" class="story-hint"></p></div>`;
+  renderStory();
+}
+function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null; if(box) box.remove(); if(!$('#sheet-root').firstChild) document.body.style.overflow=''; }
+function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
+async function storyShare(){
+  if(!sty||!sty.blob) return; const f=storyFile();
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  storySave(); toast('Saved. Add it to your story from your photos.');
+}
+function storySave(){ if(!sty||!sty.url) return; const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
 function openDetail(c, fid){
   detailArgs=[c,fid];
   let s, prev=null, who, y, own=!fid;
@@ -5705,8 +5814,11 @@ document.addEventListener('click',e=>{
     case 'open-friend': openDetail(el.dataset.cat, el.dataset.f); break;
     case 'edit': openEditor(el.dataset.cat); break;
     case 'add-shelf': ui.view='me'; if(ui.tab==='me' && ui.year!==CURRENT) ui.year=CURRENT; if(ui.tab==='me') render(); openPicker(); break;
-    case 'share': openShare(el.dataset.cat); break;
-    case 'share-send': { try{ const f=new File([shareBlob],'palate-'+el.dataset.cat+'.png',{type:'image/png'}); navigator.share({files:[f],text:'My '+CAT[el.dataset.cat].name.toLowerCase()+' on Palate',url:inviteLink()}).catch(()=>{}); }catch(e){} break; }
+    case 'share': e.stopPropagation(); openStory('shelf',el.dataset.cat); break;
+    case 'share-profile': openStory('profile'); break;
+    case 'story-close': closeStory(); break;
+    case 'story-save': storySave(); break;
+    case 'story-share': storyShare(); break;
     case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
@@ -5755,6 +5867,7 @@ document.addEventListener('change',e=>{
   if(t.dataset && t.dataset.vis){ state.vis[t.dataset.vis]=t.value; save(); render(); toast(`${CAT[t.dataset.vis].name}: ${VIS[t.value]}`); if(sheetKind==='detail') openDetail(...detailArgs); }
 });
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && sty){ closeStory(); return; }
   if(e.key==='Escape' && $('#sheet-root').firstChild){ closeSheet(); return; }
   if((e.key==='Enter'||e.key===' ') && e.target.matches('[role="button"][data-act]')){ e.preventDefault(); e.target.click(); }
   if(e.key==='Enter' && e.target.id==='ed-q'){ e.preventDefault(); if(ed.res[0]) addItem(ed.res[0]); else if(ed.query.trim()) $('[data-act="custom"]')?.click(); }
@@ -5763,6 +5876,7 @@ document.addEventListener('toggle',e=>{ const d=e.target; if(d.classList&&d.clas
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='year') setYear(+t.value);
+  else if(t.id==='story-notes'){ if(sty){ sty.notes=t.checked; try{ localStorage.setItem('palate-story-notes',t.checked?'1':'0'); }catch(e){} renderStory(); } }
   else if(t.id==='wipe-in'){ $('#wipe-btn').disabled=t.value.trim()!=='WIPE'; }
   else if(t.id==='del-in'){ $('#del-btn').disabled=t.value.trim()!=='DELETE'; }
   else if(t.id==='ed-q'){ ed.query=t.value; queueLive(); $('#ed-results').innerHTML=results(); }
