@@ -47,6 +47,10 @@ button,select,input,textarea{font:inherit;color:inherit}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 /* Top bar */
+header.top{padding-top:env(safe-area-inset-top,0px)}
+body:not(.in) #view{padding-top:env(safe-area-inset-top,0px)}
+/* Installed on an iPhone the status bar floats over the page: keep it readable (white text) on a dark strip in light mode too. */
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:#0A0A0D;z-index:250;pointer-events:none}
 .top .wrap{display:flex;align-items:center;gap:20px;padding-block:14px}
 .logo{background:none;border:0;padding:0;cursor:pointer;color:var(--text);line-height:0;display:block}
 .logo .mark{display:block;height:34px;width:auto;aspect-ratio:1048/300}
@@ -248,7 +252,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .sheet{background:var(--card);color:var(--text);width:min(620px,100%);max-height:calc(100dvh - 48px);overflow:auto;border-radius:24px;padding:20px 22px 0;overscroll-behavior:contain}
 @media (max-width:640px){
   .scrim{align-items:flex-end;padding:0}
-  .sheet{max-height:94dvh;border-radius:24px 24px 0 0;padding:16px max(16px, env(safe-area-inset-left,0px)) 0 max(16px, env(safe-area-inset-right,0px))}
+  .sheet{max-height:min(94dvh,calc(100dvh - env(safe-area-inset-top,0px) - 12px));border-radius:24px 24px 0 0;padding:16px max(16px, env(safe-area-inset-left,0px)) 0 max(16px, env(safe-area-inset-right,0px))}
 }
 .sheet-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
 .sheet-head h2{font-size:24px;font-weight:700;letter-spacing:-.03em;margin:0}
@@ -4866,6 +4870,25 @@ async function submitAuth(){
       :(m||'Something went wrong.')+(e&&e.status?` (error ${e.status})`:''));
   }
 }
+/* While the loading screen is up: shelf pictures first (about 2s at most), then the first suggestions for adding (about 1s at most). */
+const BOOT_KEEP=[];
+function loadAll(urls,ms){
+  return new Promise(res=>{
+    urls=[...new Set(urls)]; if(!urls.length) return res();
+    let n=urls.length; const t=setTimeout(res,ms);
+    const done=()=>{ if(--n<=0){ clearTimeout(t); res(); } };
+    urls.forEach(u=>{ const im=new Image(); im.decoding='async'; im.onload=im.onerror=done; im.src=u; BOOT_KEEP.push(im); });
+  });
+}
+async function preloadForBoot(){
+  try{
+    const shelf=[]; for(const c of state.order){ const e=eff(c,CURRENT); if(!e) continue; for(const it of (e.snap.top||[]).slice(0,5)){ const p=photo(c,it.n); if(p) shelf.push(dispSrc(c,p.src)); } }
+    await loadAll(shelf,2000);
+    const net=navigator.connection||{}; if(net.saveData) return;
+    const recs=[]; for(const c of CATS.filter(x=>x.popular)) for(const it of (CATALOG[c.id]||[]).filter(i=>!eff(c.id,CURRENT)||!(eff(c.id,CURRENT).snap.top||[]).some(t=>t.n===i.n)).slice(0,9)){ const p=photo(c.id,it.n); if(p) recs.push(dispSrc(c.id,p.src)); }
+    await loadAll(recs,900);
+  }catch(e){}
+}
 async function enter(user){
   $('#view').innerHTML=BOOT_HTML;
   try{
@@ -4896,6 +4919,7 @@ async function enter(user){
     if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
+    await preloadForBoot();
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
