@@ -2,6 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Your taste, ranked. Just for your friends.">
 <meta name="theme-color" content="#0A0A0D">
+<script>document.documentElement.classList.add('booting');addEventListener('DOMContentLoaded',function(){var d=document.documentElement,done=function(){if(!document.querySelector('.boot')){d.classList.remove('booting');return true}};try{new MutationObserver(function(m,o){if(done())o.disconnect()}).observe(document.getElementById('view')||document.body,{childList:true,subtree:true})}catch(e){}setTimeout(function(){d.classList.remove('booting')},15000)});</script>
 <script>try{var t=localStorage.getItem('palate-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m&&(t==='light'||(t!=='dark'&&matchMedia('(prefers-color-scheme: light)').matches)))m.content='#F1F1F4'}catch(e){}</script>
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon.ico" sizes="48x48">
@@ -338,13 +339,18 @@ body.dragging{user-select:none;-webkit-user-select:none}
 @media (max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 /* Loading screen: polaroid and word over a soft light leak. Colours dim in light mode. */
 .boot{position:fixed;top:0;left:0;right:0;bottom:calc(-1 * env(safe-area-inset-bottom,0px));min-height:100lvh;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;color:var(--text);
-  background:
+  background:var(--boot-bg);
+  animation:boot-in .35s ease both}
+:root{--boot-bg:
     radial-gradient(ellipse 28% 40% at 103% 105%, rgb(94 200 247 / calc(.40 * var(--gk))), rgb(94 200 247 / calc(.14 * var(--gk))) 55%, transparent),
     radial-gradient(ellipse 38% 42% at 40% -8%, rgb(176 124 255 / calc(.45 * var(--gk))), rgb(176 124 255 / calc(.16 * var(--gk))) 55%, transparent),
     radial-gradient(ellipse 10% 16% at -3% -5%, rgb(255 209 102 / calc(.85 * var(--gk))), rgb(255 209 102 / calc(.30 * var(--gk))) 55%, transparent),
     radial-gradient(ellipse 40% 50% at 6% -6%, rgb(255 111 156 / calc(.60 * var(--gk))), rgb(255 111 156 / calc(.21 * var(--gk))) 55%, transparent),
-    var(--bg);
-  animation:boot-in .35s ease both}
+    var(--bg)}
+/* While loading, the page itself wears the loading screen too, so no strip of the app colour can show at the edges. */
+html.booting{background:var(--boot-bg) fixed}
+html.booting body{background:transparent}
+body:not(.in) .bottom-nav{display:none!important;visibility:hidden}
 .boot .b-pol{width:96px;height:auto;aspect-ratio:48/58;filter:drop-shadow(0 8px 22px rgb(0 0 0 / .22))}
 .boot .b-word{height:44px;width:auto;aspect-ratio:3.038}
 @keyframes boot-in{from{opacity:0}to{opacity:1}}
