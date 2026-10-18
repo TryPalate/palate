@@ -56,7 +56,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .logo .mark{display:block;height:34px;width:auto;aspect-ratio:1048/300}
 .alpha-tag{font-weight:700;font-size:10px;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:5px 8px 5px 9px;cursor:pointer;margin-left:-8px}
 .alpha-tag::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px;background:conic-gradient(#FFD166,#FF5C8A,#8E6CFF,#4FC3F7,#FFD166)}
-.alpha-tag.static{display:inline-block;cursor:default;margin:10px 0 0}
+.alpha-tag.static{display:inline-block;align-self:flex-start;cursor:default;margin:10px 0 0}
 #fb-text,#fb-item,#fb-cat{width:100%;box-sizing:border-box;font:inherit;color:var(--text);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 #fb-item{margin-top:8px}
 .tabs{display:flex;gap:2px;margin-right:auto}
@@ -98,6 +98,9 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .years input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--text);margin-top:-6.5px}
 .years input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--text)}
 .years output{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.person{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.person b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.alpha-note{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-left:6px}
+.auth label.rm{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.auth label.rm input{width:auto;margin:0}
+.av,.me-av{text-shadow:0 1px 2px rgb(0 0 0 / .25)}
 .promo{margin-bottom:12px;padding-bottom:14px}.promo h2{color:var(--text)}.promo p{margin:2px 0 10px;font-size:14px}.promo-row{display:flex;gap:6px;align-items:center}
 .steps{margin:6px 0 10px;padding-left:20px;line-height:1.5}.steps li{margin:8px 0}
 .note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 14px;margin-bottom:12px;border-radius:12px;background:var(--raise);color:var(--muted);font-size:14px}
@@ -4577,7 +4580,14 @@ function snap(cat, top, hm=[], why={}){ return {top: top.map(n=>({n,s:subOf(cat,
 
 /* ---------- Backend (Supabase) ---------- */
 const CFG = window.PALATE_CONFIG || {};
-const sb = (window.supabase && CFG.url && CFG.key && !/YOUR_/.test(CFG.url + CFG.key)) ? window.supabase.createClient(CFG.url, CFG.key) : null;
+/* "Remember me": on (default) keeps you signed in on this device; off signs you out when the app or tab is closed. */
+const remembered = () => { try{ return localStorage.getItem('palate-remember')!=='0'; }catch(e){ return true; } };
+const AUTH_STORE = {
+  getItem:k=>{ try{ return localStorage.getItem(k) ?? sessionStorage.getItem(k); }catch(e){ return null; } },
+  setItem:(k,v)=>{ try{ const keep=remembered(); (keep?localStorage:sessionStorage).setItem(k,v); (keep?sessionStorage:localStorage).removeItem(k); }catch(e){} },
+  removeItem:k=>{ try{ localStorage.removeItem(k); sessionStorage.removeItem(k); }catch(e){} }
+};
+const sb = (window.supabase && CFG.url && CFG.key && !/YOUR_/.test(CFG.url + CFG.key)) ? window.supabase.createClient(CFG.url, CFG.key, {auth:{storage:AUTH_STORE}}) : null;
 let me = null;                                   /* {id, name, invite} */
 let state = {name:'', shelves:{}, order:[], vis:{}, photos:{}, custom:{}};
 let FRIENDS = [], UPDATES = [], shared = {};      /* friends' shelves, activity, and their photos */
@@ -4753,6 +4763,38 @@ function notifyBox(){
   else body=`<p>This browser cannot receive notifications.</p>`;
   return `<div class="acct-box" id="notify-box"><h3>Notifications</h3>${body}</div>`;
 }
+/* ---------- Alpha: everyone on Palate, one tap to add ---------- */
+let DIRECTORY=[];
+async function loadPeople(){
+  try{ const r=await sb.rpc('alpha_people'); DIRECTORY=(r&&!r.error&&Array.isArray(r.data))?r.data:[]; }catch(e){ DIRECTORY=[]; }
+}
+function personRow(p){ return `<div class="person">${av({id:p.id,name:p.name})}<b>${esc(p.name)}</b><button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button></div>`; }
+function peoplePanel(){
+  if(!DIRECTORY.length) return '';
+  return `<div class="panel people"><h2>People on Palate <span class="alpha-note">alpha</span></h2><p class="muted" style="margin:2px 0 8px;font-size:14px">Everyone who has signed up so far. Tap to add them as a friend.</p>${DIRECTORY.map(personRow).join('')}<div style="padding:10px 0"><button class="pill sm" data-act="add-all">Add everyone</button></div></div>`;
+}
+function openPeople(){
+  sheet(`<div class="sheet-head"><div><h2>Find your friends</h2><p>Alpha: everyone who has signed up is listed here.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div id="people-list">${DIRECTORY.length?DIRECTORY.map(personRow).join(''):'<p class="muted">Nobody else has signed up yet. Send them your invite link from the Friends tab.</p>'}</div>
+  <div class="sheet-foot"><span></span><div class="foot-right">${DIRECTORY.length?'<button class="pill soft" data-act="add-all">Add everyone</button>':''}<button class="pill" data-act="close">Done</button></div></div>`,'people');
+}
+async function afterFriendsChanged(msg){
+  try{ await loadFriends(); }catch(e){} await loadPeople();
+  if(sheetKind==='people'){ const l=$('#people-list'); if(l) l.innerHTML=DIRECTORY.length?DIRECTORY.map(personRow).join(''):'<p class="muted">You are connected with everyone. New people show up here as they join.</p>'; }
+  render(); if(msg) toast(msg);
+}
+async function addPerson(id){
+  const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(r.error){ toast(r.error.message||'Could not add that person'); return; }
+  track('friend_added'); await afterFriendsChanged('You and '+r.data+' are now friends');
+}
+async function addAll(){
+  const ids=DIRECTORY.map(p=>p.id); let n=0; for(const id of ids){ const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(!r.error) n++; }
+  track('friend_added'); await afterFriendsChanged(n?`Added ${n} friend${n===1?'':'s'}`:'Could not add anyone');
+}
+function friendsCard(){
+  if(!me || FRIENDS.length || !DIRECTORY.length || ui.view!=='me' || ui.year!==CURRENT) return '';
+  return `<div class="panel promo"><h2>Find your friends</h2><p class="muted">${DIRECTORY.length} ${DIRECTORY.length===1?'person is':'people are'} already here. Add them to see how your taste matches.</p><div class="promo-row"><button class="pill sm" data-act="people">See who is here</button></div></div>`;
+}
 function openAccount(){
   const dv=prefs().defVis||'friends';
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
@@ -4828,6 +4870,7 @@ function showAuth(mode,msg){
       ${up?'<label>Your name<input id="au-name" autocomplete="name" maxlength="40" placeholder="What your friends call you"></label>':''}
       <label>Email<input id="au-email" type="email" autocomplete="email" inputmode="email"></label>
       <label>Password<input id="au-pass" type="password" autocomplete="${up?'new-password':'current-password'}" placeholder="${up?'At least 8 characters':''}"></label>
+      <label class="rm"><input type="checkbox" id="au-remember"${remembered()?' checked':''}> Remember me on this device</label>
       <p class="auth-err" id="au-err" role="alert"></p>${msg?`<p class="auth-ok">${esc(msg)}</p>`:''}
       <button class="pill" type="submit">${up?'Create account':'Sign in'}</button>
     </form>
@@ -4847,6 +4890,7 @@ async function submitAuth(){
   if(authMode==='up'){ if(!name) return fail('Add your name.'); if(pass.length<8) return fail('Use at least 8 characters.'); }
   else if(!pass) return fail('Enter your password.');
   const btn=$('#auth-form button[type=submit]'); btn.disabled=true;
+  try{ localStorage.setItem('palate-remember',$('#au-remember')?.checked===false?'0':'1'); }catch(e){}
   try{
     if(authMode==='up'){
       const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
@@ -4919,11 +4963,13 @@ async function enter(user){
     if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
+    await loadPeople();
     await preloadForBoot();
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
     render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush();
+    if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
@@ -4944,8 +4990,16 @@ function art(name, cat, size, noh){
   return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
-function av(f, cls=''){ return `<span class="av ${cls}" style="--h:${f.hue}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
-const meAv = () => `<span class="me-av" aria-hidden="true">${esc(state.name[0]||'?')}</span>`;
+/* Every person gets their own gradient of 2 or 3 colours, always the same one for the same person. */
+function grad(seed){
+  const mix=n=>{ n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; return n>>>0; };
+  const h=mix(hash(String(seed))), g=mix(hash('g'+seed)), b=mix(hash('b'+seed));
+  const h1=h%360, h2=(h1+70+g%90)%360, h3=(h2+55+(b>>>3)%80)%360, three=b%10<4, ang=110+(g>>>5)%90;
+  const col=(hh,i)=>`hsl(${hh} ${78+((h>>>i)%12)}% ${54+((g>>>i)%8)}%)`;
+  return `linear-gradient(${ang}deg,${col(h1,1)},${col(h2,3)}${three?','+col(h3,5):''})`;
+}
+function av(f, cls=''){ return `<span class="av ${cls}" style="background:${grad(f.id||f.name)}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
+const meAv = () => `<span class="me-av" style="background:${grad((me&&me.id)||state.name)}" aria-hidden="true">${esc(state.name[0]||'?')}</span>`;
 const first = f => f.name.split(' ')[0];
 const visOf = c => state.vis[c] || 'friends';
 const VIS = {friends:'All friends', close:'Close friends', private:'Only me'};
@@ -5472,7 +5526,7 @@ function meDyn(){
   const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${CATS.length-shelfList(CURRENT).length} categories to choose from</small></button>` : '';
   const strip=(view==='me' && y===CURRENT && UPDATES.length && lateList(3)) ? `<div class="panel lately-strip"><h2>Friends lately <button class="pill ghost sm" data-act="tab" data-tab="friends">See all</button></h2><ul class="lately">${lateList(3)}</ul></div>` : '';
   const cap=(view==='me')?capsule(y):'';
-  return note + promoCard() + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
+  return note + friendsCard() + promoCard() + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
 }
 function viewMe(){
   const y=ui.year;
@@ -5513,7 +5567,7 @@ function viewFriends(){
     : `<div class="panel"><p class="empty-note">No friends yet. Send your link to someone and you will see how your tastes compare.</p></div>`;
   const lately = UPDATES.length ? `<div class="panel"><h2>Lately</h2><ul class="lately">${lateList(8)}</ul></div>` : '';
   return `<section class="head"><h1>Friends</h1></section>
-  <div class="friends">${list}<div>${invitePanel()}${lately?'<div style="height:12px"></div>'+lately:''}</div></div>`;
+  <div class="friends"><div>${list}${DIRECTORY.length?'<div style="height:12px"></div>'+peoplePanel():''}</div><div>${invitePanel()}${lately?'<div style="height:12px"></div>'+lately:''}</div></div>`;
 }
 function mini(items,c,set){ return `<ol class="mini">${[0,1,2,3,4].map(i=>{const it=items[i]; return it?`<li class="${set.has(it.n)?'':'off'}"><span class="rk">${i+1}</span>${art(it.n,c,'sm')}<b>${esc(it.n)}</b></li>`:`<li class="off"><span class="rk">${i+1}</span><span></span><b>—</b></li>`;}).join('')}</ol>`; }
 function viewCompare(f){
@@ -6381,6 +6435,9 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'people': openPeople(); break;
+    case 'add-person': addPerson(el.dataset.id); break;
+    case 'add-all': addAll(); break;
     case 'feedback': openFeedback(); break;
     case 'fb-kind': fbKind=el.dataset.v; document.querySelectorAll('[data-act="fb-kind"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===fbKind))); $('#fb-miss').hidden=fbKind!=='missing'; break;
     case 'fb-send': sendFeedback(); break;
