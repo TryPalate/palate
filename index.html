@@ -235,6 +235,14 @@ button,select,input,textarea{font:inherit;color:inherit}
 .pk-group{margin-top:16px}
 .pk-group h3{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 8px}
 .pk-grid{display:flex;flex-wrap:wrap;gap:7px}
+.pk-acc{background:var(--raise);border-radius:14px;margin-bottom:8px;padding:0 14px}
+.pk-acc summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:13px 0;font-weight:600;font-size:15px}
+.pk-acc summary::-webkit-details-marker{display:none}
+.pk-acc summary em{font-style:normal;color:var(--muted);font-weight:500;font-size:13px}
+.pk-acc summary::after{content:'';width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-left:12px;transition:transform .15s}
+.pk-acc[open] summary::after{transform:rotate(-135deg)}
+.pk-acc .pk-grid{padding-bottom:14px}
+.pk-acc .pk{background:var(--card)}
 .pk{border:0;border-radius:999px;background:var(--raise);padding:9px 14px;font-size:15px;font-weight:500;cursor:pointer}
 .pk:hover:not(:disabled){background:var(--text);color:var(--bg)}
 .pk:disabled{opacity:.35;cursor:default}
@@ -338,7 +346,7 @@ const CATS = [
  ['brands','Brands','Style & stuff','round',0],['sneakers','Sneakers','Style & stuff','wide',0],['fragrances','Fragrances','Style & stuff','square',0],['watches','Watches','Style & stuff','square',0],
  ['cars','Cars','Style & stuff','wide',0],['tech','Tech & gadgets','Style & stuff','square',0],['apps','Apps','Style & stuff','square',0],
  ['cocktails','Cocktails','Food & drink','square',0],['spirits','Spirits & beer','Food & drink','square',0],['cheese','Cheeses','Food & drink','square',0],['pasta','Pasta','Food & drink','square',0],
- ['aircraft','Aircraft','Machines','wide',0],['motorcycles','Motorcycles','Machines','wide',0],['airlines','Airlines','Machines','wide',0],
+ ['aircraft','Aircraft','Vehicles','wide',0],['motorcycles','Motorcycles','Vehicles','wide',0],['airlines','Airlines','Vehicles','wide',0],
  ['civilizations','Historical civilizations','History & ideas','wide',0],['mythology','Gods & mythology','History & ideas','round',0],['philosophers','Philosophers','History & ideas','round',0],['scientists','Scientists & thinkers','History & ideas','round',0],['weapons','Weapons','History & ideas','wide',0],
  ['wonders','Landmarks & wonders','Places','wide',0,1],['universities','Universities','Places','wide',0,1],
  ['superheroes','Superheroes','Film & TV','square',0],['villains','Villains','Film & TV','square',0],['dinosaurs','Dinosaurs','Nature','wide',0],['catbreeds','Cat breeds','Nature','square',0],['flowers','Flowers','Nature','square',0],
@@ -346,6 +354,10 @@ const CATS = [
  ['hobbies','Hobbies','Life','wide',0],['subjects','School subjects','Life','wide',0],['holidays','Holidays','Life','wide',0],['seasons','Seasons','Life','wide',0],
  ['animals','Animals','Life','square',0],['dogs','Dog breeds','Life','square',0]
 ].map(([id,name,group,shape,popular,photo])=>({id,name,group,shape,popular:!!popular,photo:!!photo}));
+/* Most-picked first. Everything not listed keeps its original order after these. */
+const POP = ['artists','albums','movies','tv','songs','games','anime','books','fastfood','countries','cities','celebrities','athletes','restaurants','brands','sneakers','cars','pokemon','fragrances','cocktails','influencers','actors','kdramas','characters','manga','podcasts','clubs','teams','drinks','snacks','desserts','cafes','tech','apps','mobilegames','boardgames','cuisines','pizza','icecream','sports','watches','hobbies','holidays','superheroes','villains','comedians','authors','musicals','painters','languages','proglangs','universities','wonders','themeparks','aircraft','motorcycles','airlines','mythology','civilizations','philosophers','scientists','weapons','dinosaurs','catbreeds','flowers','instruments','spirits','cheese','pasta'];
+CATS.forEach((c,i)=>{ const k=POP.indexOf(c.id); c.rank = k>=0 ? k : 100+i; });
+CATS.sort((a,b)=>a.rank-b.rank);
 const CAT = Object.fromEntries(CATS.map(c=>[c.id,c]));
 
 /* ---------- Searchable catalog. In the real app these come from music, film, game, book and places databases with real artwork. List order doubles as "popular". ---------- */
@@ -5326,7 +5338,8 @@ function pickerList(){
   const left=CATS.filter(c=>c.popular && !eff(c.id,CURRENT)).length;
   return (left?`<div class="quick"><div><b>Quick start</b><span>Go through the ${left} most popular shelves one after another, with suggestions.</span></div><button class="pill" data-act="quick">Start</button></div>`:'')
     + `<div class="pk-group"><h3>Popular</h3><div class="pk-grid">${CATS.filter(c=>c.popular).map(btn).join('')}</div></div>`
-    + [...new Set(CATS.map(c=>c.group))].map(g=>`<div class="pk-group"><h3>${esc(g)}</h3><div class="pk-grid">${CATS.filter(c=>c.group===g).map(btn).join('')}</div></div>`).join('');
+    + `<div class="pk-group"><h3>Browse by topic</h3>${[...new Set(CATS.map(c=>c.group))].map(g=>{ const list=CATS.filter(c=>c.group===g); const open=pk.open&&pk.open.has(g);
+        return `<details class="pk-acc" data-g="${esc(g)}"${open?' open':''}><summary><span>${esc(g)}</span><em>${list.length}</em></summary><div class="pk-grid">${list.map(btn).join('')}</div></details>`; }).join('')}</div>`;
 }
 function openPicker(){
   pk={q:''};
@@ -5470,6 +5483,7 @@ document.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ') && e.target.matches('[role="button"][data-act]')){ e.preventDefault(); e.target.click(); }
   if(e.key==='Enter' && e.target.id==='ed-q'){ e.preventDefault(); if(ed.res[0]) addItem(ed.res[0]); else if(ed.query.trim()) $('[data-act="custom"]')?.click(); }
 });
+document.addEventListener('toggle',e=>{ const d=e.target; if(d.classList&&d.classList.contains('pk-acc')&&pk){ (pk.open ||= new Set())[d.open?'add':'delete'](d.dataset.g); } },true);
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='year') setYear(+t.value);
