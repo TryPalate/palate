@@ -273,6 +273,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .invite .swap{background:none;border:0;padding:10px 0 0;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline}
 .cmp-actions{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 14px}
 .empty-note{padding:18px 4px;color:var(--muted);font-size:15px}
+.credit{margin:0 0 28px;font-size:12px;color:var(--faint)}
 </style>
 
 <header class="top">
@@ -291,6 +292,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 
 <footer class="wrap gutter">
   <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="signout">Sign out</button></div>
+  <p class="credit">Artwork from Wikipedia, Apple, AniList and Open Library.</p>
 </footer>
 
 <nav class="bottom-nav" aria-label="Sections">
@@ -1543,11 +1545,13 @@ function showAuth(mode,msg){
       <p class="auth-err" id="au-err" role="alert"></p>${msg?`<p class="auth-ok">${esc(msg)}</p>`:''}
       <button class="pill" type="submit">${up?'Create account':'Sign in'}</button>
     </form>
-    <button class="swap" data-act="auth-mode">${up?'I already have an account':'New here? Create an account'}</button></section>`;
+    <button class="swap" data-act="auth-mode">${up?'I already have an account':'New here? Create an account'}</button>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">build 2</p></section>`;
 }
-function showFatal(text){
+function showFatal(text,err){
   document.body.classList.remove('in');
-  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">${esc(text)}</p><button class="pill" data-act="reload">Try again</button><button class="swap" data-act="signout">Sign out</button></section>`;
+  const why=err?[err.code,err.message,err.details,err.hint].filter(Boolean).join(' · '):'';
+  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">${esc(text)}</p>${why?`<p class="muted" style="font-size:13px;margin:0;word-break:break-word">${esc(why)}</p>`:''}<button class="pill" data-act="reload">Try again</button><button class="swap" data-act="signout">Sign out</button></section>`;
 }
 async function submitAuth(){
   const email=($('#au-email').value||'').trim(), pass=$('#au-pass').value||'', name=($('#au-name')?.value||'').trim(), err=$('#au-err');
@@ -1560,14 +1564,24 @@ async function submitAuth(){
     if(authMode==='up'){
       const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{name}}});
       if(error) throw error;
-      if(!data.session){ showAuth('in','Account created. Check your email to confirm it, then sign in.'); return; }
+      if(!data.session){
+        const r=await sb.auth.signInWithPassword({email,password:pass});
+        if(r.error){ showAuth('in','Account created. If your email needs confirming, check your inbox, then sign in.'); return; }
+        await enter(r.data.user); return;
+      }
       await enter(data.session.user);
     } else {
       const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
       if(error) throw error;
       await enter(data.user);
     }
-  }catch(e){ btn.disabled=false; fail(/invalid login/i.test(e.message)?'Wrong email or password.':(e.message||'Something went wrong.')); }
+  }catch(e){
+    console.error(e); btn.disabled=false; const m=(e&&e.message)||'';
+    fail(/invalid login/i.test(m)?'Wrong email or password.'
+      :/already (been )?registered/i.test(m)?'That email already has an account. Tap "I already have an account" below to sign in.'
+      :/failed to fetch|networkerror|load failed/i.test(m)?"Can't reach the server. Check your connection and try again."
+      :(m||'Something went wrong.')+(e&&e.status?` (error ${e.status})`:''));
+  }
 }
 async function enter(user){
   $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1></section>';
@@ -1589,15 +1603,16 @@ async function enter(user){
     synced.photos={}; for(const k in state.photos) synced.photos[k]=JSON.stringify(state.photos[k]);
     synced.custom=JSON.stringify(state.custom);
     buildCatalog(); applyCustom();
+    AUTO.map={}; try{ const im=await sb.from('item_images').select('cat,name,url,h,s').range(0,4999); if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34}; }catch(e){}
     const code=pendingJoin(); let joined=null;
     if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; }
     await loadFriends();
     $('#acct').textContent=`Signed in as ${me.name}`;
     document.body.classList.add('in');
     if(joined){ ui.tab='friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0);
+    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); }
     if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
-  }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again."); }
+  }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
 
 /* ---------- Helpers ---------- */
@@ -1608,11 +1623,12 @@ const hue = s => hash(s)%360;
 const STOP=new Set(['the','a','an','of','and','&']);
 function initials(n){ const w=n.replace(/[^\p{L}\p{N}\s]/gu,' ').trim().split(/\s+/).filter(x=>x&&!STOP.has(x.toLowerCase())); if(!w.length) return n.slice(0,2); if(w.length===1) return w[0].slice(0,2); return w[0][0]+w[1][0]; }
 const pkey = (c,n) => c+'|'+n;
-const photo = (c,n) => state.photos[pkey(c,n)] || shared[pkey(c,n)];
+const photo = (c,n) => state.photos[pkey(c,n)] || shared[pkey(c,n)] || AUTO.map[pkey(c,n)];
+const cssUrl = u => String(u).replace(/'/g,'%27').replace(/[()"\\\s]/g, ch=>encodeURIComponent(ch));
 function art(name, cat, size){
   const shape=CAT[cat]?.shape||'square', p=photo(cat,name);
-  if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${p.src}')" role="img" aria-label="${esc(name)}"></span>`;
-  return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
+  if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${cssUrl(p.src)}')" role="img" aria-label="${esc(name)}"></span>`;
+  return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}" aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
 function av(f, cls=''){ return `<span class="av ${cls}" style="--h:${f.hue}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
@@ -1639,6 +1655,132 @@ function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; cle
 
 function row(it,i,c,prev,extra){ return `<li class="row"><span class="rk">${i+1}</span>${art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${extra?extra(it):''}</div>${change(it,i,prev)}</li>`; }
 function emptyRow(i){ return `<li class="row empty"><span class="rk">${i+1}</span><span class="ghost-art"></span><div class="nm"><b>—</b></div><span></span></li>`; }
+
+/* ---------- Artwork lookup ----------
+   Placeholders are filled in automatically from public databases (Wikipedia, Apple, AniList, Open Library).
+   A result is saved once to a shared table, so everyone after that gets it instantly. Your own uploads always win. */
+const AUTO = {map:{}, tried:new Set(), pending:[], flushT:null};
+const IMG_TIMEOUT = CFG.imgTimeout || 7000;
+const NOIMG_KEY = 'palate-noimg', NOIMG_DAYS = 14;
+let noimg = {}; try{ noimg = JSON.parse(localStorage.getItem(NOIMG_KEY)||'{}'); }catch(e){}
+function rememberNone(k){ noimg[k]=Date.now(); try{ localStorage.setItem(NOIMG_KEY, JSON.stringify(noimg)); }catch(e){} }
+const recentNone = k => noimg[k] && (Date.now()-noimg[k] < NOIMG_DAYS*864e5);
+
+/* Per category: w = word added to Wikipedia searches, i = Apple media type, a = AniList type, o = Open Library, sub = add subtitle to the search */
+const IMG_SRC = {
+  artists:{w:'musician'}, albums:{i:'album',w:'album'}, songs:{i:'song',w:'song'},
+  movies:{i:'movie',w:'film'}, tv:{i:'tv',w:'TV series'}, anime:{a:'ANIME',w:'anime'}, kdramas:{w:'South Korean TV series'}, characters:{w:'character',sub:1}, musicals:{w:'musical'},
+  celebrities:{w:''}, actors:{w:'actor'}, influencers:{w:''}, athletes:{w:''}, comedians:{w:'comedian'}, painters:{w:'painter'},
+  games:{w:'video game'}, mobilegames:{i:'app',w:'video game'}, boardgames:{w:'game'}, pokemon:{w:'Pokémon'},
+  fastfood:{w:''}, restaurants:{w:'restaurant',sub:1}, cafes:{w:''}, snacks:{w:''}, drinks:{w:''}, cuisines:{w:'cuisine'}, desserts:{w:'dessert'}, icecream:{w:'ice cream flavor'}, breakfast:{w:''}, cereal:{w:'breakfast cereal'}, fruits:{w:'fruit'}, pizza:{w:'pizza topping'}, sauces:{w:'sauce'},
+  countries:{w:'country'}, cities:{w:'city',sub:1}, themeparks:{w:'theme park'},
+  books:{o:1,w:'book'}, authors:{w:'author'}, manga:{a:'MANGA',w:'manga'}, podcasts:{w:'podcast'},
+  clubs:{w:'football club'}, teams:{w:''}, sports:{w:'sport'}, brands:{w:'brand'}, sneakers:{w:''}, fragrances:{w:'perfume'}, watches:{w:'watch'}, cars:{w:'car'}, tech:{w:''}, apps:{i:'app',w:'app'},
+  hobbies:{w:'hobby'}, subjects:{w:'academic discipline'}, holidays:{w:'holiday'}, seasons:{w:'season'}, animals:{w:'animal'}, dogs:{w:'dog breed'}
+};
+const normT = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim().replace(/^the /,'');
+const firstPart = sub => String(sub||'').split(/\s*[·\/]\s*/)[0];
+
+const gates = {};
+function gate(name,ms){ const p=(gates[name]||Promise.resolve()).then(()=>new Promise(r=>setTimeout(r,ms))); gates[name]=p; return p; }
+function jsonp(u){ return new Promise((res,rej)=>{ const cb='pl_cb'+Math.random().toString(36).slice(2); const sc=document.createElement('script');
+  const done=()=>{ clearTimeout(t); delete window[cb]; sc.remove(); }; const t=setTimeout(()=>{done();rej(new Error('timeout'));},8000);
+  window[cb]=d=>{done();res(d);}; sc.onerror=()=>{done();rej(new Error('jsonp'));}; sc.src=u+(u.includes('?')?'&':'?')+'callback='+cb; document.head.appendChild(sc); }); }
+async function getJSON(u,viaJsonp){ try{ const r=await fetch(u); if(!r.ok) throw new Error('http '+r.status); return await r.json(); }catch(e){ if(viaJsonp) return jsonp(u); throw e; } }
+
+async function wikiImage(c,n,sub){
+  const cfg=IMG_SRC[c]||{}; await gate('wiki',120);
+  const q=[n, cfg.sub?sub:'', cfg.w].filter(Boolean).join(' ');
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
+  const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+  const want=normT(n);
+  const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh)$/;   /* "Nike, Inc." counts as "Nike" */
+  for(const pg of pages){ const t=normT(pg.title); if(!pg.thumbnail) continue;
+    if(t===want || (t.startsWith(want+' ') && CORP.test(t.slice(want.length+1).split(' ')[0]))) return pg.thumbnail.source; }
+  return null;
+}
+async function itunesImage(c,n,sub){
+  const t=(IMG_SRC[c]||{}).i; if(!t) return null; await gate('itunes',3100);
+  const artist=firstPart(sub), want=normT(n);
+  const qs = t==='album'?{term:n+' '+artist,media:'music',entity:'album'} : t==='song'?{term:n+' '+artist,media:'music',entity:'song'}
+           : t==='movie'?{term:n,media:'movie',entity:'movie'} : t==='tv'?{term:n,media:'tvShow',entity:'tvSeason'} : {term:n,media:'software',entity:'software'};
+  const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({...qs,limit:'8',country:'us'}),true);
+  for(const r of (j.results||[])){
+    const title = t==='album'?r.collectionName : t==='tv'?String(r.collectionName||'').replace(/[,:\-–]\s*(season|series)\s*\d+.*$/i,'') : r.trackName;
+    if(normT(title)!==want) continue;
+    if((t==='album'||t==='song') && artist && !normT(r.artistName).includes(normT(artist))) continue;
+    const u=r.artworkUrl100||r.artworkUrl60; if(u) return u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:');
+  }
+  return null;
+}
+async function anilistImage(c,n){
+  const type=(IMG_SRC[c]||{}).a; if(!type) return null; await gate('anilist',800);
+  const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+    body:JSON.stringify({query:'query($s:String,$t:MediaType){Page(perPage:6){media(search:$s,type:$t,sort:SEARCH_MATCH){title{romaji english native}coverImage{large}}}}',variables:{s:n,t:type}})});
+  if(!r.ok) throw new Error('http '+r.status);
+  const list=((await r.json()).data||{}).Page?.media||[]; const want=normT(n);
+  for(const m of list){ const ts=[m.title.english,m.title.romaji,m.title.native].map(normT); if(m.coverImage && ts.includes(want)) return m.coverImage.large; }
+  return null;
+}
+async function openLibImage(c,n,sub){
+  if(!(IMG_SRC[c]||{}).o) return null; await gate('openlib',350);
+  const j=await getJSON('https://openlibrary.org/search.json?limit=6&fields=title,author_name,cover_i&q='+encodeURIComponent(n+' '+sub));
+  const want=normT(n);
+  for(const d of (j.docs||[])){ const t=normT(d.title); if(d.cover_i && (t===want || t.startsWith(want+' ') || want.startsWith(t+' '))) return 'https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg'; }
+  return null;
+}
+function loadImg(src){ return new Promise((res,rej)=>{ const im=new Image(); im.crossOrigin='anonymous'; const t=setTimeout(()=>rej(new Error('timeout')),IMG_TIMEOUT);
+  im.onload=()=>{clearTimeout(t);res(im);}; im.onerror=()=>{clearTimeout(t);rej(new Error('load'));}; im.src=src; }); }
+function hueSat(d){ let x=0,y=0,w=0,sat=0; for(let i=0;i<d.length;i+=4){ const [h,s,l]=rgbToHsl(d[i],d[i+1],d[i+2]); const wt=s*(1-Math.abs(l-.5)*2)+.02; x+=Math.cos(h*Math.PI/180)*wt; y+=Math.sin(h*Math.PI/180)*wt; sat+=s*wt; w+=wt; }
+  let h=Math.atan2(y,x)*180/Math.PI; if(h<0) h+=360; return {h:Math.round(h), s:Math.round(100*sat/w)}; }
+/* The card tint comes from the picture. If the image host blocks reading its pixels, try a small CORS-friendly copy; if that fails too, fall back to a colour from the name. */
+async function sampleTint(url){
+  for(const src of [url,'https://wsrv.nl/?w=48&h=48&fit=cover&output=jpg&url='+encodeURIComponent(url)]){
+    try{ const im=await loadImg(src); const cv=document.createElement('canvas'); cv.width=cv.height=16; const cx=cv.getContext('2d'); cx.drawImage(im,0,0,16,16); return hueSat(cx.getImageData(0,0,16,16).data); }catch(e){}
+  }
+  return null;
+}
+async function resolveOne(c,n){
+  const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
+  const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||''; let url=null, src='', failed=false;
+  for(const [name,fn] of [['anilist',anilistImage],['apple',itunesImage],['openlibrary',openLibImage],['wikipedia',wikiImage]]){
+    try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
+    if(url){ src=name; break; }
+  }
+  if(!url){ if(!failed) rememberNone(k); return; }
+  const tn=await sampleTint(url);
+  AUTO.map[k]={src:url,h:tn?tn.h:hue(n),s:tn?tn.s:34};
+  applyImg(c,n);
+  if(sb && me){ AUTO.pending.push({cat:c,name:n,url,h:AUTO.map[k].h,s:AUTO.map[k].s,src}); clearTimeout(AUTO.flushT); AUTO.flushT=setTimeout(flushImages,1500); }
+}
+async function flushImages(){
+  const rows=AUTO.pending.splice(0); if(!rows.length||!sb||!me) return;
+  try{ const {error}=await sb.from('item_images').upsert(rows,{onConflict:'cat,name',ignoreDuplicates:true}); if(error) throw error; }
+  catch(e){ if(window.PALATE_DEBUG) console.warn('could not share images', e); }
+}
+const Q=[]; let running=0;
+const stillShown=(c,n)=>[...document.querySelectorAll('.art[data-n]:not(.photo)')].some(el=>el.dataset.c===c&&el.dataset.n===n);
+function pump(){ while(running<3 && Q.length){ const [c,n]=Q.shift(); if(!stillShown(c,n)){ AUTO.tried.delete(pkey(c,n)); continue; } running++; resolveOne(c,n).catch(()=>{}).finally(()=>{running--; pump();}); } }
+function enqueue(c,n){ const k=pkey(c,n); if(AUTO.tried.has(k)||recentNone(k)) return; AUTO.tried.add(k); Q.push([c,n]); pump(); }
+let pointerDown=false, rerenderT=null;
+document.addEventListener('pointerdown',()=>{pointerDown=true;},true); document.addEventListener('pointerup',()=>{pointerDown=false;},true); document.addEventListener('pointercancel',()=>{pointerDown=false;},true);
+function scheduleRerender(){ clearTimeout(rerenderT); rerenderT=setTimeout(function again(){ if(pointerDown||document.body.classList.contains('dragging')||!document.body.classList.contains('in')){ rerenderT=setTimeout(again,700); return; } render(); },500); }
+function applyImg(c,n){
+  const p=photo(c,n); if(!p) return;
+  document.querySelectorAll('.art[data-n]:not(.photo)').forEach(el=>{ if(el.dataset.c===c && el.dataset.n===n){
+    el.classList.add('photo'); el.style.backgroundImage=`url('${cssUrl(p.src)}')`; el.textContent=''; el.setAttribute('role','img'); el.setAttribute('aria-label',n); el.removeAttribute('aria-hidden'); } });
+  scheduleRerender();
+}
+function hydrate(){
+  if(!me) return;
+  const seen=new Set();
+  document.querySelectorAll('.art[data-n]:not(.photo)').forEach(el=>{ const c=el.dataset.c, n=el.dataset.n, k=pkey(c,n); if(seen.has(k)) return; seen.add(k); if(photo(c,n)) applyImg(c,n); else enqueue(c,n); });
+}
+let hydrateT=null;
+function startHydration(){
+  const kick=()=>{ clearTimeout(hydrateT); hydrateT=setTimeout(hydrate,150); };
+  new MutationObserver(kick).observe(document.body,{childList:true,subtree:true}); kick();
+}
 
 /* ---------- Shelf ---------- */
 const shelfList = (y, view='me') => state.order.filter(c=>eff(c,y) && visibleIn(c,view));
@@ -2065,6 +2207,7 @@ document.addEventListener('input',e=>{
 
 document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.preventDefault(); submitAuth(); } });
 (async function boot(){
+  try{ if(new URLSearchParams(location.search).has('debug')) window.PALATE_DEBUG=true; }catch(e){}
   captureJoin();
   if(!sb){ document.body.classList.remove('in'); $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">Setup needed: open config.js and paste in your Supabase URL and publishable key.</p></section>'; return; }
   sb.auth.onAuthStateChange(ev=>{ if(ev==='SIGNED_OUT' && me) location.reload(); });
