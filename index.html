@@ -337,7 +337,7 @@ body.dragging{user-select:none;-webkit-user-select:none}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--text);color:var(--bg);font-size:14px;font-weight:500;padding:10px 16px;border-radius:999px;max-width:calc(100% - 32px)}
 @media (max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 /* Loading screen: polaroid and word over a soft light leak. Colours dim in light mode. */
-.boot{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;color:var(--text);
+.boot{position:fixed;top:0;left:0;right:0;bottom:calc(-1 * env(safe-area-inset-bottom,0px));min-height:100lvh;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;color:var(--text);
   background:
     radial-gradient(ellipse 28% 40% at 103% 105%, rgb(94 200 247 / calc(.40 * var(--gk))), rgb(94 200 247 / calc(.14 * var(--gk))) 55%, transparent),
     radial-gradient(ellipse 38% 42% at 40% -8%, rgb(176 124 255 / calc(.45 * var(--gk))), rgb(176 124 255 / calc(.16 * var(--gk))) 55%, transparent),
