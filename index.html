@@ -121,6 +121,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .art.photo{background-color:var(--raise)}
 .art b{font-weight:700;font-size:calc(var(--ht) * .32);letter-spacing:-.03em;text-transform:uppercase}
 .sh-round{border-radius:50%}
+.art.photo.sh-round{background-position:50% 22%}
 .sz-row{--w:52px;--ht:52px}.sz-row.sh-poster{--w:38px;--ht:54px}.sz-row.sh-wide{--w:58px;--ht:42px}
 .sz-sm{--w:38px;--ht:38px}.sz-sm.sh-poster{--w:28px;--ht:40px}.sz-sm.sh-wide{--w:44px;--ht:32px}
 .sz-lg{--w:180px;--ht:180px;border-radius:14px}.sz-lg.sh-poster{--w:140px;--ht:200px}.sz-lg.sh-wide{--w:220px;--ht:150px}.sz-lg.sh-round{border-radius:50%}
@@ -1458,8 +1459,1653 @@ Cavalier King Charles Spaniel|Breed
 German Shepherd|Breed
 Beagle|Breed`
 };
+const EXTRA = {
+artists:`Drake|Hip-hop
+The Weeknd|R&B
+Beyoncé|R&B
+Rihanna|Pop / R&B
+Ariana Grande|Pop
+Billie Eilish|Pop
+Olivia Rodrigo|Pop
+Dua Lipa|Pop
+Harry Styles|Pop
+Ed Sheeran|Pop
+Adele|Pop
+Lady Gaga|Pop
+Katy Perry|Pop
+Justin Bieber|Pop
+Post Malone|Pop / Hip-hop
+Travis Scott|Hip-hop
+Kanye West|Hip-hop
+J. Cole|Hip-hop
+Eminem|Hip-hop
+Jay-Z|Hip-hop
+Nicki Minaj|Hip-hop
+Cardi B|Hip-hop
+Megan Thee Stallion|Hip-hop
+Lil Wayne|Hip-hop
+Future|Hip-hop
+21 Savage|Hip-hop
+Lil Baby|Hip-hop
+Playboi Carti|Hip-hop
+Juice WRLD|Hip-hop
+XXXTENTACION|Hip-hop
+Mac Miller|Hip-hop
+A$AP Rocky|Hip-hop
+Childish Gambino|Hip-hop / R&B
+Doja Cat|Pop / Hip-hop
+Lizzo|Pop
+Lana Del Rey|Pop
+Lorde|Pop
+Sabrina Carpenter|Pop
+Chappell Roan|Pop
+Charli XCX|Pop
+Tate McRae|Pop
+Gracie Abrams|Pop
+Laufey|Jazz pop
+Hozier|Indie
+Lewis Capaldi|Pop
+Sam Smith|Pop
+Shawn Mendes|Pop
+Camila Cabello|Pop
+Selena Gomez|Pop
+Miley Cyrus|Pop
+Demi Lovato|Pop
+Bad Bunny|Latin
+J Balvin|Latin
+Karol G|Latin
+Shakira|Latin
+Rosalía|Latin
+Peso Pluma|Latin
+Rauw Alejandro|Latin
+BTS|K-pop
+BLACKPINK|K-pop
+Stray Kids|K-pop
+NewJeans|K-pop
+TWICE|K-pop
+SEVENTEEN|K-pop
+aespa|K-pop
+LE SSERAFIM|K-pop
+ENHYPEN|K-pop
+IVE|K-pop
+G-Dragon|K-pop
+IU|K-pop
+Jungkook|K-pop
+Jennie|K-pop
+Lisa|K-pop
+Rosé|K-pop
+Coldplay|Rock
+Imagine Dragons|Rock
+Arctic Monkeys|Indie rock
+The Strokes|Indie rock
+Radiohead|Rock
+Nirvana|Rock
+Foo Fighters|Rock
+Red Hot Chili Peppers|Rock
+Linkin Park|Rock
+Green Day|Rock
+Paramore|Rock
+My Chemical Romance|Rock
+Fall Out Boy|Rock
+Twenty One Pilots|Alt
+AC/DC|Rock
+Queen|Rock
+The Beatles|Rock
+The Rolling Stones|Rock
+Led Zeppelin|Rock
+Pink Floyd|Rock
+Metallica|Metal
+Guns N' Roses|Rock
+U2|Rock
+Fleetwood Mac|Rock
+David Bowie|Rock
+Prince|Pop / Funk
+Michael Jackson|Pop
+Madonna|Pop
+Elton John|Pop
+Stevie Wonder|Soul
+Marvin Gaye|Soul
+Amy Winehouse|Soul
+Daniel Caesar|R&B
+Brent Faiyaz|R&B
+Steve Lacy|R&B
+H.E.R.|R&B
+Summer Walker|R&B
+Usher|R&B
+Chris Brown|R&B
+Bryson Tiller|R&B
+Giveon|R&B
+Khalid|R&B
+Jhené Aiko|R&B
+Don Toliver|Hip-hop
+Kid Cudi|Hip-hop
+Jack Harlow|Hip-hop
+Lil Uzi Vert|Hip-hop
+Lil Nas X|Pop / Hip-hop
+Metro Boomin|Hip-hop
+Tory Lanez|R&B
+Travis Barker|Rock
+Gunna|Hip-hop
+Lil Yachty|Hip-hop
+Ice Spice|Hip-hop
+Central Cee|Hip-hop
+Stormzy|Grime
+Dave|Hip-hop
+Burna Boy|Afrobeats
+Wizkid|Afrobeats
+Tems|Afrobeats
+Rema|Afrobeats
+Asake|Afrobeats
+Ayra Starr|Afrobeats
+Tyla|Amapiano
+Calvin Harris|Dance
+David Guetta|Dance
+Avicii|Dance
+Daft Punk|Dance
+Skrillex|Dance
+Marshmello|Dance
+Kygo|Dance
+Zedd|Dance
+The Chainsmokers|Dance
+Swedish House Mafia|Dance
+Fred again..|Dance
+Taylor Swift|Pop
+Morgan Wallen|Country
+Luke Combs|Country
+Zach Bryan|Country
+Chris Stapleton|Country
+Kacey Musgraves|Country
+Johnny Cash|Country
+Dolly Parton|Country
+Bob Dylan|Folk
+Bon Iver|Indie folk
+Phoebe Bridgers|Indie
+Mitski|Indie
+Clairo|Indie
+Beabadoobee|Indie
+Tame Impala|Psychedelic
+MGMT|Indie
+Vampire Weekend|Indie
+Mac DeMarco|Indie
+Rex Orange County|Indie
+Lil Peep|Emo rap
+Bob Marley|Reggae
+Sade|Soul
+Lauryn Hill|Hip-hop / Soul
+Nas|Hip-hop
+Tupac|Hip-hop
+The Notorious B.I.G.|Hip-hop
+Snoop Dogg|Hip-hop
+Dr. Dre|Hip-hop
+50 Cent|Hip-hop
+Ludacris|Hip-hop
+Outkast|Hip-hop
+Lil Tecca|Hip-hop
+Offset|Hip-hop
+Migos|Hip-hop
+Quavo|Hip-hop
+Takeoff|Hip-hop
+Roddy Ricch|Hip-hop
+Polo G|Hip-hop
+NBA YoungBoy|Hip-hop
+Kodak Black|Hip-hop
+DaBaby|Hip-hop
+Anderson .Paak|R&B / Hip-hop
+Silk Sonic|R&B
+Teddy Swims|Soul
+Benson Boone|Pop
+Noah Kahan|Folk pop
+Djo|Indie
+Kali Uchis|R&B
+Raye|Soul
+Ravyn Lenae|R&B
+Victoria Monét|R&B
+Coco Jones|R&B
+Muni Long|R&B
+Ella Langley|Country`,
+albums:`Blonde|Frank Ocean · 2016
+Channel Orange|Frank Ocean · 2012
+SOS|SZA · 2022
+Ctrl|SZA · 2017
+To Pimp a Butterfly|Kendrick Lamar · 2015
+good kid, m.A.A.d city|Kendrick Lamar · 2012
+DAMN.|Kendrick Lamar · 2017
+GNX|Kendrick Lamar · 2024
+Mr. Morale & the Big Steppers|Kendrick Lamar · 2022
+Igor|Tyler, The Creator · 2019
+Flower Boy|Tyler, The Creator · 2017
+CALL ME IF YOU GET LOST|Tyler, The Creator · 2021
+Chromakopia|Tyler, The Creator · 2024
+My Beautiful Dark Twisted Fantasy|Kanye West · 2010
+The College Dropout|Kanye West · 2004
+Graduation|Kanye West · 2007
+Yeezus|Kanye West · 2013
+Donda|Kanye West · 2021
+Take Care|Drake · 2011
+Nothing Was the Same|Drake · 2013
+Certified Lover Boy|Drake · 2021
+Views|Drake · 2016
+Scorpion|Drake · 2018
+Honestly, Nevermind|Drake · 2022
+After Hours|The Weeknd · 2020
+Starboy|The Weeknd · 2016
+House of Balloons|The Weeknd · 2011
+Dawn FM|The Weeknd · 2022
+Hurry Up Tomorrow|The Weeknd · 2025
+Lemonade|Beyoncé · 2016
+Renaissance|Beyoncé · 2022
+Cowboy Carter|Beyoncé · 2024
+Beyoncé|Beyoncé · 2013
+Anti|Rihanna · 2016
+Folklore|Taylor Swift · 2020
+Evermore|Taylor Swift · 2020
+1989|Taylor Swift · 2014
+Midnights|Taylor Swift · 2022
+Red|Taylor Swift · 2012
+Lover|Taylor Swift · 2019
+Reputation|Taylor Swift · 2017
+Speak Now|Taylor Swift · 2010
+Fearless|Taylor Swift · 2008
+The Tortured Poets Department|Taylor Swift · 2024
+The Life of a Showgirl|Taylor Swift · 2025
+When We All Fall Asleep, Where Do We Go?|Billie Eilish · 2019
+Happier Than Ever|Billie Eilish · 2021
+Hit Me Hard and Soft|Billie Eilish · 2024
+Sour|Olivia Rodrigo · 2021
+Guts|Olivia Rodrigo · 2023
+Future Nostalgia|Dua Lipa · 2020
+Fine Line|Harry Styles · 2019
+Harry's House|Harry Styles · 2022
+Positions|Ariana Grande · 2020
+Sweetener|Ariana Grande · 2018
+Eternal Sunshine|Ariana Grande · 2024
+Short n' Sweet|Sabrina Carpenter · 2024
+The Rise and Fall of a Midwest Princess|Chappell Roan · 2023
+Brat|Charli XCX · 2024
+Born to Die|Lana Del Rey · 2012
+Norman F***ing Rockwell!|Lana Del Rey · 2019
+Pure Heroine|Lorde · 2013
+Melodrama|Lorde · 2017
+21|Adele · 2011
+25|Adele · 2015
+30|Adele · 2021
+Divide|Ed Sheeran · 2017
+Planet Her|Doja Cat · 2021
+Un Verano Sin Ti|Bad Bunny · 2022
+Debí Tirar Más Fotos|Bad Bunny · 2025
+Utopia|Travis Scott · 2023
+Astroworld|Travis Scott · 2018
+Birds in the Trap Sing McKnight|Travis Scott · 2016
+Whole Lotta Red|Playboi Carti · 2020
+Die Lit|Playboi Carti · 2018
+MUSIC|Playboi Carti · 2025
+Goodbye & Good Riddance|Juice WRLD · 2018
+Death Race for Love|Juice WRLD · 2019
+Circles|Mac Miller · 2020
+Swimming|Mac Miller · 2018
+Blue Slide Park|Mac Miller · 2011
+Man on the Moon: The End of Day|Kid Cudi · 2009
+2014 Forest Hills Drive|J. Cole · 2014
+The Off-Season|J. Cole · 2021
+Rodeo|Travis Scott · 2015
+Because the Internet|Childish Gambino · 2013
+"Awaken, My Love!"|Childish Gambino · 2016
+The Marshall Mathers LP|Eminem · 2000
+The Eminem Show|Eminem · 2002
+Illmatic|Nas · 1994
+Ready to Die|The Notorious B.I.G. · 1994
+All Eyez on Me|Tupac · 1996
+The Chronic|Dr. Dre · 1992
+The Miseducation of Lauryn Hill|Lauryn Hill · 1998
+Thriller|Michael Jackson · 1982
+Bad|Michael Jackson · 1987
+Purple Rain|Prince · 1984
+Abbey Road|The Beatles · 1969
+Sgt. Pepper's Lonely Hearts Club Band|The Beatles · 1967
+Revolver|The Beatles · 1966
+The Dark Side of the Moon|Pink Floyd · 1973
+The Wall|Pink Floyd · 1979
+Rumours|Fleetwood Mac · 1977
+Nevermind|Nirvana · 1991
+OK Computer|Radiohead · 1997
+In Rainbows|Radiohead · 2007
+Kid A|Radiohead · 2000
+AM|Arctic Monkeys · 2013
+Is This It|The Strokes · 2001
+Currents|Tame Impala · 2015
+Lonerism|Tame Impala · 2012
+For Emma, Forever Ago|Bon Iver · 2007
+Punisher|Phoebe Bridgers · 2020
+Stranger in the Alps|Phoebe Bridgers · 2017
+Be the Cowboy|Mitski · 2018
+Laurel Hell|Mitski · 2022
+Wasteland, Baby!|Hozier · 2019
+Led Zeppelin IV|Led Zeppelin · 1971
+Back in Black|AC/DC · 1980
+A Night at the Opera|Queen · 1975
+Master of Puppets|Metallica · 1986
+American Idiot|Green Day · 2004
+The Black Parade|My Chemical Romance · 2006
+Hybrid Theory|Linkin Park · 2000
+Random Access Memories|Daft Punk · 2013
+Discovery|Daft Punk · 2001
+Love Yourself: Tear|BTS · 2018
+Map of the Soul: 7|BTS · 2020
+Born Pink|BLACKPINK · 2022
+Get Up|NewJeans · 2023
+Cowboy Carter|Beyoncé · 2024
+Mañana Será Bonito|Karol G · 2023
+Afrodisiac|Rema · 2019
+Love, Damini|Burna Boy · 2022
+Made in Lagos|Wizkid · 2020
+Wasteland|Brent Faiyaz · 2022
+Daniel|Daniel Caesar · 2019
+Freudian|Daniel Caesar · 2017
+Gemini|Steve Lacy · 2022
+Heaux Tales|Jazmine Sullivan · 2021
+Starboy|The Weeknd · 2016
+Rare|Selena Gomez · 2020
+Plastic Hearts|Miley Cyrus · 2020
+Endless Summer Vacation|Miley Cyrus · 2023
+Bangerz|Miley Cyrus · 2013
+Funeral|Lil Peep · 2016
+Come Over When You're Sober, Pt. 1|Lil Peep · 2017
+Eternal Atake|Lil Uzi Vert · 2020
+Pink Tape|Lil Uzi Vert · 2023
+Hardstone Psycho|Don Toliver · 2024
+Heroes & Villains|Metro Boomin · 2022
+Hot Pink|Doja Cat · 2019
+Scarlet|Doja Cat · 2023
+Good Girl Gone Bad|Rihanna · 2007`,
+songs:`Blinding Lights|The Weeknd
+Starboy|The Weeknd
+Save Your Tears|The Weeknd
+Die For You|The Weeknd
+Flowers|Miley Cyrus
+Anti-Hero|Taylor Swift
+Cruel Summer|Taylor Swift
+All Too Well (10 Minute Version)|Taylor Swift
+Love Story|Taylor Swift
+Blank Space|Taylor Swift
+Shake It Off|Taylor Swift
+Cardigan|Taylor Swift
+Fortnight|Taylor Swift
+Espresso|Sabrina Carpenter
+Please Please Please|Sabrina Carpenter
+Good Luck, Babe!|Chappell Roan
+Pink Pony Club|Chappell Roan
+Bad Guy|Billie Eilish
+Birds of a Feather|Billie Eilish
+Ocean Eyes|Billie Eilish
+drivers license|Olivia Rodrigo
+good 4 u|Olivia Rodrigo
+vampire|Olivia Rodrigo
+Levitating|Dua Lipa
+Dance the Night|Dua Lipa
+As It Was|Harry Styles
+Watermelon Sugar|Harry Styles
+Golden|Harry Styles
+Shape of You|Ed Sheeran
+Perfect|Ed Sheeran
+Someone Like You|Adele
+Rolling in the Deep|Adele
+Easy On Me|Adele
+Hello|Adele
+Bohemian Rhapsody|Queen
+Don't Stop Me Now|Queen
+Billie Jean|Michael Jackson
+Beat It|Michael Jackson
+Smooth Criminal|Michael Jackson
+Hotel California|Eagles
+Stairway to Heaven|Led Zeppelin
+Smells Like Teen Spirit|Nirvana
+Creep|Radiohead
+Do I Wanna Know?|Arctic Monkeys
+505|Arctic Monkeys
+R U Mine?|Arctic Monkeys
+The Less I Know the Better|Tame Impala
+Redbone|Childish Gambino
+This Is America|Childish Gambino
+Pink + White|Frank Ocean
+Ivy|Frank Ocean
+Nights|Frank Ocean
+Thinkin Bout You|Frank Ocean
+Good Days|SZA
+Kill Bill|SZA
+Snooze|SZA
+Love Galore|SZA
+HUMBLE.|Kendrick Lamar
+Not Like Us|Kendrick Lamar
+All the Stars|Kendrick Lamar
+Alright|Kendrick Lamar
+Money Trees|Kendrick Lamar
+Euphoria|Kendrick Lamar
+Luther|Kendrick Lamar
+Sicko Mode|Travis Scott
+Goosebumps|Travis Scott
+Highest in the Room|Travis Scott
+God's Plan|Drake
+Hotline Bling|Drake
+One Dance|Drake
+Passionfruit|Drake
+Nonstop|Drake
+Gold Digger|Kanye West
+Stronger|Kanye West
+Runaway|Kanye West
+Heartless|Kanye West
+Lose Yourself|Eminem
+The Real Slim Shady|Eminem
+Without Me|Eminem
+Love the Way You Lie|Eminem
+Umbrella|Rihanna
+Diamonds|Rihanna
+We Found Love|Rihanna
+Work|Rihanna
+Crazy in Love|Beyoncé
+Halo|Beyoncé
+Single Ladies|Beyoncé
+Formation|Beyoncé
+Texas Hold 'Em|Beyoncé
+Bad Romance|Lady Gaga
+Poker Face|Lady Gaga
+Die With A Smile|Lady Gaga & Bruno Mars
+APT.|ROSÉ & Bruno Mars
+Locked Out of Heaven|Bruno Mars
+Uptown Funk|Mark Ronson ft. Bruno Mars
+That's What I Like|Bruno Mars
+Leave the Door Open|Silk Sonic
+Dynamite|BTS
+Butter|BTS
+Spring Day|BTS
+How You Like That|BLACKPINK
+Kill This Love|BLACKPINK
+Ditto|NewJeans
+Hype Boy|NewJeans
+Titi Me Preguntó|Bad Bunny
+Moscow Mule|Bad Bunny
+DtMF|Bad Bunny
+Tití Me Preguntó|Bad Bunny
+Hips Don't Lie|Shakira
+Bzrp Music Sessions, Vol. 53|Shakira & Bizarrap
+Mockingbird|Eminem
+Sunflower|Post Malone & Swae Lee
+Circles|Post Malone
+Rockstar|Post Malone
+Congratulations|Post Malone
+I Wanna Be Yours|Arctic Monkeys
+Mr. Brightside|The Killers
+Seven Nation Army|The White Stripes
+Yellow|Coldplay
+Viva la Vida|Coldplay
+Fix You|Coldplay
+Clocks|Coldplay
+Believer|Imagine Dragons
+Radioactive|Imagine Dragons
+Thunder|Imagine Dragons
+Africa|Toto
+Dreams|Fleetwood Mac
+Take Me to Church|Hozier
+Too Sweet|Hozier
+Lose Control|Teddy Swims
+Stick Season|Noah Kahan
+Vienna|Billy Joel
+Piano Man|Billy Joel
+Sweet Child O' Mine|Guns N' Roses
+Livin' on a Prayer|Bon Jovi
+Purple Rain|Prince
+Kiss|Prince
+Superstition|Stevie Wonder
+What's Going On|Marvin Gaye
+Let's Stay Together|Al Green
+No Woman, No Cry|Bob Marley
+Redemption Song|Bob Marley
+Sweater Weather|The Neighbourhood
+Heat Waves|Glass Animals
+Electric Feel|MGMT
+Kids|MGMT
+Pink Venom|BLACKPINK
+Supernova|aespa
+Hot Girl Summer|Megan Thee Stallion
+Savage|Megan Thee Stallion
+WAP|Cardi B & Megan Thee Stallion
+Bodak Yellow|Cardi B
+Super Bass|Nicki Minaj
+Starships|Nicki Minaj
+Rich Flex|Drake & 21 Savage
+Mask Off|Future
+Life Is Good|Future
+Wishing Well|Juice WRLD
+Lucid Dreams|Juice WRLD
+All Girls Are the Same|Juice WRLD
+Sad!|XXXTENTACION
+Look at Me!|XXXTENTACION
+Mask Off|Future
+Mi Gente|J Balvin
+Tusa|Karol G
+Despacito|Luis Fonsi
+Calm Down|Rema
+Essence|Wizkid ft. Tems
+Last Last|Burna Boy
+Free Mind|Tems
+Water|Tyla`,
+movies:`The Godfather|Francis Ford Coppola · 1972
+The Godfather Part II|Francis Ford Coppola · 1974
+Pulp Fiction|Quentin Tarantino · 1994
+Kill Bill: Vol. 1|Quentin Tarantino · 2003
+Django Unchained|Quentin Tarantino · 2012
+Once Upon a Time in Hollywood|Quentin Tarantino · 2019
+Inglourious Basterds|Quentin Tarantino · 2009
+Fight Club|David Fincher · 1999
+Se7en|David Fincher · 1995
+Gone Girl|David Fincher · 2014
+The Social Network|David Fincher · 2010
+Zodiac|David Fincher · 2007
+The Dark Knight|Christopher Nolan · 2008
+Inception|Christopher Nolan · 2010
+Interstellar|Christopher Nolan · 2014
+Oppenheimer|Christopher Nolan · 2023
+Dunkirk|Christopher Nolan · 2017
+The Prestige|Christopher Nolan · 2006
+Memento|Christopher Nolan · 2000
+Tenet|Christopher Nolan · 2020
+Parasite|Bong Joon-ho · 2019
+Oldboy|Park Chan-wook · 2003
+Decision to Leave|Park Chan-wook · 2022
+Spirited Away|Hayao Miyazaki · 2001
+Princess Mononoke|Hayao Miyazaki · 1997
+My Neighbor Totoro|Hayao Miyazaki · 1988
+Howl's Moving Castle|Hayao Miyazaki · 2004
+The Boy and the Heron|Hayao Miyazaki · 2023
+Your Name.|Makoto Shinkai · 2016
+Weathering with You|Makoto Shinkai · 2019
+Suzume|Makoto Shinkai · 2022
+Whiplash|Damien Chazelle · 2014
+La La Land|Damien Chazelle · 2016
+Drive|Nicolas Winding Refn · 2011
+Blade Runner 2049|Denis Villeneuve · 2017
+Dune|Denis Villeneuve · 2021
+Dune: Part Two|Denis Villeneuve · 2024
+Arrival|Denis Villeneuve · 2016
+Sicario|Denis Villeneuve · 2015
+Prisoners|Denis Villeneuve · 2013
+Everything Everywhere All at Once|Daniels · 2022
+Get Out|Jordan Peele · 2017
+Us|Jordan Peele · 2019
+Nope|Jordan Peele · 2022
+Hereditary|Ari Aster · 2018
+Midsommar|Ari Aster · 2019
+The Lighthouse|Robert Eggers · 2019
+Nosferatu|Robert Eggers · 2024
+Lady Bird|Greta Gerwig · 2017
+Barbie|Greta Gerwig · 2023
+Little Women|Greta Gerwig · 2019
+Moonlight|Barry Jenkins · 2016
+Call Me by Your Name|Luca Guadagnino · 2017
+Challengers|Luca Guadagnino · 2024
+Past Lives|Celine Song · 2023
+Anora|Sean Baker · 2024
+The Brutalist|Brady Corbet · 2024
+Poor Things|Yorgos Lanthimos · 2023
+The Grand Budapest Hotel|Wes Anderson · 2014
+Moonrise Kingdom|Wes Anderson · 2012
+The Royal Tenenbaums|Wes Anderson · 2001
+Fantastic Mr. Fox|Wes Anderson · 2009
+Eternal Sunshine of the Spotless Mind|Michel Gondry · 2004
+Lost in Translation|Sofia Coppola · 2003
+The Virgin Suicides|Sofia Coppola · 1999
+Marie Antoinette|Sofia Coppola · 2006
+Goodfellas|Martin Scorsese · 1990
+Taxi Driver|Martin Scorsese · 1976
+The Departed|Martin Scorsese · 2006
+The Wolf of Wall Street|Martin Scorsese · 2013
+Killers of the Flower Moon|Martin Scorsese · 2023
+Casino|Martin Scorsese · 1995
+Raging Bull|Martin Scorsese · 1980
+Schindler's List|Steven Spielberg · 1993
+Jurassic Park|Steven Spielberg · 1993
+Jaws|Steven Spielberg · 1975
+E.T. the Extra-Terrestrial|Steven Spielberg · 1982
+Saving Private Ryan|Steven Spielberg · 1998
+Catch Me If You Can|Steven Spielberg · 2002
+Back to the Future|Robert Zemeckis · 1985
+Forrest Gump|Robert Zemeckis · 1994
+The Shawshank Redemption|Frank Darabont · 1994
+The Green Mile|Frank Darabont · 1999
+Gladiator|Ridley Scott · 2000
+Alien|Ridley Scott · 1979
+Blade Runner|Ridley Scott · 1982
+The Martian|Ridley Scott · 2015
+Titanic|James Cameron · 1997
+Avatar|James Cameron · 2009
+Terminator 2: Judgment Day|James Cameron · 1991
+Aliens|James Cameron · 1986
+The Matrix|The Wachowskis · 1999
+Star Wars|George Lucas · 1977
+The Empire Strikes Back|Irvin Kershner · 1980
+Revenge of the Sith|George Lucas · 2005
+The Lord of the Rings: The Fellowship of the Ring|Peter Jackson · 2001
+The Lord of the Rings: The Return of the King|Peter Jackson · 2003
+The Lord of the Rings: The Two Towers|Peter Jackson · 2002
+Harry Potter and the Prisoner of Azkaban|Alfonso Cuarón · 2004
+Harry Potter and the Sorcerer's Stone|Chris Columbus · 2001
+Gravity|Alfonso Cuarón · 2013
+Roma|Alfonso Cuarón · 2018
+Children of Men|Alfonso Cuarón · 2006
+Pan's Labyrinth|Guillermo del Toro · 2006
+The Shape of Water|Guillermo del Toro · 2017
+Joker|Todd Phillips · 2019
+The Hangover|Todd Phillips · 2009
+Superbad|Greg Mottola · 2007
+Mean Girls|Mark Waters · 2004
+Clueless|Amy Heckerling · 1995
+Legally Blonde|Robert Luketic · 2001
+Easy A|Will Gluck · 2010
+10 Things I Hate About You|Gil Junger · 1999
+Bridesmaids|Paul Feig · 2011
+Knives Out|Rian Johnson · 2019
+Glass Onion|Rian Johnson · 2022
+Top Gun: Maverick|Joseph Kosinski · 2022
+Mad Max: Fury Road|George Miller · 2015
+John Wick|Chad Stahelski · 2014
+Spider-Man: Into the Spider-Verse|Peter Ramsey · 2018
+Spider-Man: Across the Spider-Verse|Joaquim Dos Santos · 2023
+Spider-Man: No Way Home|Jon Watts · 2021
+Avengers: Endgame|Russo Brothers · 2019
+Avengers: Infinity War|Russo Brothers · 2018
+The Avengers|Joss Whedon · 2012
+Black Panther|Ryan Coogler · 2018
+Sinners|Ryan Coogler · 2025
+Creed|Ryan Coogler · 2015
+Guardians of the Galaxy|James Gunn · 2014
+Thor: Ragnarok|Taika Waititi · 2017
+Iron Man|Jon Favreau · 2008
+Deadpool & Wolverine|Shawn Levy · 2024
+Toy Story|John Lasseter · 1995
+Toy Story 3|Lee Unkrich · 2010
+Finding Nemo|Andrew Stanton · 2003
+WALL·E|Andrew Stanton · 2008
+Up|Pete Docter · 2009
+Inside Out|Pete Docter · 2015
+Coco|Lee Unkrich · 2017
+Ratatouille|Brad Bird · 2007
+The Incredibles|Brad Bird · 2004
+Soul|Pete Docter · 2020
+The Lion King|Roger Allers · 1994
+Aladdin|Ron Clements · 1992
+Beauty and the Beast|Gary Trousdale · 1991
+Frozen|Chris Buck · 2013
+Moana|Ron Clements · 2016
+Encanto|Byron Howard · 2021
+Zootopia|Byron Howard · 2016
+Shrek|Andrew Adamson · 2001
+How to Train Your Dragon|Chris Sanders · 2010
+Kung Fu Panda|Mark Osborne · 2008
+Puss in Boots: The Last Wish|Joel Crawford · 2022
+The Notebook|Nick Cassavetes · 2004
+Pride & Prejudice|Joe Wright · 2005
+Titanic|James Cameron · 1997
+Her|Spike Jonze · 2013
+Silver Linings Playbook|David O. Russell · 2012
+American Psycho|Mary Harron · 2000
+Scarface|Brian De Palma · 1983
+Heat|Michael Mann · 1995
+No Country for Old Men|Coen Brothers · 2007
+The Big Lebowski|Coen Brothers · 1998
+Fargo|Coen Brothers · 1996
+12 Angry Men|Sidney Lumet · 1957
+Citizen Kane|Orson Welles · 1941
+Casablanca|Michael Curtiz · 1942
+Psycho|Alfred Hitchcock · 1960
+Vertigo|Alfred Hitchcock · 1958
+Rear Window|Alfred Hitchcock · 1954
+2001: A Space Odyssey|Stanley Kubrick · 1968
+The Shining|Stanley Kubrick · 1980
+A Clockwork Orange|Stanley Kubrick · 1971
+Seven Samurai|Akira Kurosawa · 1954
+Amélie|Jean-Pierre Jeunet · 2001
+Burning|Lee Chang-dong · 2018
+Train to Busan|Yeon Sang-ho · 2016
+Memories of Murder|Bong Joon-ho · 2003
+The Handmaiden|Park Chan-wook · 2016
+Perfect Blue|Satoshi Kon · 1997
+Akira|Katsuhiro Otomo · 1988
+Grave of the Fireflies|Isao Takahata · 1988
+A Silent Voice|Naoko Yamada · 2016
+Jujutsu Kaisen 0|Sunghoo Park · 2021
+Demon Slayer: Mugen Train|Haruo Sotozaki · 2020
+Weapons|Zach Cregger · 2025
+Superman|James Gunn · 2025
+Wicked|Jon M. Chu · 2024
+The Batman|Matt Reeves · 2022
+Oppenheimer|Christopher Nolan · 2023
+Saltburn|Emerald Fennell · 2023
+Marty Supreme|Josh Safdie · 2025`,
+tv:`Breaking Bad|AMC · 2008
+Better Call Saul|AMC · 2015
+The Sopranos|HBO · 1999
+The Wire|HBO · 2002
+Game of Thrones|HBO · 2011
+House of the Dragon|HBO · 2022
+Succession|HBO · 2018
+The White Lotus|HBO · 2021
+Euphoria|HBO · 2019
+The Last of Us|HBO · 2023
+Chernobyl|HBO · 2019
+Band of Brothers|HBO · 2001
+True Detective|HBO · 2014
+Westworld|HBO · 2016
+Stranger Things|Netflix · 2016
+Squid Game|Netflix · 2021
+Wednesday|Netflix · 2022
+Bridgerton|Netflix · 2020
+The Crown|Netflix · 2016
+Ozark|Netflix · 2017
+Narcos|Netflix · 2015
+Dark|Netflix · 2017
+Money Heist|Netflix · 2017
+Black Mirror|Netflix · 2011
+Mindhunter|Netflix · 2017
+Arcane|Netflix · 2021
+The Queen's Gambit|Netflix · 2020
+Beef|Netflix · 2023
+Adolescence|Netflix · 2025
+Baby Reindeer|Netflix · 2024
+Love Is Blind|Netflix · 2020
+Cobra Kai|Netflix · 2018
+You|Netflix · 2018
+Shadow and Bone|Netflix · 2021
+One Piece|Netflix · 2023
+The Boys|Prime Video · 2019
+Fallout|Prime Video · 2024
+Invincible|Prime Video · 2021
+The Marvelous Mrs. Maisel|Prime Video · 2017
+Reacher|Prime Video · 2022
+The Bear|FX · 2022
+Shōgun|FX · 2024
+Atlanta|FX · 2016
+Fargo|FX · 2014
+What We Do in the Shadows|FX · 2019
+American Horror Story|FX · 2011
+It's Always Sunny in Philadelphia|FX · 2005
+Severance|Apple TV+ · 2022
+Ted Lasso|Apple TV+ · 2020
+Slow Horses|Apple TV+ · 2022
+Silo|Apple TV+ · 2023
+The Morning Show|Apple TV+ · 2019
+Pluribus|Apple TV+ · 2025
+The Mandalorian|Disney+ · 2019
+Andor|Disney+ · 2022
+WandaVision|Disney+ · 2021
+Loki|Disney+ · 2021
+Only Murders in the Building|Hulu · 2021
+The Handmaid's Tale|Hulu · 2017
+Abbott Elementary|ABC · 2021
+Modern Family|ABC · 2009
+Grey's Anatomy|ABC · 2005
+Lost|ABC · 2004
+Scandal|ABC · 2012
+How to Get Away with Murder|ABC · 2014
+The Office|NBC · 2005
+Parks and Recreation|NBC · 2009
+Brooklyn Nine-Nine|NBC · 2013
+30 Rock|NBC · 2006
+Community|NBC · 2009
+This Is Us|NBC · 2016
+The Good Place|NBC · 2016
+Friends|NBC · 1994
+Seinfeld|NBC · 1989
+Saturday Night Live|NBC · 1975
+Law & Order: SVU|NBC · 1999
+The Big Bang Theory|CBS · 2007
+How I Met Your Mother|CBS · 2005
+Young Sheldon|CBS · 2017
+Survivor|CBS · 2000
+The Simpsons|Fox · 1989
+Family Guy|Fox · 1999
+Futurama|Fox · 1999
+Bob's Burgers|Fox · 2011
+House|Fox · 2004
+Glee|Fox · 2009
+New Girl|Fox · 2011
+South Park|Comedy Central · 1997
+Rick and Morty|Adult Swim · 2013
+BoJack Horseman|Netflix · 2014
+Avatar: The Last Airbender|Nickelodeon · 2005
+SpongeBob SquarePants|Nickelodeon · 1999
+Gravity Falls|Disney Channel · 2012
+Adventure Time|Cartoon Network · 2010
+Gossip Girl|The CW · 2007
+Riverdale|The CW · 2017
+The Vampire Diaries|The CW · 2009
+Supernatural|The CW · 2005
+Pretty Little Liars|Freeform · 2010
+Shameless|Showtime · 2011
+Dexter|Showtime · 2006
+Homeland|Showtime · 2011
+Yellowjackets|Showtime · 2021
+Peaky Blinders|BBC · 2013
+Sherlock|BBC · 2010
+Doctor Who|BBC · 1963
+Fleabag|BBC · 2016
+Normal People|BBC · 2020
+Planet Earth|BBC · 2006
+Downton Abbey|ITV · 2010
+Line of Duty|BBC · 2012
+Skins|E4 · 2007
+Derry Girls|Channel 4 · 2018
+The Inbetweeners|E4 · 2008
+Gavin & Stacey|BBC · 2007
+Love Island|ITV · 2015
+Heartstopper|Netflix · 2022
+Sex Education|Netflix · 2019
+The Summer I Turned Pretty|Prime Video · 2022
+Outer Banks|Netflix · 2020
+Never Have I Ever|Netflix · 2020
+Emily in Paris|Netflix · 2020
+Gilmore Girls|The WB · 2000
+Dawson's Creek|The WB · 1998
+Scrubs|NBC · 2001
+Arrested Development|Fox · 2003
+Curb Your Enthusiasm|HBO · 2000
+Entourage|HBO · 2004
+Sex and the City|HBO · 1998
+Girls|HBO · 2012
+Insecure|HBO · 2016
+Veep|HBO · 2012
+Barry|HBO · 2018
+Hacks|Max · 2021
+Industry|HBO · 2020`,
+anime:`Attack on Titan|Wit Studio · 2013
+Death Note|Madhouse · 2006
+Fullmetal Alchemist: Brotherhood|Bones · 2009
+Demon Slayer|ufotable · 2019
+Jujutsu Kaisen|MAPPA · 2020
+My Hero Academia|Bones · 2016
+One Piece|Toei Animation · 1999
+Naruto|Pierrot · 2002
+Naruto Shippuden|Pierrot · 2007
+Bleach|Pierrot · 2004
+Dragon Ball Z|Toei Animation · 1989
+Hunter x Hunter|Madhouse · 2011
+Cowboy Bebop|Sunrise · 1998
+Neon Genesis Evangelion|Gainax · 1995
+One Punch Man|Madhouse · 2015
+Mob Psycho 100|Bones · 2016
+Chainsaw Man|MAPPA · 2022
+Spy x Family|Wit Studio · 2022
+Frieren: Beyond Journey's End|Madhouse · 2023
+Dandadan|Science SARU · 2024
+Solo Leveling|A-1 Pictures · 2024
+Bocchi the Rock!|CloverWorks · 2022
+Kaguya-sama: Love Is War|A-1 Pictures · 2019
+Your Lie in April|A-1 Pictures · 2014
+Steins;Gate|White Fox · 2011
+Code Geass|Sunrise · 2006
+Tokyo Ghoul|Pierrot · 2014
+Haikyu!!|Production I.G · 2014
+Kuroko's Basketball|Production I.G · 2012
+Blue Lock|8bit · 2022
+Vinland Saga|Wit Studio · 2019
+Berserk|Oriental Light and Magic · 1997
+Sword Art Online|A-1 Pictures · 2012
+Fire Force|David Production · 2019
+Black Clover|Pierrot · 2017
+Fairy Tail|A-1 Pictures · 2009
+Gintama|Sunrise · 2006
+JoJo's Bizarre Adventure|David Production · 2012
+Re:Zero|White Fox · 2016
+Konosuba|Studio Deen · 2016
+Overlord|Madhouse · 2015
+That Time I Got Reincarnated as a Slime|8bit · 2018
+Made in Abyss|Kinema Citrus · 2017
+Violet Evergarden|Kyoto Animation · 2018
+Clannad|Kyoto Animation · 2007
+K-On!|Kyoto Animation · 2009
+Toradora!|J.C.Staff · 2008
+Your Name.|CoMix Wave · 2016
+Monster|Madhouse · 2004
+Samurai Champloo|Manglobe · 2004
+Trigun|Madhouse · 1998
+Fruits Basket|TMS Entertainment · 2019
+Ouran High School Host Club|Bones · 2006
+Oshi no Ko|Doga Kobo · 2023
+Kaiju No. 8|Production I.G · 2024
+Sakamoto Days|TMS Entertainment · 2025
+Cyberpunk: Edgerunners|Trigger · 2022
+Lycoris Recoil|A-1 Pictures · 2022
+Nana|Madhouse · 2006
+Assassination Classroom|Lerche · 2015
+The Apothecary Diaries|OLM · 2023`,
+games:`Elden Ring|FromSoftware · 2022
+Dark Souls|FromSoftware · 2011
+Bloodborne|FromSoftware · 2015
+Sekiro: Shadows Die Twice|FromSoftware · 2019
+The Legend of Zelda: Breath of the Wild|Nintendo · 2017
+The Legend of Zelda: Tears of the Kingdom|Nintendo · 2023
+The Legend of Zelda: Ocarina of Time|Nintendo · 1998
+Super Mario Odyssey|Nintendo · 2017
+Super Mario 64|Nintendo · 1996
+Mario Kart 8 Deluxe|Nintendo · 2017
+Super Smash Bros. Ultimate|Nintendo · 2018
+Animal Crossing: New Horizons|Nintendo · 2020
+Pokémon Scarlet and Violet|Game Freak · 2022
+Pokémon Emerald|Game Freak · 2004
+Metroid Dread|Nintendo · 2021
+Kirby and the Forgotten Land|Nintendo · 2022
+Splatoon 3|Nintendo · 2022
+Red Dead Redemption 2|Rockstar · 2018
+Grand Theft Auto V|Rockstar · 2013
+Grand Theft Auto: San Andreas|Rockstar · 2004
+The Witcher 3: Wild Hunt|CD Projekt · 2015
+Cyberpunk 2077|CD Projekt · 2020
+Baldur's Gate 3|Larian · 2023
+Skyrim|Bethesda · 2011
+Fallout 4|Bethesda · 2015
+Fallout: New Vegas|Obsidian · 2010
+Starfield|Bethesda · 2023
+Minecraft|Mojang · 2011
+Terraria|Re-Logic · 2011
+Stardew Valley|ConcernedApe · 2016
+Hollow Knight|Team Cherry · 2017
+Celeste|Maddy Makes Games · 2018
+Hades|Supergiant · 2020
+Hades II|Supergiant · 2024
+Cuphead|Studio MDHR · 2017
+Undertale|Toby Fox · 2015
+Deltarune|Toby Fox · 2018
+Inside|Playdead · 2016
+Limbo|Playdead · 2010
+Disco Elysium|ZA/UM · 2019
+Outer Wilds|Mobius Digital · 2019
+Portal 2|Valve · 2011
+Half-Life 2|Valve · 2004
+Half-Life: Alyx|Valve · 2020
+Counter-Strike 2|Valve · 2023
+Team Fortress 2|Valve · 2007
+Left 4 Dead 2|Valve · 2009
+Dota 2|Valve · 2013
+League of Legends|Riot · 2009
+Valorant|Riot · 2020
+Overwatch 2|Blizzard · 2022
+World of Warcraft|Blizzard · 2004
+Diablo IV|Blizzard · 2023
+StarCraft II|Blizzard · 2010
+Hearthstone|Blizzard · 2014
+Fortnite|Epic Games · 2017
+Apex Legends|Respawn · 2019
+Call of Duty: Modern Warfare II|Infinity Ward · 2022
+Call of Duty: Black Ops 6|Treyarch · 2024
+Call of Duty: Warzone|Raven · 2020
+Battlefield 1|DICE · 2016
+Halo: Combat Evolved|Bungie · 2001
+Halo 3|Bungie · 2007
+Destiny 2|Bungie · 2017
+Gears of War|Epic Games · 2006
+Forza Horizon 5|Playground · 2021
+Gran Turismo 7|Polyphony · 2022
+FIFA 23|EA · 2022
+EA Sports FC 25|EA · 2024
+Madden NFL 25|EA · 2024
+NBA 2K25|2K · 2024
+NBA 2K26|2K · 2025
+Rocket League|Psyonix · 2015
+Fall Guys|Mediatonic · 2020
+Among Us|Innersloth · 2018
+Rainbow Six Siege|Ubisoft · 2015
+Assassin's Creed II|Ubisoft · 2009
+Assassin's Creed Valhalla|Ubisoft · 2020
+Assassin's Creed Black Flag|Ubisoft · 2013
+Far Cry 3|Ubisoft · 2012
+The Last of Us Part II|Naughty Dog · 2020
+The Last of Us|Naughty Dog · 2013
+Uncharted 4|Naughty Dog · 2016
+God of War|Santa Monica Studio · 2018
+God of War Ragnarök|Santa Monica Studio · 2022
+Marvel's Spider-Man 2|Insomniac · 2023
+Marvel's Spider-Man|Insomniac · 2018
+Ghost of Tsushima|Sucker Punch · 2020
+Horizon Zero Dawn|Guerrilla · 2017
+Horizon Forbidden West|Guerrilla · 2022
+Death Stranding|Kojima Productions · 2019
+Metal Gear Solid 3|Konami · 2004
+Persona 5 Royal|Atlus · 2019
+Persona 3 Reload|Atlus · 2024
+Final Fantasy VII|Square Enix · 1997
+Final Fantasy VII Remake|Square Enix · 2020
+Final Fantasy X|Square Enix · 2001
+Final Fantasy XIV|Square Enix · 2013
+Kingdom Hearts II|Square Enix · 2005
+NieR: Automata|PlatinumGames · 2017
+Resident Evil 4|Capcom · 2023
+Resident Evil 2|Capcom · 2019
+Monster Hunter: World|Capcom · 2018
+Monster Hunter Wilds|Capcom · 2025
+Street Fighter 6|Capcom · 2023
+Devil May Cry 5|Capcom · 2019
+Mega Man 11|Capcom · 2018
+Tekken 8|Bandai Namco · 2024
+Mortal Kombat 1|NetherRealm · 2023
+Sonic Mania|Sega · 2017
+Yakuza 0|Sega · 2015
+Like a Dragon: Infinite Wealth|Sega · 2024
+BioShock|2K · 2007
+Borderlands 2|Gearbox · 2012
+Mass Effect 2|BioWare · 2010
+Dragon Age: Origins|BioWare · 2009
+The Sims 4|Maxis · 2014
+Civilization VI|Firaxis · 2016
+Age of Empires II|Ensemble · 1999
+Cities: Skylines|Colossal Order · 2015
+Factorio|Wube · 2020
+Slay the Spire|Mega Crit · 2019
+Balatro|LocalThunk · 2024
+Vampire Survivors|poncle · 2022
+Hollow Knight: Silksong|Team Cherry · 2025
+Clair Obscur: Expedition 33|Sandfall · 2025
+Black Myth: Wukong|Game Science · 2024
+Palworld|Pocketpair · 2024
+Helldivers 2|Arrowhead · 2024
+Lethal Company|Zeekerss · 2023
+Phasmophobia|Kinetic Games · 2020
+Marvel Rivals|NetEase · 2024
+Genshin Impact|HoYoverse · 2020
+Honkai: Star Rail|HoYoverse · 2023
+Zenless Zone Zero|HoYoverse · 2024
+Ghost of Yōtei|Sucker Punch · 2025
+Expedition 33|Sandfall · 2025
+Roblox|Roblox Corporation · 2006
+Pizza Tower|Tour De Pizza · 2023
+Subnautica|Unknown Worlds · 2018
+Resident Evil Village|Capcom · 2021
+It Takes Two|Hazelight · 2021
+Spider-Man 2|Insomniac · 2023
+Fall of Cybertron|High Moon · 2012`,
+actors:`Timothée Chalamet|Actor
+Zendaya|Actor
+Tom Holland|Actor
+Margot Robbie|Actor
+Ryan Gosling|Actor
+Leonardo DiCaprio|Actor
+Brad Pitt|Actor
+Robert Downey Jr.|Actor
+Chris Hemsworth|Actor
+Chris Evans|Actor
+Scarlett Johansson|Actor
+Jennifer Lawrence|Actor
+Emma Stone|Actor
+Emma Watson|Actor
+Anne Hathaway|Actor
+Florence Pugh|Actor
+Anya Taylor-Joy|Actor
+Jenna Ortega|Actor
+Sydney Sweeney|Actor
+Austin Butler|Actor
+Pedro Pascal|Actor
+Adam Driver|Actor
+Oscar Isaac|Actor
+Keanu Reeves|Actor
+Tom Hardy|Actor
+Cillian Murphy|Actor
+Christian Bale|Actor
+Joaquin Phoenix|Actor
+Jake Gyllenhaal|Actor
+Paul Mescal|Actor
+Barry Keoghan|Actor
+Jacob Elordi|Actor
+Glen Powell|Actor
+Dwayne Johnson|Actor
+Will Smith|Actor
+Denzel Washington|Actor
+Michael B. Jordan|Actor
+Idris Elba|Actor
+Samuel L. Jackson|Actor
+Morgan Freeman|Actor
+Al Pacino|Actor
+Robert De Niro|Actor
+Jack Nicholson|Actor
+Tom Hanks|Actor
+Meryl Streep|Actor
+Viola Davis|Actor
+Cate Blanchett|Actor
+Nicole Kidman|Actor
+Natalie Portman|Actor
+Saoirse Ronan|Actor
+Lupita Nyong'o|Actor
+Ana de Armas|Actor
+Millie Bobby Brown|Actor
+Sadie Sink|Actor
+Jeremy Allen White|Actor
+Ayo Edebiri|Actor
+Bella Ramsey|Actor
+Henry Cavill|Actor
+Ben Affleck|Actor
+Matt Damon|Actor
+Jonah Hill|Actor
+Seth Rogen|Actor
+Ryan Reynolds|Actor
+Hugh Jackman|Actor
+Daniel Radcliffe|Actor
+Robert Pattinson|Actor
+Kristen Stewart|Actor
+Lily James|Actor
+Rami Malek|Actor
+Mahershala Ali|Actor
+Daniel Kaluuya|Actor
+Lee Jung-jae|Actor
+Song Kang-ho|Actor
+Park Seo-joon|Actor
+Gong Yoo|Actor
+Lee Min-ho|Actor
+Song Joong-ki|Actor
+Kim Soo-hyun|Actor
+IU|Actor / Singer`,
+athletes:`LeBron James|Basketball
+Stephen Curry|Basketball
+Kevin Durant|Basketball
+Giannis Antetokounmpo|Basketball
+Luka Dončić|Basketball
+Nikola Jokić|Basketball
+Jayson Tatum|Basketball
+Victor Wembanyama|Basketball
+Anthony Edwards|Basketball
+Shai Gilgeous-Alexander|Basketball
+Caitlin Clark|Basketball
+A'ja Wilson|Basketball
+Michael Jordan|Basketball
+Kobe Bryant|Basketball
+Shaquille O'Neal|Basketball
+Lionel Messi|Football
+Cristiano Ronaldo|Football
+Kylian Mbappé|Football
+Erling Haaland|Football
+Vinícius Júnior|Football
+Jude Bellingham|Football
+Lamine Yamal|Football
+Mohamed Salah|Football
+Neymar|Football
+Kevin De Bruyne|Football
+Harry Kane|Football
+Bukayo Saka|Football
+Pelé|Football
+Diego Maradona|Football
+Zinedine Zidane|Football
+Ronaldinho|Football
+Thierry Henry|Football
+Patrick Mahomes|American football
+Travis Kelce|American football
+Josh Allen|American football
+Lamar Jackson|American football
+Jalen Hurts|American football
+Tom Brady|American football
+Aaron Rodgers|American football
+Saquon Barkley|American football
+Justin Jefferson|American football
+Shohei Ohtani|Baseball
+Aaron Judge|Baseball
+Mookie Betts|Baseball
+Juan Soto|Baseball
+Derek Jeter|Baseball
+Babe Ruth|Baseball
+Max Verstappen|Formula 1
+Lewis Hamilton|Formula 1
+Charles Leclerc|Formula 1
+Lando Norris|Formula 1
+Oscar Piastri|Formula 1
+Fernando Alonso|Formula 1
+Ayrton Senna|Formula 1
+Michael Schumacher|Formula 1
+Carlos Sainz|Formula 1
+Roger Federer|Tennis
+Rafael Nadal|Tennis
+Novak Djokovic|Tennis
+Carlos Alcaraz|Tennis
+Jannik Sinner|Tennis
+Serena Williams|Tennis
+Coco Gauff|Tennis
+Iga Świątek|Tennis
+Naomi Osaka|Tennis
+Aryna Sabalenka|Tennis
+Simone Biles|Gymnastics
+Usain Bolt|Track
+Noah Lyles|Track
+Sha'Carri Richardson|Track
+Michael Phelps|Swimming
+Katie Ledecky|Swimming
+Léon Marchand|Swimming
+Tiger Woods|Golf
+Rory McIlroy|Golf
+Scottie Scheffler|Golf
+Connor McDavid|Hockey
+Wayne Gretzky|Hockey
+Alex Ovechkin|Hockey
+Sidney Crosby|Hockey
+Conor McGregor|MMA
+Jon Jones|MMA
+Islam Makhachev|MMA
+Khabib Nurmagomedov|MMA
+Mike Tyson|Boxing
+Muhammad Ali|Boxing
+Canelo Álvarez|Boxing
+Tyson Fury|Boxing
+Oleksandr Usyk|Boxing
+Floyd Mayweather|Boxing
+Megan Rapinoe|Football
+Alex Morgan|Football
+Sam Kerr|Football
+Aitana Bonmatí|Football
+Mikaela Shiffrin|Skiing
+Sunisa Lee|Gymnastics
+Rebeca Andrade|Gymnastics
+Eliud Kipchoge|Running
+Armand Duplantis|Pole vault`,
+celebrities:`Kim Kardashian|Media
+Kylie Jenner|Media
+Kendall Jenner|Model
+Hailey Bieber|Model
+Bella Hadid|Model
+Gigi Hadid|Model
+Emily Ratajkowski|Model
+Rihanna|Music / Business
+Oprah Winfrey|Media
+Ellen DeGeneres|Media
+Jimmy Fallon|Media
+Kevin Hart|Comedy
+Dave Chappelle|Comedy
+Trevor Noah|Comedy
+Jimmy Kimmel|Media
+Jennifer Aniston|Actor
+Courteney Cox|Actor
+Paris Hilton|Media
+Elon Musk|Business
+Mark Zuckerberg|Business
+Jeff Bezos|Business
+Bill Gates|Business
+Warren Buffett|Business
+Jensen Huang|Business
+Sam Altman|Business
+Steve Jobs|Business
+Barack Obama|Politics
+Michelle Obama|Politics
+Donald Trump|Politics
+Joe Biden|Politics
+Kamala Harris|Politics
+Alexandria Ocasio-Cortez|Politics
+Taylor Swift|Music
+Travis Kelce|Sports
+Selena Gomez|Music / Actor
+Zendaya|Actor
+Meghan Markle|Royal
+Prince Harry|Royal
+Kate Middleton|Royal
+King Charles III|Royal
+Greta Thunberg|Activist
+Malala Yousafzai|Activist
+Pope Francis|Religion
+Dalai Lama|Religion
+Neil deGrasse Tyson|Science
+Bill Nye|Science
+Stephen Hawking|Science
+Albert Einstein|Science
+Martin Luther King Jr.|Leader
+Nelson Mandela|Leader
+Abraham Lincoln|Leader`,
+influencers:`MrBeast|YouTube
+PewDiePie|YouTube
+Markiplier|YouTube
+Jacksepticeye|YouTube
+Dream|YouTube
+Ludwig|Streamer
+Kai Cenat|Streamer
+IShowSpeed|Streamer
+xQc|Streamer
+Pokimane|Streamer
+Ninja|Streamer
+Valkyrae|Streamer
+Sykkuno|Streamer
+Ibai|Streamer
+TommyInnit|YouTube
+Technoblade|YouTube
+Dude Perfect|YouTube
+Emma Chamberlain|YouTube
+James Charles|YouTube
+Charli D'Amelio|TikTok
+Addison Rae|TikTok
+Khaby Lame|TikTok
+Alex Cooper|Podcast
+Joe Rogan|Podcast
+Logan Paul|YouTube
+KSI|YouTube
+Sidemen|YouTube
+Mark Rober|YouTube
+Veritasium|YouTube
+Kurzgesagt|YouTube
+Vsauce|YouTube
+MKBHD|YouTube
+Linus Tech Tips|YouTube
+Peter McKinnon|YouTube
+Casey Neistat|YouTube
+Hasan Piker|Streamer
+Alix Earle|TikTok
+Mikayla Nogueira|TikTok
+Alan Chikin Chow|YouTube
+Airrack|YouTube
+Ryan Trahan|YouTube
+Jynxzi|Streamer
+Adin Ross|Streamer
+Duke Dennis|Streamer
+Plaqueboymax|Streamer
+Sketch|Streamer
+Mizkif|Streamer`,
+books:`To Kill a Mockingbird|Harper Lee
+1984|George Orwell
+Animal Farm|George Orwell
+Brave New World|Aldous Huxley
+The Great Gatsby|F. Scott Fitzgerald
+The Catcher in the Rye|J.D. Salinger
+Pride and Prejudice|Jane Austen
+Jane Eyre|Charlotte Brontë
+Wuthering Heights|Emily Brontë
+Frankenstein|Mary Shelley
+Dracula|Bram Stoker
+The Picture of Dorian Gray|Oscar Wilde
+Crime and Punishment|Fyodor Dostoevsky
+The Brothers Karamazov|Fyodor Dostoevsky
+Anna Karenina|Leo Tolstoy
+The Stranger|Albert Camus
+The Metamorphosis|Franz Kafka
+One Hundred Years of Solitude|Gabriel García Márquez
+Love in the Time of Cholera|Gabriel García Márquez
+Beloved|Toni Morrison
+The Bluest Eye|Toni Morrison
+Their Eyes Were Watching God|Zora Neale Hurston
+Invisible Man|Ralph Ellison
+Things Fall Apart|Chinua Achebe
+Half of a Yellow Sun|Chimamanda Ngozi Adichie
+Americanah|Chimamanda Ngozi Adichie
+The Kite Runner|Khaled Hosseini
+Life of Pi|Yann Martel
+The Alchemist|Paulo Coelho
+Norwegian Wood|Haruki Murakami
+Kafka on the Shore|Haruki Murakami
+1Q84|Haruki Murakami
+Harry Potter and the Sorcerer's Stone|J.K. Rowling
+Harry Potter and the Chamber of Secrets|J.K. Rowling
+Harry Potter and the Prisoner of Azkaban|J.K. Rowling
+Harry Potter and the Goblet of Fire|J.K. Rowling
+The Hobbit|J.R.R. Tolkien
+The Fellowship of the Ring|J.R.R. Tolkien
+The Lion, the Witch and the Wardrobe|C.S. Lewis
+The Hunger Games|Suzanne Collins
+Catching Fire|Suzanne Collins
+Divergent|Veronica Roth
+Percy Jackson: The Lightning Thief|Rick Riordan
+Twilight|Stephenie Meyer
+The Fault in Our Stars|John Green
+Looking for Alaska|John Green
+Paper Towns|John Green
+Dune|Frank Herbert
+Ender's Game|Orson Scott Card
+Foundation|Isaac Asimov
+Neuromancer|William Gibson
+The Hitchhiker's Guide to the Galaxy|Douglas Adams
+Fahrenheit 451|Ray Bradbury
+Slaughterhouse-Five|Kurt Vonnegut
+Catch-22|Joseph Heller
+The Handmaid's Tale|Margaret Atwood
+The Road|Cormac McCarthy
+Blood Meridian|Cormac McCarthy
+A Game of Thrones|George R.R. Martin
+The Name of the Wind|Patrick Rothfuss
+Mistborn|Brandon Sanderson
+The Way of Kings|Brandon Sanderson
+The Wheel of Time|Robert Jordan
+Gone Girl|Gillian Flynn
+The Girl with the Dragon Tattoo|Stieg Larsson
+The Da Vinci Code|Dan Brown
+The Silent Patient|Alex Michaelides
+Where the Crawdads Sing|Delia Owens
+It Ends with Us|Colleen Hoover
+Verity|Colleen Hoover
+November 9|Colleen Hoover
+The Seven Husbands of Evelyn Hugo|Taylor Jenkins Reid
+Daisy Jones & The Six|Taylor Jenkins Reid
+Normal People|Sally Rooney
+Beach Read|Emily Henry
+Book Lovers|Emily Henry
+Fourth Wing|Rebecca Yarros
+A Court of Thorns and Roses|Sarah J. Maas
+Throne of Glass|Sarah J. Maas
+The Song of Achilles|Madeline Miller
+Circe|Madeline Miller
+Educated|Tara Westover
+Becoming|Michelle Obama
+Atomic Habits|James Clear
+Sapiens|Yuval Noah Harari
+Thinking, Fast and Slow|Daniel Kahneman
+The 48 Laws of Power|Robert Greene
+Rich Dad Poor Dad|Robert Kiyosaki
+The Psychology of Money|Morgan Housel
+How to Win Friends and Influence People|Dale Carnegie
+The Subtle Art of Not Giving a F*ck|Mark Manson
+Man's Search for Meaning|Viktor Frankl
+Meditations|Marcus Aurelius
+The Art of War|Sun Tzu
+The Prince|Niccolò Machiavelli
+Zero to One|Peter Thiel
+Shoe Dog|Phil Knight
+Steve Jobs|Walter Isaacson
+The Diary of a Young Girl|Anne Frank
+Night|Elie Wiesel
+The Outsiders|S.E. Hinton
+Lord of the Flies|William Golding
+Of Mice and Men|John Steinbeck
+The Grapes of Wrath|John Steinbeck
+East of Eden|John Steinbeck
+Moby-Dick|Herman Melville
+The Odyssey|Homer
+Don Quixote|Miguel de Cervantes
+Les Misérables|Victor Hugo
+The Count of Monte Cristo|Alexandre Dumas
+Little Women|Louisa May Alcott
+Charlotte's Web|E.B. White
+Where the Wild Things Are|Maurice Sendak
+Matilda|Roald Dahl
+Charlie and the Chocolate Factory|Roald Dahl
+Diary of a Wimpy Kid|Jeff Kinney
+Wonder|R.J. Palacio
+Holes|Louis Sachar
+The Giver|Lois Lowry
+The Little Prince|Antoine de Saint-Exupéry`,
+manga:`One Piece|Eiichiro Oda
+Naruto|Masashi Kishimoto
+Bleach|Tite Kubo
+Dragon Ball|Akira Toriyama
+Attack on Titan|Hajime Isayama
+Death Note|Tsugumi Ohba
+Fullmetal Alchemist|Hiromu Arakawa
+Berserk|Kentaro Miura
+Vagabond|Takehiko Inoue
+Slam Dunk|Takehiko Inoue
+Monster|Naoki Urasawa
+20th Century Boys|Naoki Urasawa
+Chainsaw Man|Tatsuki Fujimoto
+Jujutsu Kaisen|Gege Akutami
+Demon Slayer|Koyoharu Gotouge
+My Hero Academia|Kohei Horikoshi
+Hunter x Hunter|Yoshihiro Togashi
+Tokyo Ghoul|Sui Ishida
+Spy x Family|Tatsuya Endo
+Dandadan|Yukinobu Tatsu
+Blue Lock|Muneyuki Kaneshiro
+Haikyu!!|Haruichi Furudate
+Kaguya-sama: Love Is War|Aka Akasaka
+Frieren: Beyond Journey's End|Kanehito Yamada
+Vinland Saga|Makoto Yukimura
+Oshi no Ko|Aka Akasaka
+Sakamoto Days|Yuto Suzuki
+Kagurabachi|Takeru Hokazono
+Dr. Stone|Riichiro Inagaki
+The Promised Neverland|Kaiu Shirai
+Black Clover|Yūki Tabata
+Fairy Tail|Hiro Mashima
+Gintama|Hideaki Sorachi
+JoJo's Bizarre Adventure|Hirohiko Araki
+One-Punch Man|ONE
+Mob Psycho 100|ONE
+Solo Leveling|Chugong
+Tower of God|SIU
+Blue Period|Tsubasa Yamaguchi
+Nana|Ai Yazawa
+Fruits Basket|Natsuki Takaya
+Ouran High School Host Club|Bisco Hatori
+Uzumaki|Junji Ito
+Gantz|Hiroya Oku
+Initial D|Shuichi Shigeno
+Kingdom|Yasuhisa Hara`,
+brands:`Nike|Sportswear
+Adidas|Sportswear
+Puma|Sportswear
+New Balance|Sportswear
+Under Armour|Sportswear
+Lululemon|Athleisure
+Gymshark|Athleisure
+Alo Yoga|Athleisure
+Apple|Tech
+Samsung|Tech
+Sony|Tech
+Google|Tech
+Microsoft|Tech
+Tesla|Cars
+Toyota|Cars
+BMW|Cars
+Mercedes-Benz|Cars
+Porsche|Cars
+Ferrari|Cars
+Lamborghini|Cars
+Honda|Cars
+Ford|Cars
+Chanel|Luxury
+Louis Vuitton|Luxury
+Gucci|Luxury
+Prada|Luxury
+Hermès|Luxury
+Dior|Luxury
+Balenciaga|Luxury
+Rolex|Luxury
+Cartier|Luxury
+Tiffany & Co.|Luxury
+Supreme|Streetwear
+Off-White|Streetwear
+Stüssy|Streetwear
+Carhartt|Workwear
+Patagonia|Outdoor
+The North Face|Outdoor
+Arc'teryx|Outdoor
+Levi's|Denim
+Zara|Fashion
+H&M|Fashion
+Uniqlo|Fashion
+Ralph Lauren|Fashion
+Tommy Hilfiger|Fashion
+Calvin Klein|Fashion
+Fear of God|Fashion
+Aritzia|Fashion
+Brandy Melville|Fashion
+Sephora|Beauty
+Fenty Beauty|Beauty
+Rare Beauty|Beauty
+Glossier|Beauty
+Charlotte Tilbury|Beauty
+Dyson|Home
+IKEA|Home
+Lego|Toys
+Disney|Entertainment
+Netflix|Entertainment
+Spotify|Entertainment
+Starbucks|Food
+McDonald's|Food
+Coca-Cola|Drinks
+Pepsi|Drinks
+Red Bull|Drinks
+Amazon|Retail
+Target|Retail
+Costco|Retail
+Trader Joe's|Retail
+Whole Foods|Retail`,
+clubs:`Real Madrid|La Liga
+FC Barcelona|La Liga
+Atlético Madrid|La Liga
+Manchester United|Premier League
+Manchester City|Premier League
+Liverpool|Premier League
+Arsenal|Premier League
+Chelsea|Premier League
+Tottenham Hotspur|Premier League
+Newcastle United|Premier League
+Aston Villa|Premier League
+West Ham United|Premier League
+Bayern Munich|Bundesliga
+Borussia Dortmund|Bundesliga
+Bayer Leverkusen|Bundesliga
+Paris Saint-Germain|Ligue 1
+Juventus|Serie A
+AC Milan|Serie A
+Inter Milan|Serie A
+Napoli|Serie A
+AS Roma|Serie A
+Ajax|Eredivisie
+Benfica|Primeira Liga
+FC Porto|Primeira Liga
+Celtic|Scottish Premiership
+Inter Miami|MLS
+LA Galaxy|MLS
+LAFC|MLS
+Seattle Sounders|MLS
+Boca Juniors|Argentina
+River Plate|Argentina
+Flamengo|Brazil`,
+teams:`Los Angeles Lakers|NBA
+Golden State Warriors|NBA
+Boston Celtics|NBA
+Chicago Bulls|NBA
+New York Knicks|NBA
+Miami Heat|NBA
+Dallas Mavericks|NBA
+Denver Nuggets|NBA
+Oklahoma City Thunder|NBA
+Dallas Cowboys|NFL
+Kansas City Chiefs|NFL
+San Francisco 49ers|NFL
+New England Patriots|NFL
+Philadelphia Eagles|NFL
+Buffalo Bills|NFL
+Green Bay Packers|NFL
+New York Yankees|MLB
+Los Angeles Dodgers|MLB
+Boston Red Sox|MLB
+Chicago Cubs|MLB
+Toronto Maple Leafs|NHL
+Boston Bruins|NHL
+Edmonton Oilers|NHL
+Ferrari|Formula 1
+Red Bull Racing|Formula 1
+McLaren|Formula 1
+Mercedes|Formula 1
+Duke Blue Devils|College basketball
+Kentucky Wildcats|College basketball
+UConn Huskies|College basketball
+North Carolina Tar Heels|College basketball
+Alabama Crimson Tide|College football
+Ohio State Buckeyes|College football
+Michigan Wolverines|College football`
+};
 const CATALOG = {};
-function buildCatalog(){ for (const id in RAW) CATALOG[id] = RAW[id].trim().split('\n').map(l=>{const [n,s]=l.split('|');return {n:n.trim(),s:(s||'').trim()};}); }
+function buildCatalog(){
+  const parse=t=>t.trim().split('\n').map(l=>{const [n,s]=l.split('|');return {n:n.trim(),s:(s||'').trim()};});
+  for (const id in RAW){ const seen=new Set(), out=[];
+    for(const it of [...parse(RAW[id]), ...(EXTRA[id]?parse(EXTRA[id]):[])]){ const k=it.n.toLowerCase(); if(!it.n||seen.has(k)) continue; seen.add(k); out.push(it); }
+    CATALOG[id]=out; }
+}
 buildCatalog();
 
 function subOf(cat, n){ const f=(CATALOG[cat]||[]).find(i=>i.n===n); return f?f.s:''; }
@@ -1625,10 +3271,10 @@ function initials(n){ const w=n.replace(/[^\p{L}\p{N}\s]/gu,' ').trim().split(/\
 const pkey = (c,n) => c+'|'+n;
 const photo = (c,n) => state.photos[pkey(c,n)] || shared[pkey(c,n)] || AUTO.map[pkey(c,n)];
 const cssUrl = u => String(u).replace(/'/g,'%27').replace(/[()"\\\s]/g, ch=>encodeURIComponent(ch));
-function art(name, cat, size){
+function art(name, cat, size, noh){
   const shape=CAT[cat]?.shape||'square', p=photo(cat,name);
   if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${cssUrl(p.src)}')" role="img" aria-label="${esc(name)}"></span>`;
-  return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}" aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
+  return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
 function av(f, cls=''){ return `<span class="av ${cls}" style="--h:${f.hue}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
@@ -1688,6 +3334,44 @@ function jsonp(u){ return new Promise((res,rej)=>{ const cb='pl_cb'+Math.random(
   window[cb]=d=>{done();res(d);}; sc.onerror=()=>{done();rej(new Error('jsonp'));}; sc.src=u+(u.includes('?')?'&':'?')+'callback='+cb; document.head.appendChild(sc); }); }
 async function getJSON(u,viaJsonp){ try{ const r=await fetch(u); if(!r.ok) throw new Error('http '+r.status); return await r.json(); }catch(e){ if(viaJsonp) return jsonp(u); throw e; } }
 
+/* Deezer: clear, centred artist portraits and album covers. It has no CORS headers, so it is called with JSONP. */
+const DZ_OK = u => u && !/\/(artist|cover)\/\//.test(u) && !/\/images\/(artist|cover)\/(?:\/|$)/.test(u);
+async function deezer(kind,q,limit){
+  const j=await jsonp('https://api.deezer.com/search/'+kind+'?limit='+(limit||6)+'&output=jsonp&q='+encodeURIComponent(q));
+  if(!j||j.error) throw new Error('deezer'); return j.data||[];
+}
+async function deezerImage(c,n,sub){
+  const kind = c==='artists'?'artist' : c==='albums'?'album' : c==='songs'?'track' : null; if(!kind) return null;
+  await gate('deezer',250); const want=normT(n), artist=firstPart(sub);
+  const list=await deezer(kind, kind==='artist'?n : n+' '+artist, 8);
+  for(const r of list){
+    if(kind==='artist'){ if(normT(r.name)===want && DZ_OK(r.picture_big)) return r.picture_big; }
+    else if(kind==='album'){ if(normT(r.title)===want && (!artist||normT(r.artist&&r.artist.name).includes(normT(artist))) && DZ_OK(r.cover_big)) return r.cover_big; }
+    else { const al=r.album||{}; if(normT(r.title)===want && (!artist||normT(r.artist&&r.artist.name).includes(normT(artist))) && DZ_OK(al.cover_big)) return al.cover_big; }
+  }
+  return null;
+}
+/* Roblox games: Wikipedia has no pictures for most of them. Roblox's own icon service is tried through a public mirror that allows browsers. */
+async function robloxImage(c,n,sub){
+  if(c!=='games' || !/^roblox/i.test(sub||'')) return null; await gate('roblox',400);
+  const j=await getJSON('https://apis.roproxy.com/search-api/omni-search?pageType=all&sessionId='+Math.random().toString(36).slice(2)+'&searchQuery='+encodeURIComponent(n));
+  const want=normT(n); let hit=null;
+  for(const g of (j.searchResults||[])){ for(const x of (g.contents||[])){ if(x.contentType==='Game' && normT(x.name)===want){ hit=x; break; } } if(hit) break; }
+  if(!hit) return null;
+  const t=await getJSON('https://thumbnails.roproxy.com/v1/games/icons?returnPolicy=PlaceHolder&size=256x256&format=Png&universeIds='+hit.universeId);
+  const u=t.data&&t.data[0]&&t.data[0].imageUrl; return /^https:\/\/[a-z0-9]+\.rbxcdn\.com\//.test(u||'')?u:null;
+}
+async function wikiTitleImage(c,n){
+  const cfg=IMG_SRC[c]||{}; if(!cfg.w) return null; await gate('wiki',120);
+  const game=c==='games'||c==='mobilegames';
+  const titles=[n+' ('+cfg.w+')', game?n+' (video game)':'', n].filter((v,i,a)=>v&&a.indexOf(v)===i).join('|');
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=400&pilicense=any&titles='+encodeURIComponent(titles));
+  const want=normT(n), STRICT=/^(video game|album|song|film|TV series|anime|manga|book|musical|podcast|game|app|South Korean TV series|character)$/.test(cfg.w);
+  const hits=Object.values((j.query&&j.query.pages)||{}).filter(pg=>pg.thumbnail && normT(pg.title)===want);
+  hits.sort((x,y)=>(/\(/.test(y.title)?1:0)-(/\(/.test(x.title)?1:0));   /* "Hades (video game)" beats the god "Hades" */
+  const best=hits.find(pg=>/\(/.test(pg.title)) || (STRICT?null:hits[0]);
+  return best?best.thumbnail.source:null;
+}
 async function wikiImage(c,n,sub){
   const cfg=IMG_SRC[c]||{}; await gate('wiki',120);
   const q=[n, cfg.sub?sub:'', cfg.w].filter(Boolean).join(' ');
@@ -1697,7 +3381,7 @@ async function wikiImage(c,n,sub){
   const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh)$/;   /* "Nike, Inc." counts as "Nike" */
   for(const pg of pages){ const t=normT(pg.title); if(!pg.thumbnail) continue;
     if(t===want || (t.startsWith(want+' ') && CORP.test(t.slice(want.length+1).split(' ')[0]))) return pg.thumbnail.source; }
-  return null;
+  return wikiTitleImage(c,n);
 }
 async function itunesImage(c,n,sub){
   const t=(IMG_SRC[c]||{}).i; if(!t) return null; await gate('itunes',3100);
@@ -1743,11 +3427,15 @@ async function sampleTint(url){
 async function resolveOne(c,n){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||''; let url=null, src='', failed=false;
-  for(const [name,fn] of [['anilist',anilistImage],['apple',itunesImage],['openlibrary',openLibImage],['wikipedia',wikiImage]]){
+  for(const [name,fn] of [['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['openlibrary',openLibImage],['roblox',robloxImage],['wikipedia',wikiImage]]){
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
     if(url){ src=name; break; }
   }
   if(!url){ if(!failed) rememberNone(k); return; }
+  await adoptImage(c,n,url,src);
+}
+async function adoptImage(c,n,url,src){
+  const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
   const tn=await sampleTint(url);
   AUTO.map[k]={src:url,h:tn?tn.h:hue(n),s:tn?tn.s:34};
   applyImg(c,n);
@@ -1756,10 +3444,11 @@ async function resolveOne(c,n){
 async function flushImages(){
   const rows=AUTO.pending.splice(0); if(!rows.length||!sb||!me) return;
   try{ const {error}=await sb.from('item_images').upsert(rows,{onConflict:'cat,name',ignoreDuplicates:true}); if(error) throw error; }
-  catch(e){ if(window.PALATE_DEBUG) console.warn('could not share images', e); }
+  catch(e){ if(window.PALATE_DEBUG) console.warn('could not share images', e);
+    if(rows.length>1) for(const r of rows){ try{ await sb.from('item_images').upsert([r],{onConflict:'cat,name',ignoreDuplicates:true}); }catch(_){} } }   /* one rejected row must not sink the rest */
 }
 const Q=[]; let running=0;
-const stillShown=(c,n)=>[...document.querySelectorAll('.art[data-n]:not(.photo)')].some(el=>el.dataset.c===c&&el.dataset.n===n);
+const stillShown=(c,n)=>[...document.querySelectorAll('.art[data-n]:not(.photo):not([data-noh])')].some(el=>el.dataset.c===c&&el.dataset.n===n);
 function pump(){ while(running<3 && Q.length){ const [c,n]=Q.shift(); if(!stillShown(c,n)){ AUTO.tried.delete(pkey(c,n)); continue; } running++; resolveOne(c,n).catch(()=>{}).finally(()=>{running--; pump();}); } }
 function enqueue(c,n){ const k=pkey(c,n); if(AUTO.tried.has(k)||recentNone(k)) return; AUTO.tried.add(k); Q.push([c,n]); pump(); }
 let pointerDown=false, rerenderT=null;
@@ -1774,7 +3463,7 @@ function applyImg(c,n){
 function hydrate(){
   if(!me) return;
   const seen=new Set();
-  document.querySelectorAll('.art[data-n]:not(.photo)').forEach(el=>{ const c=el.dataset.c, n=el.dataset.n, k=pkey(c,n); if(seen.has(k)) return; seen.add(k); if(photo(c,n)) applyImg(c,n); else enqueue(c,n); });
+  document.querySelectorAll('.art[data-n]:not(.photo):not([data-noh])').forEach(el=>{ const c=el.dataset.c, n=el.dataset.n, k=pkey(c,n); if(seen.has(k)) return; seen.add(k); if(photo(c,n)) applyImg(c,n); else enqueue(c,n); });
 }
 let hydrateT=null;
 function startHydration(){
@@ -1900,7 +3589,12 @@ function viewRecap(){
 
 /* ---------- Sheets ---------- */
 let lastFocus=null, ed=null, pk=null, sheetKind=null, detailArgs=null;
-function sheet(html, kind){ const root=$('#sheet-root'); if(!root.firstChild) lastFocus=document.activeElement; sheetKind=kind; root.innerHTML=`<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; document.body.style.overflow='hidden'; }
+function sheet(html, kind, keep){
+  const root=$('#sheet-root'); if(!root.firstChild) lastFocus=document.activeElement;
+  const old=keep && root.querySelector('.sheet'), top=old?old.scrollTop:0;     /* re-rendering the same sheet keeps your scroll position */
+  sheetKind=kind; root.innerHTML=`<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; document.body.style.overflow='hidden';
+  if(old){ const n=root.querySelector('.sheet'); if(n) n.scrollTop=top; }
+}
 function closeSheet(){ $('#sheet-root').innerHTML=''; document.body.style.overflow=''; ed=null; pk=null; sheetKind=null; try{lastFocus&&lastFocus.focus();}catch(e){} }
 function frTags(c){ return it=>{ const sh=sharers(c,it.n); return (sh.length?`<div class="also-fr">${sh.map(x=>`<span class="fr-tag">${av(x.f)}${esc(first(x.f))} ${x.label}</span>`).join('')}</div>`:'') + (it.why?`<p class="why">${esc(it.why)}</p>`:''); }; }
 function photoBtn(c,n,size){ return `<button type="button" class="art-btn" data-act="photo" data-cat="${c}" data-n="${esc(n)}" aria-label="${photo(c,n)?'Change':'Add'} photo for ${esc(n)}">${art(n,c,size)}<span class="hint">${photo(c,n)?'Edit':'+ Photo'}</span></button>`; }
@@ -1925,11 +3619,83 @@ function openEditor(c, flow){
   const e=eff(c,CURRENT), s=e?e.snap:{top:[],hm:[]};
   const slots=Array(7).fill(null);
   s.top.forEach((it,i)=>slots[i]={...it}); s.hm.forEach((it,i)=>slots[5+i]={...it});
-  ed={cat:c,slots,query:'',confirm:false,isNew:!e,res:[],flow:!!flow};
+  ed={cat:c,slots,query:'',confirm:false,isNew:!e,res:[],flow:!!flow,live:[],liveQ:'',shown:false};
   renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),30);
 }
 function hl(n,q){ const i=n.toLowerCase().indexOf(q); if(i<0) return esc(n); return esc(n.slice(0,i))+'<mark>'+esc(n.slice(i,i+q.length))+'</mark>'+esc(n.slice(i+q.length)); }
-function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}">${art(it.n,ed.cat,'sm')}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
+function resArt(it){
+  if(it.img){ const shape=CAT[ed.cat]?.shape||'square'; return `<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(it.img)}')" role="img" aria-label="${esc(it.n)}"></span>`; }
+  return art(it.n,ed.cat,'sm',true);
+}
+function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}">${resArt(it)}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
+
+/* ---------- Live title search (type-ahead) ----------
+   Typing searches the category's own database for titles AND pictures at the same time, so tapping a result already has its photo. */
+const DESC_OK = {
+  artists:/singer|rapper|musician|band|group|songwriter|duo|producer|\bDJ\b|vocalist|trio|composer/i,
+  games:/video game|game series|franchise|mobile game|online game|roblox/i,
+  actors:/actor|actress/i, comedians:/comedian|stand-up|humorist/i, painters:/painter|artist/i, authors:/author|writer|novelist|poet/i,
+  athletes:/player|footballer|athlete|boxer|driver|sprinter|swimmer|golfer|tennis|basketball|racer|wrestler|runner|gymnast|skater|cyclist|fighter|cricketer|quarterback|rugby|skier|jockey/i,
+  countries:/country|state in|republic|kingdom|island nation/i, cities:/city|town|capital|municipality|metropolis|borough|commune/i,
+  brands:/company|brand|manufacturer|retailer|chain|corporation|label|conglomerate/i, pokemon:/pok[eé]mon/i, dogs:/dog breed|breed of/i,
+  clubs:/football club|soccer club|association football|sports club/i, themeparks:/theme park|amusement park|water park|resort/i,
+  podcasts:/podcast/i, musicals:/musical/i, boardgames:/game/i, cars:/car|automobile|vehicle|sedan|suv|coupe|truck/i, sports:/sport|game/i
+};
+const LIVE = new Map();
+const yr = d => (String(d||'').match(/(19|20)\d\d/)||[''])[0];
+async function liveSearch(c,q){
+  const cfg=IMG_SRC[c]||{}, out=[];
+  if(c==='artists'){
+    const list=await deezer('artist',q,8);
+    for(const r of list) if(DZ_OK(r.picture_big)) out.push({n:r.name,s:'Artist',img:r.picture_medium||r.picture_big,full:r.picture_big,src:'deezer'});
+  } else if(c==='albums'||c==='songs'){
+    const list=await deezer(c==='albums'?'album':'track',q,8);
+    for(const r of list){ const al=c==='albums'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue;
+      out.push({n:r.title_short||r.title,s:(r.artist&&r.artist.name)||'',img:al.cover_medium||al.cover_big,full:al.cover_big,src:'deezer'}); }
+  } else if(cfg.i){
+    const t=cfg.i; await gate('itunes-live',1200);
+    const qs=t==='movie'?{media:'movie',entity:'movie'}:t==='tv'?{media:'tvShow',entity:'tvSeason'}:{media:'software',entity:'software'};
+    const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({...qs,term:q,limit:'10',country:'us'}),true);
+    const seen=new Set();
+    for(const r of (j.results||[])){
+      const name=t==='movie'?r.trackName : t==='tv'?String(r.collectionName||'').replace(/[,:\-–]\s*(season|series|volume)\s*\d+.*$/i,'') : r.trackName;
+      const u=r.artworkUrl100||r.artworkUrl60||r.artworkUrl512; if(!name||!u||seen.has(normT(name))) continue; seen.add(normT(name));
+      const sub=t==='movie'?[r.artistName,yr(r.releaseDate)].filter(Boolean).join(' · ') : t==='tv'?[yr(r.releaseDate)].filter(Boolean).join('') : (r.sellerName||'');
+      out.push({n:name,s:sub,img:u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:'),full:u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),src:'apple'});
+    }
+  } else if(cfg.a){
+    await gate('anilist',800);
+    const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify({query:'query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,sort:SEARCH_MATCH){title{romaji english}seasonYear startDate{year}coverImage{medium large}studios(isMain:true){nodes{name}}}}}',variables:{s:q,t:cfg.a}})});
+    if(!r.ok) throw new Error('http '+r.status);
+    for(const m of (((await r.json()).data||{}).Page||{}).media||[]){ const n=m.title.english||m.title.romaji; if(!n||!m.coverImage) continue;
+      const st=(m.studios&&m.studios.nodes[0]||{}).name||''; const y=m.seasonYear||(m.startDate&&m.startDate.year)||'';
+      out.push({n,s:[st,y].filter(Boolean).join(' · '),img:m.coverImage.medium||m.coverImage.large,full:m.coverImage.large,src:'anilist'}); }
+  } else if(cfg.o){
+    await gate('openlib',350);
+    const j=await getJSON('https://openlibrary.org/search.json?limit=10&fields=title,author_name,cover_i&q='+encodeURIComponent(q));
+    const seen=new Set();
+    for(const d of (j.docs||[])){ if(!d.cover_i||seen.has(normT(d.title))) continue; seen.add(normT(d.title));
+      out.push({n:d.title,s:(d.author_name||[])[0]||'',img:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-S.jpg',full:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg',src:'openlibrary'}); }
+  } else {
+    await gate('wiki',120);
+    const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=prefixsearch&gpslimit=10&gpsnamespace=0&prop=pageimages|description&piprop=thumbnail&pithumbsize=300&pilicense=any&gpssearch='+encodeURIComponent(q));
+    const ok=DESC_OK[c], pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+    for(const pg of pages){ if(!pg.thumbnail||/disambiguation|^list of/i.test((pg.description||'')+pg.title)) continue; if(ok && !ok.test(pg.description||'')) continue;
+      out.push({n:pg.title.replace(/\s*\([^)]*\)\s*$/,''),s:String(pg.description||'').replace(/^./,m=>m.toUpperCase()).slice(0,48),img:pg.thumbnail.source,full:pg.thumbnail.source,src:'wikipedia'}); }
+  }
+  return out.slice(0,8);
+}
+let liveT=null;
+function queueLive(){
+  clearTimeout(liveT); const q=ed.query.trim(), c=ed.cat; if(q.length<2){ ed.live=[]; ed.liveQ=''; return; }
+  const key=c+'|'+q.toLowerCase(); if(LIVE.has(key)){ ed.live=LIVE.get(key); ed.liveQ=q; return; }
+  liveT=setTimeout(async()=>{
+    let list=[]; try{ list=await liveSearch(c,q); }catch(e){ if(window.PALATE_DEBUG) console.warn('live search failed',e); }
+    LIVE.set(key,list);
+    if(ed && ed.cat===c && ed.query.trim()===q){ ed.live=list; ed.liveQ=q; const ul=$('#ed-results'); if(ul) ul.innerHTML=results(); }
+  },350);
+}
 function results(){
   const raw=ed.query.trim(), q=raw.toLowerCase();
   const have=new Set(ed.slots.filter(Boolean).map(s=>s.n.toLowerCase()));
@@ -1947,10 +3713,15 @@ function results(){
     if(pop.length) html+=`<li class="sec">Popular</li>`+pop.map(it=>resBtn(it,k++,'')).join('');
     return html;
   }
+  const live=(ed.liveQ===raw?ed.live:[]);
+  const liveBy=new Map(live.map(x=>[normT(x.n),x]));
   const m=all.filter(it=>!have.has(it.n.toLowerCase()) && (it.n.toLowerCase().includes(q)||it.s.toLowerCase().includes(q)));
   m.sort((a,b)=>(b.n.toLowerCase().startsWith(q))-(a.n.toLowerCase().startsWith(q)));
-  ed.res=m.slice(0,7);
-  const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q);
+  const local=m.slice(0,live.length?5:7).map(it=>{ const t=liveBy.get(normT(it.n)); return t?{...it,img:t.img,full:t.full,src:t.src}:it; });
+  const lset=new Set(local.map(it=>normT(it.n)));
+  const extra=live.filter(x=>!lset.has(normT(x.n)) && !have.has(x.n.toLowerCase())).slice(0,6);
+  ed.res=[...local,...extra];
+  const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
   return ed.res.map((it,k)=>resBtn(it,k,q)).join('')
     + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>Not listed yet · you can add your own photo</span></div><span class="add">Add</span></button></li>`);
 }
@@ -1978,7 +3749,8 @@ function renderEditor(){
     <div class="label">Honorable mentions</div>
     <ol class="rows">${[5,6].map(slotRow).join('')}</ol>
     </div>
-    <div class="sheet-foot">${left}<div class="foot-right"><button class="pill soft" data-act="close">Cancel</button>${nx?`<button class="pill soft" data-act="save-next" data-next="${nx}">Save & next: ${esc(CAT[nx].name)}</button>`:''}<button class="pill" data-act="save">Save</button></div></div>`, 'editor');
+    <div class="sheet-foot">${left}<div class="foot-right"><button class="pill soft" data-act="close">Cancel</button>${nx?`<button class="pill soft" data-act="save-next" data-next="${nx}">Save & next: ${esc(CAT[nx].name)}</button>`:''}<button class="pill" data-act="save">Save</button></div></div>`, 'editor', ed.shown);
+  ed.shown=true;
 }
 function compact(){ const t=ed.slots.slice(0,5).filter(Boolean), h=ed.slots.slice(5).filter(Boolean); ed.slots=[...t,...Array(5-t.length).fill(null),...h,...Array(2-h.length).fill(null)]; }
 function swap(a,b){ const s=ed.slots; [s[a],s[b]]=[s[b],s[a]]; compact(); renderEditor(); }
@@ -1991,7 +3763,9 @@ function move(i,dir){
 function addItem(it){
   let k=ed.slots.findIndex((s,i)=>i<5&&!s); if(k<0) k=ed.slots.findIndex((s,i)=>i>=5&&!s);
   if(k<0){ toast('Full. Remove one first.'); return; }
-  ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; renderEditor();
+  ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; ed.live=[]; ed.liveQ='';
+  if(it.full && !photo(ed.cat,it.n)) adoptImage(ed.cat,it.n,it.full,it.src||'live').catch(()=>{});   /* the photo loads now, because you picked it */
+  renderEditor();
   setTimeout(()=>$('#ed-q')?.focus(),20);
 }
 function saveEditor(next){
@@ -2200,7 +3974,7 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('input',e=>{
   const t=e.target;
   if(t.id==='year') setYear(+t.value);
-  else if(t.id==='ed-q'){ ed.query=t.value; $('#ed-results').innerHTML=results(); }
+  else if(t.id==='ed-q'){ ed.query=t.value; queueLive(); $('#ed-results').innerHTML=results(); }
   else if(t.classList.contains('why-in')){ const s=ed.slots[+t.dataset.i]; if(s) s.why=t.value; }
   else if(t.id==='pk-q'){ pk.q=t.value; $('#pk-list').innerHTML=pickerList(); }
 });
