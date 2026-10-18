@@ -50,6 +50,11 @@ button,select,input,textarea{font:inherit;color:inherit}
 .top .wrap{display:flex;align-items:center;gap:20px;padding-block:14px}
 .logo{background:none;border:0;padding:0;cursor:pointer;color:var(--text);line-height:0;display:block}
 .logo .mark{display:block;height:34px;width:auto;aspect-ratio:1048/300}
+.alpha-tag{font-weight:700;font-size:10px;line-height:1;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:5px 8px 5px 9px;cursor:pointer;margin-left:-8px}
+.alpha-tag::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px;background:conic-gradient(#FFD166,#FF5C8A,#8E6CFF,#4FC3F7,#FFD166)}
+.alpha-tag.static{display:inline-block;cursor:default;margin:10px 0 0}
+#fb-text,#fb-item,#fb-cat{width:100%;box-sizing:border-box;font:inherit;color:var(--text);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+#fb-item{margin-top:8px}
 .tabs{display:flex;gap:2px;margin-right:auto}
 .tab{background:none;border:0;cursor:pointer;font-size:15px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:999px}
 .tab[aria-current="page"]{color:var(--text);background:var(--raise)}
@@ -364,6 +369,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 <header class="top">
   <div class="wrap gutter">
     <button class="logo" data-act="tab" data-tab="me" aria-label="Palate home"><svg class="mark" viewBox="0 0 1048 300" aria-hidden="true"><use href="#pl-logo"/></svg></button>
+    <button class="alpha-tag" data-act="feedback" aria-label="Palate is in alpha. Send feedback" title="Alpha: tap to send feedback">alpha</button>
     <nav class="tabs" aria-label="Sections">
       <button class="tab" data-act="tab" data-tab="me">Shelf</button>
       <button class="tab" data-act="tab" data-tab="friends">Friends</button>
@@ -4749,6 +4755,7 @@ function openAccount(){
   <div class="acct-box"><h3>Appearance</h3><p>Match your device, or pick light or dark. This is saved on this device.</p>
     <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
   ${notifyBox()}
+  <div class="acct-box"><h3>Alpha feedback</h3><p>Palate is in alpha with friends. Tell us what is missing, wrong or worth building. Things you add also help fill the shared catalog for everyone.</p><button class="pill soft sm" data-act="feedback">Send feedback</button></div>
   <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
     <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
     <button class="pill soft sm" data-act="all-private">Make every shelf Only me</button></div>
@@ -4811,7 +4818,7 @@ const pendingJoin = () => { try{ return sessionStorage.getItem('palate-join'); }
 function showAuth(mode,msg){
   authMode=mode||authMode; document.body.classList.remove('in'); $('#sheet-root').innerHTML='';
   const up=authMode==='up';
-  $('#view').innerHTML=`<section class="auth">${LOGO_H1}<p class="tag">Your taste, ranked. Just for your friends.</p>
+  $('#view').innerHTML=`<section class="auth">${LOGO_H1}<span class="alpha-tag static">alpha</span><p class="tag">Your taste, ranked. Just for your friends.</p>
     ${pendingJoin()?'<div class="invited">You were invited by a friend. Make an account or sign in to connect.</div>':''}
     <form id="auth-form" novalidate>
       ${up?'<label>Your name<input id="au-name" autocomplete="name" maxlength="40" placeholder="What your friends call you"></label>':''}
@@ -4892,7 +4899,7 @@ async function enter(user){
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); syncPush();
+    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush();
     if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
@@ -5908,7 +5915,9 @@ async function fillDetails(c,n){
 }
 function addCustom(c,n){
   const it={n,s:''}; (state.custom[c] ||= []).push(it); CATALOG[c].push(it); save(); addItem(it);
-  fillDetails(c,n).catch(()=>{});
+  noteMiss(c,n);                                   /* it was not in the catalog: tell us so we can add it properly */
+  toast('Looking up the details…');
+  fillDetails(c,n).then(r=>{ if(r&&r.s) toast('Found: '+r.s); }).catch(()=>{});
 }
 /* Older custom items still say "Added by you": fill in a few each time the app opens */
 function stripStrayNative(){
@@ -5926,6 +5935,67 @@ async function upgradeLegacyCustom(){
   for(const c in state.custom){ if(!Array.isArray(state.custom[c])) continue;
     for(const it of [...state.custom[c]]){ if(left<=0) return; if(!/^added by you$/i.test(it.s||'')) continue; left--; try{ await fillDetails(c,it.n); }catch(e){} }
   }
+}
+/* ---------- Alpha: grow the shared dataset, and listen ----------
+   While Palate is friends-only, every sign-in helps fill the shared catalog: things people added get researched,
+   uploaded photos become the default picture, and what people could not find is written down for us to add. */
+const ALPHA = true;
+const sane = (c,n,s) => !!(CAT[c] && typeof n==='string' && n.trim().length>=2 && n.length<=120 && String(s||'').length<=160 && !/[<>]|https?:|www\./i.test(n+' '+(s||'')));
+const realSub = s => !!String(s||'').trim() && !/^added by you$/i.test(s);
+const MISSED = new Set();
+function noteMiss(c,q){
+  q=String(q||'').trim().slice(0,120); const k=c+'|'+q.toLowerCase(); if(!sb||!me||q.length<2||MISSED.has(k)) return; MISSED.add(k);
+  try{ sb.from('feedback').insert({kind:'miss',cat:c,item:q}).then(()=>{},()=>{}); }catch(e){}
+}
+let curated=false;
+async function curateAlpha(){
+  if(curated || !ALPHA || !sb || !me) return; curated=true;
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const items=new Map();
+  const add=(c,it,mine)=>{ if(!it||!it.n||!CAT[c]) return; const k=pkey(c,it.n), o=items.get(k);
+    if(!o) items.set(k,{c,n:it.n,s:it.s||'',mine}); else { if(!realSub(o.s)&&realSub(it.s)) o.s=it.s; o.mine=o.mine||mine; } };
+  for(const c of state.order){ if(state.vis[c]==='private') continue;           /* private shelves never feed the shared catalog */
+    for(const y in state.shelves[c].years){ const sn=state.shelves[c].years[y]; for(const it of [...(sn.top||[]),...(sn.hm||[])]) add(c,it,true); } }
+  for(const c in state.custom) if(Array.isArray(state.custom[c]) && state.vis[c]!=='private') for(const it of state.custom[c]) add(c,it,true);
+  for(const f of FRIENDS) for(const c in f.shelves){ const sn=f.shelves[c]; for(const it of [...(sn.top||[]),...(sn.hm||[])]) add(c,it,false); }
+  /* 1. Photos you uploaded become the shared default, where nobody has set one yet */
+  for(const k in state.photos){ const p=state.photos[k], i=k.indexOf('|'), c=k.slice(0,i), n=k.slice(i+1);
+    if(!p || !/^https:\/\//.test(p.src||'') || AUTO.map[k] || state.vis[c]==='private' || !sane(c,n,'')) continue;
+    AUTO.pending.push({cat:c,name:n,url:p.src,h:p.h||hue(n),s:p.s||30,src:'user-upload'}); }
+  if(AUTO.pending.length) flushImages();
+  const list=[...items.values()].filter(x=>sane(x.c,x.n,x.s)).sort((a,b)=>(b.mine-a.mine));
+  /* 2. Things nobody has described yet: share what we know, research the rest */
+  let research=14;
+  for(const x of list){
+    const key=x.c+'|'+x.n.toLowerCase(); if(STATIC.has(key)||KNOWN.has(key)) continue;
+    if(realSub(x.s)){ await shareItem(x.c,x.n,x.s); continue; }
+    if(research<=0) continue; research--;
+    try{ if(x.mine) await fillDetails(x.c,x.n); else { const r=await enrichItem(x.c,x.n); if(r.s) await shareItem(x.c,x.n,r.s); if(r.img && !photo(x.c,x.n)) adoptImage(x.c,x.n,r.img,r.src||'live').catch(()=>{}); } }catch(e){}
+    await wait(1200);
+  }
+  /* 3. Things with no picture yet: find one for everybody */
+  let pics=30;
+  for(const x of list){ if(pics<=0) break; if(photo(x.c,x.n)||recentNone(pkey(x.c,x.n))) continue; pics--; try{ await resolveOne(x.c,x.n,realSub(x.s)?x.s:''); }catch(e){} await wait(900); }
+}
+let fbKind='idea';
+function openFeedback(kind){
+  fbKind=kind||'idea';
+  const K=[['idea','An idea'],['bug','Something is wrong'],['missing','Something is missing']];
+  sheet(`<div class="sheet-head"><div><h2>Alpha feedback</h2><p>Palate is in alpha. What you tell us decides what gets built, which pictures and titles are added, and what shows up as popular.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="seg" role="group" aria-label="Kind of feedback">${K.map(([v,l])=>`<button data-act="fb-kind" data-v="${v}" aria-pressed="${v===fbKind}">${l}</button>`).join('')}</div>
+  <div id="fb-miss" ${fbKind==='missing'?'':'hidden'} style="margin-top:12px"><select id="fb-cat" aria-label="Category">${CATS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+    <input id="fb-item" placeholder="What is it called?" maxlength="120" autocomplete="off" aria-label="What is it called"></div>
+  <textarea id="fb-text" rows="4" maxlength="1000" placeholder="Tell us more (optional for missing items)" aria-label="Your feedback" style="margin-top:12px"></textarea>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="fb-send">Send</button></div></div>`,'feedback');
+}
+async function sendFeedback(){
+  const text=($('#fb-text').value||'').trim().slice(0,1000), miss=fbKind==='missing';
+  const item=miss?($('#fb-item').value||'').trim().slice(0,120):'', cat=miss?$('#fb-cat').value:null;
+  if(miss ? !item : !text){ toast(miss?'Tell us what is missing':'Write a few words first'); return; }
+  const btn=document.querySelector('[data-act="fb-send"]'); if(btn) btn.disabled=true;
+  try{ const r=await sb.from('feedback').insert({kind:miss?'miss':fbKind,cat,item:item||null,text:text||null}); if(r&&r.error) throw r.error;
+    closeSheet(); toast(miss?'Thanks, we will add it':'Thank you, this helps'); if(miss) curated=false; }
+  catch(e){ console.warn(e); toast('Could not send that. Try again in a minute.'); if(btn) btn.disabled=false; }
 }
 async function liveSearch(c,q){
   const lang=LANG_OF(q); if(!lang) return liveSearch1(c,q);
@@ -6287,6 +6357,9 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'feedback': openFeedback(); break;
+    case 'fb-kind': fbKind=el.dataset.v; document.querySelectorAll('[data-act="fb-kind"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===fbKind))); $('#fb-miss').hidden=fbKind!=='missing'; break;
+    case 'fb-send': sendFeedback(); break;
     case 'install': if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.finally(()=>{ deferredInstall=null; refreshPromo(); }); } else iosSteps(); break;
     case 'tip-x': tipHide(el.dataset.k); refreshPromo(); break;
     case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(ok&&$('#notify-box')) $('#notify-box').outerHTML=notifyBox(); }); break;
