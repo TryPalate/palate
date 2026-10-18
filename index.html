@@ -2,6 +2,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Your taste, ranked. Just for your friends.">
 <meta name="theme-color" content="#0A0A0D">
+<script>try{var t=localStorage.getItem('palate-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m&&(t==='light'||(t!=='dark'&&matchMedia('(prefers-color-scheme: light)').matches)))m.content='#F1F1F4'}catch(e){}</script>
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon.ico" sizes="48x48">
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Palate">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
@@ -10,7 +20,7 @@
 :root{
   --bg:#0A0A0D; --card:#15151A; --raise:#22222A; --text:#F5F5F7; --muted:#8E8E98; --faint:#55555E; --line:rgb(255 255 255 / .08);
   --accent:#FFB06B; --scrim:rgb(0 0 0 / .62); --good:#7BD88F;
-  --tint-s:38%; --tint-l:24%; --art-s:40%; --art-l:44%;
+  --tint-s:38%; --tint-l:24%; --art-s:40%; --art-l:44%; --polaroid:#F5F5F7; --gk:1;
   --font:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   color-scheme:dark;
 }
@@ -18,13 +28,13 @@
   :root:not([data-theme="dark"]){
     --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#6C6C75; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
     --accent:#C8641E; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
-    --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; color-scheme:light;
+    --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; color-scheme:light;
   }
 }
 :root[data-theme="light"]{
   --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#6C6C75; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
   --accent:#C8641E; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
-  --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; color-scheme:light;
+  --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; color-scheme:light;
 }
 
 *{box-sizing:border-box}
@@ -38,7 +48,8 @@ button,select,input,textarea{font:inherit;color:inherit}
 
 /* Top bar */
 .top .wrap{display:flex;align-items:center;gap:20px;padding-block:14px}
-.logo{font-weight:800;font-size:30px;letter-spacing:-.055em;line-height:1;background:none;border:0;padding:0 0 4px;cursor:pointer;text-transform:lowercase}
+.logo{background:none;border:0;padding:0;cursor:pointer;color:var(--text);line-height:0;display:block}
+.logo .mark{display:block;height:34px;width:auto;aspect-ratio:1048/300}
 .tabs{display:flex;gap:2px;margin-right:auto}
 .tab{background:none;border:0;cursor:pointer;font-size:15px;font-weight:500;color:var(--muted);padding:7px 12px;border-radius:999px}
 .tab[aria-current="page"]{color:var(--text);background:var(--raise)}
@@ -129,6 +140,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .acct-box select{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;margin-bottom:10px}
 .capsule{margin-bottom:14px}.capsule ul{list-style:none;margin:0;padding:0}.capsule li{padding:10px 0;display:grid;gap:6px}.capsule li+li{border-top:1px solid var(--line)}
 .cap-c{font-size:12px;color:var(--muted)}.cap-r{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}.cap-r b{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:36%}.cap-r i{font-style:normal;color:var(--muted)}.cap-r em{font-style:normal;font-size:12.5px;color:var(--muted)}
+.acct-box .seg{margin-top:2px}
 .acct-box{margin-top:14px;padding:14px;border-radius:14px;background:var(--raise)}
 .acct-box h3{margin:0 0 4px;font-size:15px}.acct-box p{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
 .acct-box input{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;margin-bottom:10px}
@@ -307,12 +319,25 @@ body.dragging{user-select:none;-webkit-user-select:none}
 .foot{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding-block:4px 24px;font-size:13px;color:var(--faint)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--text);color:var(--bg);font-size:14px;font-weight:500;padding:10px 16px;border-radius:999px;max-width:calc(100% - 32px)}
 @media (max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+/* Loading screen: polaroid and word over a soft light leak. Colours dim in light mode. */
+.boot{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;color:var(--text);
+  background:
+    radial-gradient(ellipse 28% 40% at 103% 105%, rgb(94 200 247 / calc(.40 * var(--gk))), rgb(94 200 247 / calc(.14 * var(--gk))) 55%, transparent),
+    radial-gradient(ellipse 38% 42% at 40% -8%, rgb(176 124 255 / calc(.45 * var(--gk))), rgb(176 124 255 / calc(.16 * var(--gk))) 55%, transparent),
+    radial-gradient(ellipse 10% 16% at -3% -5%, rgb(255 209 102 / calc(.85 * var(--gk))), rgb(255 209 102 / calc(.30 * var(--gk))) 55%, transparent),
+    radial-gradient(ellipse 40% 50% at 6% -6%, rgb(255 111 156 / calc(.60 * var(--gk))), rgb(255 111 156 / calc(.21 * var(--gk))) 55%, transparent),
+    var(--bg);
+  animation:boot-in .35s ease both}
+.boot .b-pol{width:96px;height:auto;aspect-ratio:48/58;filter:drop-shadow(0 8px 22px rgb(0 0 0 / .22))}
+.boot .b-word{height:44px;width:auto;aspect-ratio:3.038}
+@keyframes boot-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}.boot{animation:none}}
 
 /* Sign-in + invite */
 body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{display:none}
 .auth{max-width:380px;margin:12vh auto 0;display:flex;flex-direction:column;gap:14px}
-.auth .logo{font-size:56px;cursor:default;text-align:left;margin:0}
+.auth .logo{cursor:default;margin:0}
+.auth .logo .mark{height:64px}
 .auth p.tag{color:var(--muted);margin:-6px 0 6px}
 .auth form{display:flex;flex-direction:column;gap:12px}
 .auth label{display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--muted);font-weight:500}
@@ -333,9 +358,10 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .credit{margin:0 0 28px;font-size:12px;color:var(--faint)}
 </style>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><radialGradient id="pl0" cx="0.5" cy="0.55" r="0.5"><stop offset="0" stop-color="#FFD166"/><stop offset="1" stop-color="#FFD166" stop-opacity="0"/></radialGradient><radialGradient id="pl1" cx="0.2" cy="0.2" r="0.7"><stop offset="0" stop-color="#FF8A5B"/><stop offset="1" stop-color="#FF8A5B" stop-opacity="0"/></radialGradient><radialGradient id="pl2" cx="0.85" cy="0.25" r="0.65"><stop offset="0" stop-color="#FF5C8A"/><stop offset="1" stop-color="#FF5C8A" stop-opacity="0"/></radialGradient><radialGradient id="pl3" cx="0.15" cy="0.9" r="0.65"><stop offset="0" stop-color="#4FC3F7"/><stop offset="1" stop-color="#4FC3F7" stop-opacity="0"/></radialGradient><radialGradient id="pl4" cx="0.9" cy="0.9" r="0.7"><stop offset="0" stop-color="#8E6CFF"/><stop offset="1" stop-color="#8E6CFF" stop-opacity="0"/></radialGradient></defs><symbol id="pl-logo" viewBox="0 0 1048 300"><rect x="0" y="0.0" width="300" height="300" rx="67.11" fill="#0A0A0D"/><rect x="70.55" y="55.50" width="158.90" height="192.00" rx="9.93" fill="#F5F5F7"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="#F7EFE6"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="url(#pl0)"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="url(#pl1)"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="url(#pl2)"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="url(#pl3)"/><rect x="87.10" y="72.05" width="125.79" height="125.79" fill="url(#pl4)"/><path transform="translate(376.43,206.51)" d="M76.284 2.3400000000000003Q64.116 2.3400000000000003 54.288000000000004 -2.8080000000000003Q48.438 -5.6160000000000005 43.992000000000004 -10.062000000000001V47.268H13.572000000000001V-113.022H44.226V-102.96000000000001Q48.672000000000004 -107.17200000000001 54.522000000000006 -110.21400000000001Q64.116 -115.36200000000001 76.284 -115.36200000000001Q91.962 -115.36200000000001 104.364 -107.64000000000001Q116.766 -99.918 123.90300000000002 -86.58000000000001Q131.04000000000002 -73.242 131.04000000000002 -56.394000000000005Q131.04000000000002 -39.78 123.90300000000002 -26.442Q116.766 -13.104000000000001 104.364 -5.382000000000001Q91.962 2.3400000000000003 76.284 2.3400000000000003ZM70.902 -25.974Q79.32600000000001 -25.974 85.87800000000001 -29.835Q92.43 -33.696000000000005 96.05700000000002 -40.599000000000004Q99.68400000000001 -47.502 99.68400000000001 -56.628Q99.68400000000001 -65.52000000000001 96.05700000000002 -72.423Q92.43 -79.32600000000001 85.87800000000001 -83.18700000000001Q79.32600000000001 -87.048 70.902 -87.048Q62.712 -87.048 56.160000000000004 -83.18700000000001Q49.608000000000004 -79.32600000000001 45.981 -72.423Q42.354 -65.52000000000001 42.354 -56.628Q42.354 -47.502 45.981 -40.599000000000004Q49.608000000000004 -33.696000000000005 56.043000000000006 -29.835Q62.478 -25.974 70.902 -25.974ZM196.092 2.3400000000000003Q180.64800000000002 2.3400000000000003 168.24600000000004 -5.382000000000001Q155.84400000000002 -13.104000000000001 148.824 -26.442Q141.804 -39.78 141.804 -56.394000000000005Q141.804 -73.242 148.824 -86.58000000000001Q155.84400000000002 -99.918 168.24600000000004 -107.64000000000001Q180.64800000000002 -115.36200000000001 196.092 -115.36200000000001Q208.26000000000002 -115.36200000000001 217.854 -110.44800000000001Q224.17200000000003 -107.17200000000001 228.85200000000003 -102.25800000000001V-113.022H259.27200000000005V0.0H228.85200000000003V-10.998000000000001Q224.17200000000003 -6.0840000000000005 217.854 -2.8080000000000003Q208.26000000000002 2.3400000000000003 196.092 2.3400000000000003ZM201.70800000000003 -25.974Q214.57800000000003 -25.974 222.53400000000002 -34.515Q230.49 -43.056000000000004 230.49 -56.628Q230.49 -65.52000000000001 226.863 -72.423Q223.23600000000002 -79.32600000000001 216.80100000000002 -83.18700000000001Q210.366 -87.048 201.70800000000003 -87.048Q193.28400000000002 -87.048 186.84900000000002 -83.18700000000001Q180.41400000000002 -79.32600000000001 176.78700000000003 -72.423Q173.16000000000003 -65.52000000000001 173.16000000000003 -56.628Q173.16000000000003 -47.502 176.78700000000003 -40.599000000000004Q180.41400000000002 -33.696000000000005 186.84900000000002 -29.835Q193.28400000000002 -25.974 201.70800000000003 -25.974ZM284.076 0.0V-169.18200000000002H314.73V0.0ZM386.802 2.3400000000000003Q371.358 2.3400000000000003 358.956 -5.382000000000001Q346.554 -13.104000000000001 339.534 -26.442Q332.514 -39.78 332.514 -56.394000000000005Q332.514 -73.242 339.534 -86.58000000000001Q346.554 -99.918 358.956 -107.64000000000001Q371.358 -115.36200000000001 386.802 -115.36200000000001Q398.97 -115.36200000000001 408.56399999999996 -110.44800000000001Q414.882 -107.17200000000001 419.562 -102.25800000000001V-113.022H449.98199999999997V0.0H419.562V-10.998000000000001Q414.882 -6.0840000000000005 408.56399999999996 -2.8080000000000003Q398.97 2.3400000000000003 386.802 2.3400000000000003ZM392.418 -25.974Q405.288 -25.974 413.244 -34.515Q421.2 -43.056000000000004 421.2 -56.628Q421.2 -65.52000000000001 417.573 -72.423Q413.946 -79.32600000000001 407.511 -83.18700000000001Q401.076 -87.048 392.418 -87.048Q383.99399999999997 -87.048 377.55899999999997 -83.18700000000001Q371.124 -79.32600000000001 367.497 -72.423Q363.87 -65.52000000000001 363.87 -56.628Q363.87 -47.502 367.497 -40.599000000000004Q371.124 -33.696000000000005 377.55899999999997 -29.835Q383.99399999999997 -25.974 392.418 -25.974ZM491.4 0.0V-86.11200000000001H464.958V-113.022H491.4V-160.056H522.054V-113.022H548.496V-86.11200000000001H522.054V0.0ZM617.526 2.3400000000000003Q599.742 2.3400000000000003 585.9359999999999 -5.265000000000001Q572.13 -12.870000000000001 564.057 -26.208Q555.9839999999999 -39.546 555.9839999999999 -56.628Q555.9839999999999 -73.476 563.823 -86.697Q571.662 -99.918 585.234 -107.757Q598.806 -115.596 615.42 -115.596Q631.8 -115.596 644.319 -108.225Q656.838 -100.854 663.9749999999999 -88.101Q671.112 -75.348 671.112 -59.202000000000005Q671.112 -56.160000000000004 670.761 -53.001000000000005Q670.41 -49.842000000000006 669.4739999999999 -45.864000000000004L586.872 -45.63Q587.808 -42.120000000000005 589.446 -39.312000000000005Q593.1899999999999 -31.590000000000003 600.444 -27.495000000000005Q607.698 -23.400000000000002 617.292 -23.400000000000002Q625.95 -23.400000000000002 632.97 -26.325000000000003Q639.99 -29.25 645.1379999999999 -35.1L663.156 -17.082Q654.966 -7.488 643.149 -2.574Q631.332 2.3400000000000003 617.526 2.3400000000000003ZM586.872 -68.562 641.6279999999999 -68.796Q640.692 -72.774 639.288 -76.05000000000001Q636.012 -82.836 630.045 -86.463Q624.078 -90.09 615.42 -90.09Q606.294 -90.09 599.508 -85.995Q592.722 -81.9 589.212 -74.646Q587.808 -71.83800000000001 586.872 -68.562Z" fill="currentColor"/></symbol><symbol id="pl-polaroid" viewBox="0 0 48 58"><rect width="48" height="58" rx="3" style="fill:var(--polaroid,#F5F5F7)"/><rect x="5" y="5" width="38" height="38" fill="#F7EFE6"/><rect x="5" y="5" width="38" height="38" fill="url(#pl0)"/><rect x="5" y="5" width="38" height="38" fill="url(#pl1)"/><rect x="5" y="5" width="38" height="38" fill="url(#pl2)"/><rect x="5" y="5" width="38" height="38" fill="url(#pl3)"/><rect x="5" y="5" width="38" height="38" fill="url(#pl4)"/></symbol><symbol id="pl-word" viewBox="0 0 281.0 92.5"><path transform="translate(-5.80,72.30)" d="M32.6 1.0Q27.400000000000002 1.0 23.200000000000003 -1.2000000000000002Q20.700000000000003 -2.4000000000000004 18.8 -4.3V20.200000000000003H5.800000000000001V-48.300000000000004H18.900000000000002V-44.0Q20.8 -45.800000000000004 23.3 -47.1Q27.400000000000002 -49.300000000000004 32.6 -49.300000000000004Q39.300000000000004 -49.300000000000004 44.60000000000001 -46.0Q49.900000000000006 -42.7 52.95 -37.0Q56.0 -31.3 56.0 -24.1Q56.0 -17.0 52.95 -11.3Q49.900000000000006 -5.6000000000000005 44.60000000000001 -2.3000000000000003Q39.300000000000004 1.0 32.6 1.0ZM30.3 -11.100000000000001Q33.9 -11.100000000000001 36.7 -12.75Q39.5 -14.4 41.05 -17.35Q42.6 -20.3 42.6 -24.200000000000003Q42.6 -28.0 41.05 -30.95Q39.5 -33.9 36.7 -35.55Q33.9 -37.2 30.3 -37.2Q26.8 -37.2 24.0 -35.55Q21.200000000000003 -33.9 19.650000000000002 -30.95Q18.1 -28.0 18.1 -24.200000000000003Q18.1 -20.3 19.650000000000002 -17.35Q21.200000000000003 -14.4 23.950000000000003 -12.75Q26.700000000000003 -11.100000000000001 30.3 -11.100000000000001ZM83.80000000000001 1.0Q77.2 1.0 71.9 -2.3000000000000003Q66.60000000000001 -5.6000000000000005 63.60000000000001 -11.3Q60.6 -17.0 60.6 -24.1Q60.6 -31.3 63.60000000000001 -37.0Q66.60000000000001 -42.7 71.9 -46.0Q77.2 -49.300000000000004 83.80000000000001 -49.300000000000004Q89.0 -49.300000000000004 93.10000000000001 -47.2Q95.80000000000001 -45.800000000000004 97.80000000000001 -43.7V-48.300000000000004H110.80000000000001V0.0H97.80000000000001V-4.7Q95.80000000000001 -2.6 93.10000000000001 -1.2000000000000002Q89.0 1.0 83.80000000000001 1.0ZM86.2 -11.100000000000001Q91.7 -11.100000000000001 95.1 -14.750000000000002Q98.5 -18.400000000000002 98.5 -24.200000000000003Q98.5 -28.0 96.95 -30.95Q95.4 -33.9 92.65 -35.55Q89.9 -37.2 86.2 -37.2Q82.60000000000001 -37.2 79.85000000000001 -35.55Q77.10000000000001 -33.9 75.55000000000001 -30.95Q74.0 -28.0 74.0 -24.200000000000003Q74.0 -20.3 75.55000000000001 -17.35Q77.10000000000001 -14.4 79.85000000000001 -12.75Q82.60000000000001 -11.100000000000001 86.2 -11.100000000000001ZM121.4 0.0V-72.3H134.5V0.0ZM165.3 1.0Q158.70000000000002 1.0 153.40000000000003 -2.3000000000000003Q148.10000000000002 -5.6000000000000005 145.10000000000002 -11.3Q142.10000000000002 -17.0 142.10000000000002 -24.1Q142.10000000000002 -31.3 145.10000000000002 -37.0Q148.10000000000002 -42.7 153.40000000000003 -46.0Q158.70000000000002 -49.300000000000004 165.3 -49.300000000000004Q170.5 -49.300000000000004 174.60000000000002 -47.2Q177.3 -45.800000000000004 179.3 -43.7V-48.300000000000004H192.3V0.0H179.3V-4.7Q177.3 -2.6 174.60000000000002 -1.2000000000000002Q170.5 1.0 165.3 1.0ZM167.70000000000002 -11.100000000000001Q173.20000000000002 -11.100000000000001 176.60000000000002 -14.750000000000002Q180.0 -18.400000000000002 180.0 -24.200000000000003Q180.0 -28.0 178.45 -30.95Q176.9 -33.9 174.15 -35.55Q171.4 -37.2 167.70000000000002 -37.2Q164.10000000000002 -37.2 161.35000000000002 -35.55Q158.60000000000002 -33.9 157.05 -30.95Q155.5 -28.0 155.5 -24.200000000000003Q155.5 -20.3 157.05 -17.35Q158.60000000000002 -14.4 161.35000000000002 -12.75Q164.10000000000002 -11.100000000000001 167.70000000000002 -11.100000000000001ZM210.00000000000003 0.0V-36.800000000000004H198.70000000000002V-48.300000000000004H210.00000000000003V-68.4H223.10000000000002V-48.300000000000004H234.40000000000003V-36.800000000000004H223.10000000000002V0.0ZM263.90000000000003 1.0Q256.3 1.0 250.40000000000003 -2.25Q244.50000000000003 -5.5 241.05 -11.200000000000001Q237.60000000000002 -16.900000000000002 237.60000000000002 -24.200000000000003Q237.60000000000002 -31.400000000000002 240.95000000000005 -37.050000000000004Q244.30000000000004 -42.7 250.10000000000002 -46.050000000000004Q255.90000000000003 -49.400000000000006 263.0 -49.400000000000006Q270.0 -49.400000000000006 275.35 -46.25Q280.70000000000005 -43.1 283.75 -37.650000000000006Q286.8 -32.2 286.8 -25.3Q286.8 -24.0 286.65 -22.65Q286.5 -21.3 286.1 -19.6L250.80000000000004 -19.5Q251.20000000000002 -18.0 251.90000000000003 -16.8Q253.50000000000003 -13.5 256.6 -11.75Q259.70000000000005 -10.0 263.8 -10.0Q267.5 -10.0 270.5 -11.25Q273.5 -12.5 275.70000000000005 -15.0L283.40000000000003 -7.300000000000001Q279.90000000000003 -3.2 274.85 -1.1Q269.8 1.0 263.90000000000003 1.0ZM250.80000000000004 -29.3 274.20000000000005 -29.400000000000002Q273.8 -31.1 273.20000000000005 -32.5Q271.8 -35.4 269.25 -36.95Q266.70000000000005 -38.5 263.0 -38.5Q259.1 -38.5 256.20000000000005 -36.75Q253.30000000000004 -35.0 251.80000000000004 -31.900000000000002Q251.20000000000002 -30.700000000000003 250.80000000000004 -29.3Z" fill="currentColor"/></symbol></svg>
 <header class="top">
   <div class="wrap gutter">
-    <button class="logo" data-act="tab" data-tab="me" aria-label="Palate home">palate</button>
+    <button class="logo" data-act="tab" data-tab="me" aria-label="Palate home"><svg class="mark" viewBox="0 0 1048 300" aria-hidden="true"><use href="#pl-logo"/></svg></button>
     <nav class="tabs" aria-label="Sections">
       <button class="tab" data-act="tab" data-tab="me">Shelf</button>
       <button class="tab" data-act="tab" data-tab="friends">Friends</button>
@@ -345,7 +371,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
   </div>
 </header>
 
-<main id="view" class="wrap gutter"></main>
+<main id="view" class="wrap gutter"><div class="boot" role="status" aria-label="Loading Palate"><svg class="b-pol" viewBox="0 0 48 58" aria-hidden="true"><use href="#pl-polaroid"/></svg><svg class="b-word" viewBox="0 0 304 100" aria-hidden="true"><use href="#pl-word"/></svg></div></main>
 
 <footer class="wrap gutter">
   <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="account">Account</button><button class="pill ghost" data-act="signout">Sign out</button></div>
@@ -4529,6 +4555,20 @@ let me = null;                                   /* {id, name, invite} */
 let state = {name:'', shelves:{}, order:[], vis:{}, photos:{}, custom:{}};
 let FRIENDS = [], UPDATES = [], shared = {};      /* friends' shelves, activity, and their photos */
 const KEY = 'palate-v3';
+const LOGO_H1 = '<h1 class="logo" aria-label="Palate"><svg class="mark" viewBox="0 0 1048 300" aria-hidden="true"><use href="#pl-logo"/></svg></h1>';
+const BOOT_HTML = '<div class="boot" role="status" aria-label="Loading Palate"><svg class="b-pol" viewBox="0 0 48 58" aria-hidden="true"><use href="#pl-polaroid"/></svg><svg class="b-word" viewBox="0 0 304 100" aria-hidden="true"><use href="#pl-word"/></svg></div>';
+/* Light / dark: 'system' follows the device. Saved per device. */
+const THEME_KEY = 'palate-theme';
+const themePref = () => { try{ const t=localStorage.getItem(THEME_KEY); return t==='light'||t==='dark'?t:'system'; }catch(e){ return 'system'; } };
+function applyTheme(){
+  const t=themePref(), root=document.documentElement;
+  if(t==='system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+  const light = t==='light' || (t==='system' && matchMedia('(prefers-color-scheme: light)').matches);
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content = light?'#F1F1F4':'#0A0A0D';
+}
+function setTheme(t){ try{ if(t==='system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY,t); }catch(e){} applyTheme(); }
+try{ matchMedia('(prefers-color-scheme: light)').addEventListener('change',applyTheme); }catch(e){}
+applyTheme();
 const prefs = () => (state.custom && state.custom._prefs) || {};
 function setPref(k,v){ state.custom._prefs={...prefs(),[k]:v}; save(); }
 function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.custom[c])) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
@@ -4614,6 +4654,8 @@ function maybeShowMatch(){
 function openAccount(){
   const dv=prefs().defVis||'friends';
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="acct-box"><h3>Appearance</h3><p>Match your device, or pick light or dark. This is saved on this device.</p>
+    <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
   <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
     <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
     <button class="pill soft sm" data-act="all-private">Make every shelf Only me</button></div>
@@ -4632,7 +4674,7 @@ async function resetPassword(email,msgEl){
 }
 function showRecovery(){
   document.body.classList.remove('in'); $('#sheet-root').innerHTML='';
-  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="tag">Choose a new password.</p>
+  $('#view').innerHTML=`<section class="auth">${LOGO_H1}<p class="tag">Choose a new password.</p>
     <form id="rec-form" novalidate><label>New password<input id="rec-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></label>
     <p class="auth-err" id="rec-err" role="alert"></p><button class="pill" type="submit">Save password</button></form></section>`;
 }
@@ -4676,7 +4718,7 @@ const pendingJoin = () => { try{ return sessionStorage.getItem('palate-join'); }
 function showAuth(mode,msg){
   authMode=mode||authMode; document.body.classList.remove('in'); $('#sheet-root').innerHTML='';
   const up=authMode==='up';
-  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="tag">Your taste, ranked. Just for your friends.</p>
+  $('#view').innerHTML=`<section class="auth">${LOGO_H1}<p class="tag">Your taste, ranked. Just for your friends.</p>
     ${pendingJoin()?'<div class="invited">You were invited by a friend. Make an account or sign in to connect.</div>':''}
     <form id="auth-form" novalidate>
       ${up?'<label>Your name<input id="au-name" autocomplete="name" maxlength="40" placeholder="What your friends call you"></label>':''}
@@ -4692,7 +4734,7 @@ function showAuth(mode,msg){
 function showFatal(text,err){
   document.body.classList.remove('in');
   const why=err?[err.code,err.message,err.details,err.hint].filter(Boolean).join(' · '):'';
-  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">${esc(text)}</p>${why?`<p class="muted" style="font-size:13px;margin:0;word-break:break-word">${esc(why)}</p>`:''}<button class="pill" data-act="reload">Try again</button><button class="swap" data-act="signout">Sign out</button></section>`;
+  $('#view').innerHTML=`<section class="auth">${LOGO_H1}<p class="auth-err" style="min-height:0">${esc(text)}</p>${why?`<p class="muted" style="font-size:13px;margin:0;word-break:break-word">${esc(why)}</p>`:''}<button class="pill" data-act="reload">Try again</button><button class="swap" data-act="signout">Sign out</button></section>`;
 }
 async function submitAuth(){
   const email=($('#au-email').value||'').trim(), pass=$('#au-pass').value||'', name=($('#au-name')?.value||'').trim(), err=$('#au-err');
@@ -4725,7 +4767,7 @@ async function submitAuth(){
   }
 }
 async function enter(user){
-  $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1></section>';
+  $('#view').innerHTML=BOOT_HTML;
   try{
     me={id:user.id,email:user.email||''};
     let pr=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle(); if(pr.error) throw pr.error;
@@ -5999,6 +6041,7 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'theme': setTheme(el.dataset.v); document.querySelectorAll('[data-act="theme"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===el.dataset.v))); break;
     case 'account': openAccount(); break;
     case 'export-data': exportMyData(); break;
     case 'forgot': resetPassword(($('#au-email')||{}).value?.trim(),$('#au-err')); break;
@@ -6046,7 +6089,7 @@ document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.prevent
 (async function boot(){
   try{ if(new URLSearchParams(location.search).has('debug')) window.PALATE_DEBUG=true; }catch(e){}
   captureJoin();
-  if(!sb){ document.body.classList.remove('in'); $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">Setup needed: open config.js and paste in your Supabase URL and publishable key.</p></section>'; return; }
+  if(!sb){ document.body.classList.remove('in'); $('#view').innerHTML='<section class="auth">'+LOGO_H1+'<p class="auth-err" style="min-height:0">Setup needed: open config.js and paste in your Supabase URL and publishable key.</p></section>'; return; }
   recovering=/type=recovery/.test(location.hash);
   sb.auth.onAuthStateChange(ev=>{ if(ev==='SIGNED_OUT' && me) location.reload(); if(ev==='PASSWORD_RECOVERY'){ recovering=true; showRecovery(); } });
   try{ const {data}=await sb.auth.getSession(); if(recovering){ if(data.session) showRecovery(); else showAuth('in','That reset link expired. Request a new one.'); } else if(data.session) await enter(data.session.user); else showAuth('in'); }
