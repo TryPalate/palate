@@ -125,6 +125,10 @@ button,select,input,textarea{font:inherit;color:inherit}
 .lately-strip h2{display:flex;justify-content:space-between;align-items:center}
 .tab[data-new]::after,.bottom-nav [data-new]::after{content:attr(data-new);display:inline-block;min-width:16px;height:16px;line-height:16px;margin-left:6px;border-radius:8px;background:var(--accent,#ff6a3d);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:0 4px;vertical-align:middle}
 .starter{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 2px}
+.acct-adv{margin-top:18px}.acct-adv summary{cursor:pointer;font-size:12.5px;color:var(--muted);list-style:none;padding:6px 2px}.acct-adv summary::-webkit-details-marker{display:none}
+.acct-box select{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;margin-bottom:10px}
+.capsule{margin-bottom:14px}.capsule ul{list-style:none;margin:0;padding:0}.capsule li{padding:10px 0;display:grid;gap:6px}.capsule li+li{border-top:1px solid var(--line)}
+.cap-c{font-size:12px;color:var(--muted)}.cap-r{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}.cap-r b{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:36%}.cap-r i{font-style:normal;color:var(--muted)}.cap-r em{font-style:normal;font-size:12.5px;color:var(--muted)}
 .acct-box{margin-top:14px;padding:14px;border-radius:14px;background:var(--raise)}
 .acct-box h3{margin:0 0 4px;font-size:15px}.acct-box p{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
 .acct-box input{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-size:15px;margin-bottom:10px}
@@ -4525,7 +4529,9 @@ let me = null;                                   /* {id, name, invite} */
 let state = {name:'', shelves:{}, order:[], vis:{}, photos:{}, custom:{}};
 let FRIENDS = [], UPDATES = [], shared = {};      /* friends' shelves, activity, and their photos */
 const KEY = 'palate-v3';
-function applyCustom(){ for(const c in state.custom) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
+const prefs = () => (state.custom && state.custom._prefs) || {};
+function setPref(k,v){ state.custom._prefs={...prefs(),[k]:v}; save(); }
+function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.custom[c])) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
 const ui = {tab:'me', year:CURRENT, compare:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
 
@@ -4606,14 +4612,36 @@ function maybeShowMatch(){
   return true;
 }
 function openAccount(){
-  sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <div class="acct-box"><h3>Download my data</h3><p>Get a file with all your shelves, notes and years. Keep it somewhere safe. It is yours.</p><button class="pill" data-act="export-data">Download</button></div>
+  const dv=prefs().defVis||'friends';
+  sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
+    <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
+    <button class="pill soft sm" data-act="all-private">Make every shelf Only me</button></div>
+  <div class="acct-box"><h3>Sign-in</h3><p>Forgot your password, or want a new one? We will email you a link.</p><button class="pill soft sm" data-act="reset-pw">Email me a reset link</button></div>
   <div class="acct-box"><h3>Wipe my data</h3><p>Deletes all your shelves, photos and custom items. Your account and friends stay, so you can start over fresh. This cannot be undone.</p>
     <input id="wipe-in" placeholder='Type WIPE to confirm' autocomplete="off" aria-label="Type WIPE to confirm"><button class="pill danger-solid" id="wipe-btn" data-act="wipe" disabled>Wipe my data</button></div>
   <div class="acct-box"><h3>Delete my account</h3><p>Permanently deletes your account, shelves, photos and friendships. You will be signed out. This cannot be undone.</p>
     <input id="del-in" placeholder='Type DELETE to confirm' autocomplete="off" aria-label="Type DELETE to confirm"><button class="pill danger-solid" id="del-btn" data-act="delete-account" disabled>Delete my account</button></div>
+  <details class="acct-adv"><summary>Advanced</summary><div class="acct-box"><h3>Download my data</h3><p>A file with all your shelves, notes and years. It is yours to keep.</p><button class="pill soft sm" data-act="export-data">Download</button></div></details>
   <div style="height:18px"></div>`,'account');
 }
+async function resetPassword(email,msgEl){
+  if(!/^\S+@\S+\.\S+$/.test(email||'')){ if(msgEl) msgEl.textContent='Enter your email first.'; return; }
+  try{ const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname}); if(error) throw error; toast('Check your email for the reset link'); if(msgEl) msgEl.textContent='Check your email for the reset link.'; track('password_reset'); }
+  catch(e){ console.error(e); if(msgEl) msgEl.textContent='Could not send that. Try again in a minute.'; else toast('Could not send that. Try again in a minute.'); }
+}
+function showRecovery(){
+  document.body.classList.remove('in'); $('#sheet-root').innerHTML='';
+  $('#view').innerHTML=`<section class="auth"><h1 class="logo">palate</h1><p class="tag">Choose a new password.</p>
+    <form id="rec-form" novalidate><label>New password<input id="rec-pass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></label>
+    <p class="auth-err" id="rec-err" role="alert"></p><button class="pill" type="submit">Save password</button></form></section>`;
+}
+async function submitRecovery(){
+  const pw=$('#rec-pass').value||'', err=$('#rec-err'); if(pw.length<8){ err.textContent='Use at least 8 characters.'; return; }
+  const {data,error}=await sb.auth.updateUser({password:pw}); if(error){ err.textContent=error.message||'Could not save that.'; return; }
+  recovering=false; try{ history.replaceState(null,'',location.pathname); }catch(e){} await enter(data.user);
+}
+let recovering=false;
 async function removeMyFiles(){ try{ const {data}=await sb.storage.from('photos').list(me.id,{limit:1000}); if(data&&data.length) await sb.storage.from('photos').remove(data.map(f=>me.id+'/'+f.name)); }catch(e){ console.warn(e); } }
 async function wipeData(){
   const btn=$('#wipe-btn'); if(btn) btn.disabled=true; toast('Wiping…');
@@ -4621,10 +4649,10 @@ async function wipeData(){
     clearTimeout(pushT);
     let r=await sb.from('shelves').delete().eq('user_id',me.id); if(r.error) throw r.error;
     r=await sb.from('item_photos').delete().eq('user_id',me.id); if(r.error) throw r.error;
-    r=await sb.from('user_settings').upsert({user_id:me.id,custom:{}},{onConflict:'user_id'}); if(r.error) throw r.error;
+    const keep=prefs(); const cu=Object.keys(keep).length?{_prefs:keep}:{}; r=await sb.from('user_settings').upsert({user_id:me.id,custom:cu},{onConflict:'user_id'}); if(r.error) throw r.error;
     await removeMyFiles();
-    state={name:state.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
-    synced.shelves={}; synced.photos={}; synced.custom='{}'; buildCatalog(); applyCustom();
+    state={name:state.name,shelves:{},order:[],vis:{},photos:{},custom:cu};
+    synced.shelves={}; synced.photos={}; synced.custom=JSON.stringify(cu); buildCatalog(); applyCustom();
     try{ localStorage.removeItem(matchKey); }catch(e){}
     ui.tab='me'; ui.year=CURRENT; ui.view='me'; closeSheet(); render(); toast('All your data was wiped');
   }catch(e){ console.error(e); toast("Couldn't wipe everything. Try again."); if(btn) btn.disabled=false; }
@@ -4657,6 +4685,7 @@ function showAuth(mode,msg){
       <p class="auth-err" id="au-err" role="alert"></p>${msg?`<p class="auth-ok">${esc(msg)}</p>`:''}
       <button class="pill" type="submit">${up?'Create account':'Sign in'}</button>
     </form>
+    ${up?'':'<button class="swap" data-act="forgot">Forgot password?</button>'}
     <button class="swap" data-act="auth-mode">${up?'I already have an account':'New here? Create an account'}</button>
     <p class="muted" style="font-size:12px;margin:8px 0 0">build 2</p></section>`;
 }
@@ -4698,7 +4727,7 @@ async function submitAuth(){
 async function enter(user){
   $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1></section>';
   try{
-    me={id:user.id};
+    me={id:user.id,email:user.email||''};
     let pr=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle(); if(pr.error) throw pr.error;
     let prof=pr.data;
     if(!prof){ const name=((user.user_metadata&&user.user_metadata.name)||(user.email||'friend').split('@')[0]).slice(0,40); const ins=await sb.from('profiles').insert({id:me.id,name}).select().single(); if(ins.error) throw ins.error; prof=ins.data; }
@@ -5245,6 +5274,24 @@ function shelfCard(c,y,view){
     <p class="also">${s.hm.length?'Also · '+s.hm.map(h=>esc(h.n)).join(', '):''}</p>
   </article>`;
 }
+function capsule(y){
+  const rows=[]; const cur=y<CURRENT?CURRENT:CURRENT;
+  for(const c of state.order){
+    if(!visibleIn(c,'me')) continue;
+    const now=eff(c,CURRENT); if(!now) continue;
+    const then=y<CURRENT ? eff(c,y) : eff(c,CURRENT-1);
+    if(!then || then.year>=CURRENT || !then.snap.top.length) continue;
+    const a=then.snap.top[0], b=now.snap.top[0];
+    rows.push({c,a,b,ty:then.year,same:a.n===b.n});
+  }
+  if(!rows.length) return '';
+  rows.sort((p,q)=>(p.same-q.same)||(q.ty-p.ty));
+  const ty=y<CURRENT?y:Math.max(...rows.map(r=>r.ty));
+  const head=y<CURRENT?`Your ${y} vs now`:(ty===CURRENT-1?'This time last year':`Back in ${ty}`);
+  return `<div class="panel capsule"><h2>${esc(head)}</h2><ul>${rows.slice(0,4).map(r=>`<li><span class="cap-c">${esc(CAT[r.c].name)}</span>${r.same
+    ? `<span class="cap-r">${art(r.b.n,r.c,'sm')}<b>${esc(r.b.n)}</b><em>still #1 since ${r.ty}</em></span>`
+    : `<span class="cap-r">${art(r.a.n,r.c,'sm')}<b>${esc(r.a.n)}</b><i>→</i>${art(r.b.n,r.c,'sm')}<b>${esc(r.b.n)}</b></span>`}</li>`).join('')}</ul></div>`;
+}
 function meDyn(){
   const y=ui.year, view=ui.view, list=shelfList(y,view);
   let note='';
@@ -5253,7 +5300,8 @@ function meDyn(){
   if(view==='me' && y===CURRENT && !shelfList(CURRENT).length) note=`<div class="panel"><h2>Start with 3 favorites</h2><p class="muted" style="margin:0">Pick a topic, add a few things you love, and you will instantly see how you match your friends. You do not need to fill all five spots.</p><div class="starter">${['artists','movies','albums','tv','games'].filter(id=>CAT[id]).map(id=>`<button class="pk" data-act="pick-cat" data-cat="${id}">${esc(CAT[id].name)}</button>`).join('')}</div><div style="margin-top:10px"><button class="pill sm" data-act="quick">Walk me through it</button></div></div>`;
   const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${CATS.length-shelfList(CURRENT).length} categories to choose from</small></button>` : '';
   const strip=(view==='me' && y===CURRENT && UPDATES.length && lateList(3)) ? `<div class="panel lately-strip"><h2>Friends lately <button class="pill ghost sm" data-act="tab" data-tab="friends">See all</button></h2><ul class="lately">${lateList(3)}</ul></div>` : '';
-  return note + strip + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
+  const cap=(view==='me')?capsule(y):'';
+  return note + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
 }
 function viewMe(){
   const y=ui.year;
@@ -5752,7 +5800,8 @@ function saveEditor(next){
   const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
   const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
-  const c=ed.cat, flow=ed.flow; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
+  const c=ed.cat, flow=ed.flow; const isNew=!state.order.includes(c); (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
+  if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
   save(); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
   if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
@@ -5952,6 +6001,9 @@ document.addEventListener('click',e=>{
       break; }
     case 'account': openAccount(); break;
     case 'export-data': exportMyData(); break;
+    case 'forgot': resetPassword(($('#au-email')||{}).value?.trim(),$('#au-err')); break;
+    case 'reset-pw': resetPassword(me.email,null); break;
+    case 'all-private': { let n=0; for(const c of state.order) if(visOf(c)!=='private'){ state.vis[c]='private'; n++; } save(); render(); toast(n?`${n} shelf${n===1?'':'ves'} now Only me`:'Everything is already private'); break; }
     case 'wipe': wipeData(); break;
     case 'delete-account': deleteAccount(); break;
     case 'signout': sb.auth.signOut().finally(()=>location.reload()); break;
@@ -5969,6 +6021,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
+  if(t.id==='def-vis'){ setPref('defVis',t.value); toast('New shelves start as: '+VIS[t.value]); return; }
   if(t.dataset && t.dataset.vis){ state.vis[t.dataset.vis]=t.value; save(); render(); toast(`${CAT[t.dataset.vis].name}: ${VIS[t.value]}`); if(sheetKind==='detail') openDetail(...detailArgs); }
 });
 document.addEventListener('keydown',e=>{
@@ -5989,13 +6042,14 @@ document.addEventListener('input',e=>{
   else if(t.id==='pk-q'){ pk.q=t.value; $('#pk-list').innerHTML=pickerList(); }
 });
 
-document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.preventDefault(); submitAuth(); } });
+document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.preventDefault(); submitAuth(); } else if(e.target.id==='rec-form'){ e.preventDefault(); submitRecovery(); } });
 (async function boot(){
   try{ if(new URLSearchParams(location.search).has('debug')) window.PALATE_DEBUG=true; }catch(e){}
   captureJoin();
   if(!sb){ document.body.classList.remove('in'); $('#view').innerHTML='<section class="auth"><h1 class="logo">palate</h1><p class="auth-err" style="min-height:0">Setup needed: open config.js and paste in your Supabase URL and publishable key.</p></section>'; return; }
-  sb.auth.onAuthStateChange(ev=>{ if(ev==='SIGNED_OUT' && me) location.reload(); });
-  try{ const {data}=await sb.auth.getSession(); if(data.session) await enter(data.session.user); else showAuth('in'); }
+  recovering=/type=recovery/.test(location.hash);
+  sb.auth.onAuthStateChange(ev=>{ if(ev==='SIGNED_OUT' && me) location.reload(); if(ev==='PASSWORD_RECOVERY'){ recovering=true; showRecovery(); } });
+  try{ const {data}=await sb.auth.getSession(); if(recovering){ if(data.session) showRecovery(); else showAuth('in','That reset link expired. Request a new one.'); } else if(data.session) await enter(data.session.user); else showAuth('in'); }
   catch(e){ console.error(e); showAuth('in'); }
 })();
 })();
