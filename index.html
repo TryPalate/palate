@@ -4920,7 +4920,7 @@ const shelfList = (y, view='me') => state.order.filter(c=>eff(c,y) && visibleIn(
 function visTag(c){ const v=visOf(c); if(v==='friends') return ''; return `<span class="vis">${v==='private'?LOCK:PEOPLE}${v==='private'?'Only me':'Close'}</span>`; }
 function shelfCard(c,y,view){
   const s=eff(c,y).snap, prev=prevFor(c,y), fs=shelfSharers(c,s);
-  const rows=[0,1,2,3,4].map(i=>s.top[i]?row(s.top[i],i,c,prev):emptyRow(i)).join('');
+  const rows=s.top.slice(0,5).map((it,i)=>row(it,i,c,prev)).join('');   /* only the picks you made, no empty slots */
   return `<article class="card tap" style="${tint(c,s.top[0].n)}" role="button" tabindex="0" data-act="open" data-cat="${c}" aria-label="${esc(CAT[c].name)}">
     <div class="card-head"><h2>${esc(CAT[c].name)}</h2><div class="meta">${view==='me'?visTag(c):''}${fs.length?`<span class="stack" title="Friends who share picks here">${fs.slice(0,3).map(f=>av(f)).join('')}</span>`:''}</div></div>
     <ol class="rows">${rows}</ol>
