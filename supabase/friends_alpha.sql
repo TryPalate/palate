@@ -7,13 +7,22 @@ alter table public.app_config enable row level security;
 revoke all on public.app_config from anon, authenticated;
 insert into public.app_config values ('alpha_directory', 'on') on conflict (key) do nothing;
 
-create or replace function public.alpha_people() returns table (id uuid, name text)
+-- Profile picture: which of the 3 gradients a person picked (0, 1 or 2).
+alter table public.profiles add column if not exists avatar smallint not null default 0 check (avatar between 0 and 2);
+create or replace function public.set_avatar(p_i int) returns void language sql security definer set search_path = public as $$
+  update public.profiles set avatar = greatest(0, least(2, p_i)) where id = auth.uid();
+$$;
+revoke all on function public.set_avatar(int) from public, anon;
+grant execute on function public.set_avatar(int) to authenticated;
+
+drop function if exists public.alpha_people();
+create or replace function public.alpha_people() returns table (id uuid, name text, avatar smallint)
 language plpgsql security definer set search_path = public as $$
 begin
   if auth.uid() is null then raise exception 'Sign in first'; end if;
   if coalesce((select value from public.app_config where key = 'alpha_directory'), 'off') <> 'on' then return; end if;
   return query
-    select p.id, p.name from public.profiles p
+    select p.id, p.name, p.avatar from public.profiles p
     where p.id <> auth.uid()
       and not exists (select 1 from public.friendships f where f.user_id = auth.uid() and f.friend_id = p.id)
     order by lower(p.name), p.created_at limit 300;

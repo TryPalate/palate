@@ -100,7 +100,10 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area
 .years output{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
 .person{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}.person b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.alpha-note{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-left:6px}
 .auth label.rm{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--muted)}.auth label.rm input{width:auto;margin:0}
-.av,.me-av{text-shadow:0 1px 2px rgb(0 0 0 / .25)}
+.av,.me-av{text-shadow:0 1px 2px rgb(0 0 0 / .18)}
+button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
+.av-pick{display:flex;gap:16px;justify-content:center;padding:18px 0 26px}.av-opt{background:none;border:3px solid transparent;border-radius:50%;padding:3px;cursor:pointer}.av-opt[aria-pressed=true]{border-color:var(--text)}
+.av-big{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:32px;text-shadow:0 1px 2px rgb(0 0 0 / .18)}
 .promo{margin-bottom:12px;padding-bottom:14px}.promo h2{color:var(--text)}.promo p{margin:2px 0 10px;font-size:14px}.promo-row{display:flex;gap:6px;align-items:center}
 .steps{margin:6px 0 10px;padding-left:20px;line-height:1.5}.steps li{margin:8px 0}
 .note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 14px;margin-bottom:12px;border-radius:12px;background:var(--raise);color:var(--muted);font-size:14px}
@@ -4653,12 +4656,12 @@ async function loadFriends(){
   FRIENDS=[]; UPDATES=[]; shared={};
   if(!ids.length) return;
   const [pr,sh,ph]=await Promise.all([
-    sb.from('profiles').select('id,name').in('id',ids),
+    sb.from('profiles').select('id,name,avatar').in('id',ids).then(r=>r.error?sb.from('profiles').select('id,name').in('id',ids):r),   /* works before the avatar column exists */
     sb.from('shelves').select('user_id,cat,years,updated_at').in('user_id',ids),
     sb.from('item_photos').select('user_id,cat,name,url,h,s').in('user_id',ids)]);
   if(pr.error) throw pr.error; if(sh.error) throw sh.error; if(ph.error) throw ph.error;
   const closeOf=Object.fromEntries(rows.map(r=>[r.friend_id,r.close]));
-  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,hue:hue(p.name),close:!!closeOf[p.id],shelves:{}}));
+  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,avatar:p.avatar||0,hue:hue(p.name),close:!!closeOf[p.id],shelves:{}}));
   const by=Object.fromEntries(FRIENDS.map(f=>[f.id,f])); const ups=[];
   for(const r of (sh.data||[])){ const f=by[r.user_id]; if(!f||!CAT[r.cat]) continue; const sn=snapAt(r.years,CURRENT); if(!sn) continue; f.shelves[r.cat]=sn; ups.push([f.id,r.cat,r.updated_at]); }
   FRIENDS.sort((a,b)=>a.name.localeCompare(b.name));
@@ -4768,7 +4771,7 @@ let DIRECTORY=[];
 async function loadPeople(){
   try{ const r=await sb.rpc('alpha_people'); DIRECTORY=(r&&!r.error&&Array.isArray(r.data))?r.data:[]; }catch(e){ DIRECTORY=[]; }
 }
-function personRow(p){ return `<div class="person">${av({id:p.id,name:p.name})}<b>${esc(p.name)}</b><button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button></div>`; }
+function personRow(p){ return `<div class="person">${av({id:p.id,name:p.name,avatar:p.avatar})}<b>${esc(p.name)}</b><button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button></div>`; }
 function peoplePanel(){
   if(!DIRECTORY.length) return '';
   return `<div class="panel people"><h2>People on Palate <span class="alpha-note">alpha</span></h2><p class="muted" style="margin:2px 0 8px;font-size:14px">Everyone who has signed up so far. Tap to add them as a friend.</p>${DIRECTORY.map(personRow).join('')}<div style="padding:10px 0"><button class="pill sm" data-act="add-all">Add everyone</button></div></div>`;
@@ -4795,12 +4798,25 @@ function friendsCard(){
   if(!me || FRIENDS.length || !DIRECTORY.length || ui.view!=='me' || ui.year!==CURRENT) return '';
   return `<div class="panel promo"><h2>Find your friends</h2><p class="muted">${DIRECTORY.length} ${DIRECTORY.length===1?'person is':'people are'} already here. Add them to see how your taste matches.</p><div class="promo-row"><button class="pill sm" data-act="people">See who is here</button></div></div>`;
 }
+function openAvatar(){
+  const cur=(me&&me.avatar)|0, seed=(me&&me.id)||state.name, ini=esc(state.name[0]||'?');
+  sheet(`<div class="sheet-head"><div><h2>Your picture</h2><p>Pick the gradient your friends see next to your name.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="av-pick" role="group" aria-label="Picture options">${[0,1,2].map(v=>`<button class="av-opt" data-act="avatar-pick" data-v="${v}" aria-pressed="${v===cur}" aria-label="Option ${v+1}"><span class="av-big" style="background:${grad(seed,v)}">${ini}</span></button>`).join('')}</div>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Done</button></div></div>`,'avatar');
+}
+async function pickAvatar(v){
+  const prev=(me.avatar|0); me.avatar=v;
+  document.querySelectorAll('[data-act="avatar-pick"]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===v))); render();
+  try{ const r=await sb.rpc('set_avatar',{p_i:v}); if(r&&r.error) throw r.error; track('avatar_pick'); }
+  catch(e){ console.warn(e); me.avatar=prev; document.querySelectorAll('[data-act="avatar-pick"]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===prev))); render(); toast("Could not save that. Try again in a minute."); }
+}
 function openAccount(){
   const dv=prefs().defVis||'friends';
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="acct-box"><h3>Appearance</h3><p>Match your device, or pick light or dark. This is saved on this device.</p>
     <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
   ${notifyBox()}
+  <div class="acct-box"><h3>Profile picture</h3><p>Choose the gradient your friends see next to your name.</p><button class="pill soft sm" data-act="avatar">Change picture</button></div>
   <div class="acct-box"><h3>Alpha feedback</h3><p>Palate is in alpha with friends. Tell us what is missing, wrong or worth building. Things you add also help fill the shared catalog for everyone.</p><button class="pill soft sm" data-act="feedback">Send feedback</button></div>
   <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
     <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
@@ -4950,7 +4966,7 @@ async function enter(user){
     if(pr.error) throw pr.error;
     let prof=pr.data;
     if(!prof){ const name=((user.user_metadata&&user.user_metadata.name)||(user.email||'friend').split('@')[0]).slice(0,40); const ins=await sb.from('profiles').insert({id:me.id,name}).select().single(); if(ins.error) throw ins.error; prof=ins.data; }
-    me.name=prof.name; me.invite=prof.invite_code; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
+    me.name=prof.name; me.invite=prof.invite_code; me.avatar=prof.avatar||0; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
     if(sh.error) throw sh.error; if(ph.error) throw ph.error; if(us.error) throw us.error;
     for(const r of sh.data||[]){ if(!CAT[r.cat]) continue; state.shelves[r.cat]={years:r.years||{}}; state.order.push(r.cat); if(r.vis!=='friends') state.vis[r.cat]=r.vis; }
     for(const p of ph.data||[]) state.photos[pkey(p.cat,p.name)]={src:p.url,h:p.h||0,s:p.s||30};
@@ -4990,16 +5006,18 @@ function art(name, cat, size, noh){
   return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
-/* Every person gets their own gradient of 2 or 3 colours, always the same one for the same person. */
-function grad(seed){
+/* Every person gets their own soft gradient of 2 or 3 colours taken from the logo, always the same one for the same person.
+   v (0, 1 or 2) is the option they picked on their profile. */
+const SOFT=['#EDBB6A','#EE9A6E','#E5799B','#B992E3','#9483E6','#6BB9E0'];   /* gold, tangerine, rose, lilac, violet, sky: the logo, a little muted */
+function grad(seed,v=0){
   const mix=n=>{ n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; return n>>>0; };
-  const h=mix(hash(String(seed))), g=mix(hash('g'+seed)), b=mix(hash('b'+seed));
-  const h1=h%360, h2=(h1+70+g%90)%360, h3=(h2+55+(b>>>3)%80)%360, three=b%10<4, ang=110+(g>>>5)%90;
-  const col=(hh,i)=>`hsl(${hh} ${78+((h>>>i)%12)}% ${54+((g>>>i)%8)}%)`;
-  return `linear-gradient(${ang}deg,${col(h1,1)},${col(h2,3)}${three?','+col(h3,5):''})`;
+  const k=String(seed)+'#'+(v|0), h=mix(hash(k)), g=mix(hash('g'+k)), three=(h>>>7)%10<4;
+  const step=three?1+(g%2):1+(g%3), span=step*(three?2:1), start=(h>>>3)%(SOFT.length-span);
+  const cols=[...Array(three?3:2)].map((_,i)=>SOFT[start+i*step]); if((g>>>4)%2) cols.reverse();
+  return `linear-gradient(${120+(g>>>9)%80}deg,${cols.join(',')})`;
 }
-function av(f, cls=''){ return `<span class="av ${cls}" style="background:${grad(f.id||f.name)}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
-const meAv = () => `<span class="me-av" style="background:${grad((me&&me.id)||state.name)}" aria-hidden="true">${esc(state.name[0]||'?')}</span>`;
+function av(f, cls=''){ return `<span class="av ${cls}" style="background:${grad(f.id||f.name,f.avatar)}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
+const meAv = (tap) => tap ? `<button class="me-av tap-av" data-act="avatar" style="background:${grad((me&&me.id)||state.name,me&&me.avatar)}" aria-label="Change your picture" title="Change your picture">${esc(state.name[0]||'?')}</button>` : `<span class="me-av" style="background:${grad((me&&me.id)||state.name,me&&me.avatar)}" aria-hidden="true">${esc(state.name[0]||'?')}</span>`;
 const first = f => f.name.split(' ')[0];
 const visOf = c => state.vis[c] || 'friends';
 const VIS = {friends:'All friends', close:'Close friends', private:'Only me'};
@@ -5531,7 +5549,7 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv()}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
       ${minYear()<CURRENT?`<div class="years"><label for="year" class="vh">Year</label><input type="range" id="year" min="${minYear()}" max="${CURRENT}" step="1" value="${y}" aria-valuetext="${y}"><output id="year-out" for="year">${y}</output></div>`:''}
@@ -6435,6 +6453,8 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'avatar': openAvatar(); break;
+    case 'avatar-pick': pickAvatar(+el.dataset.v); break;
     case 'people': openPeople(); break;
     case 'add-person': addPerson(el.dataset.id); break;
     case 'add-all': addAll(); break;
