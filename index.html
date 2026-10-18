@@ -89,6 +89,8 @@ button,select,input,textarea{font:inherit;color:inherit}
 .years input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--text);margin-top:-6.5px}
 .years input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--text)}
 .years output{font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+.promo{margin-bottom:12px;padding-bottom:14px}.promo h2{color:var(--text)}.promo p{margin:2px 0 10px;font-size:14px}.promo-row{display:flex;gap:6px;align-items:center}
+.steps{margin:6px 0 10px;padding-left:20px;line-height:1.5}.steps li{margin:8px 0}
 .note{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:9px 14px;margin-bottom:12px;border-radius:12px;background:var(--raise);color:var(--muted);font-size:14px}
 
 /* Shelf cards — all the same size */
@@ -389,6 +391,8 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
+<script>/* Start fetching last visit's pictures right now, in parallel with the app code and the database. */
+try{var _m=JSON.parse(localStorage.getItem('palate-imgs')||'{}'),_t=localStorage.getItem('palate-v3-tab')||'me',_l=(_m[_t]||_m.me||[]).slice(0,90);window.__pre=_l.map(function(u){var i=new Image();i.decoding='async';i.src=u;return i})}catch(e){}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script>
@@ -1158,7 +1162,12 @@ China|Asia
 Singapore|Asia
 Croatia|Europe
 Germany|Europe
-Denmark|Europe`,
+Denmark|Europe
+Hong Kong|Asia
+India|Asia
+Russia|Europe
+Egypt|Africa
+Saudi Arabia|Asia`,
 cities:`Tokyo|Japan
 New York City|United States
 London|United Kingdom
@@ -1186,7 +1195,14 @@ Chicago|United States
 San Francisco|United States
 Berlin|Germany
 Vienna|Austria
-Osaka|Japan`,
+Osaka|Japan
+Beijing|China
+Shanghai|China
+Dubai|United Arab Emirates
+Moscow|Russia
+Cairo|Egypt
+Mumbai|India
+Busan|South Korea`,
 themeparks:`Universal Studios Japan|Osaka
 Tokyo DisneySea|Tokyo
 Disneyland|California
@@ -4544,6 +4560,7 @@ function buildCatalog(){
     CATALOG[id]=out; }
 }
 buildCatalog();
+const STATIC = new Set(); for(const c in CATALOG) for(const it of CATALOG[c]) STATIC.add(c+'|'+it.n.toLowerCase());   /* what ships with the app */
 
 function subOf(cat, n){ const f=(CATALOG[cat]||[]).find(i=>i.n===n); return f?f.s:''; }
 function snap(cat, top, hm=[], why={}){ return {top: top.map(n=>({n,s:subOf(cat,n),why:why[n]||''})), hm: hm.map(n=>({n,s:subOf(cat,n),why:''}))}; }
@@ -4569,11 +4586,14 @@ function applyTheme(){
 function setTheme(t){ try{ if(t==='system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY,t); }catch(e){} applyTheme(); }
 try{ matchMedia('(prefers-color-scheme: light)').addEventListener('change',applyTheme); }catch(e){}
 applyTheme();
+if('serviceWorker' in navigator) addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });   /* keeps pictures on the device, and receives notifications */
 const prefs = () => (state.custom && state.custom._prefs) || {};
 function setPref(k,v){ state.custom._prefs={...prefs(),[k]:v}; save(); }
 function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.custom[c])) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
 const ui = {tab:'me', year:CURRENT, compare:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
+if(location.hash==='#friends') ui.tab='friends';
+addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me){ ui.tab='friends'; ui.compare=null; render(); window.scrollTo(0,0); } });
 
 /* Saving: any change calls save(); a moment later only what changed is sent to Supabase. */
 const synced = {shelves:{}, photos:{}, custom:'{}'};
@@ -4651,11 +4671,84 @@ function maybeShowMatch(){
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Keep going</button></div></div>`,'match');
   return true;
 }
+/* ---------- Install tip and notifications ---------- */
+const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const isStandalone = () => { try{ return matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }catch(e){ return false; } };
+const canPush = () => !!(CFG.vapidPublicKey && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window);
+let deferredInstall=null, pushOn=false;
+addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=e; if(me) refreshPromo(); });
+addEventListener('appinstalled',()=>{ deferredInstall=null; if(me){ refreshPromo(); } });
+const tipOff = k => { try{ return !!localStorage.getItem('palate-tip-'+k); }catch(e){ return false; } };
+function tipHide(k){ try{ localStorage.setItem('palate-tip-'+k,String(Date.now())); }catch(e){} }
+function promoCard(){
+  if(!me || ui.view!=='me' || ui.year!==CURRENT || !shelfList(CURRENT).length) return '';
+  const x=k=>`<button class="pill ghost sm" data-act="tip-x" data-k="${k}" aria-label="Dismiss">Not now</button>`;
+  if(!isStandalone() && !tipOff('install') && (deferredInstall || IS_IOS))
+    return `<div class="panel promo"><h2>Keep Palate on your home screen</h2><p class="muted">Opens in one tap, loads faster, and ${IS_IOS?'lets us tell you when friends update their shelves.':'feels like a real app.'}</p><div class="promo-row"><button class="pill sm" data-act="install">${IS_IOS?'Show me how':'Install'}</button>${x('install')}</div></div>`;
+  if(canPush() && !pushOn && !tipOff('notify') && Notification.permission==='default' && FRIENDS.length)
+    return `<div class="panel promo"><h2>Know when friends update</h2><p class="muted">One short note when a friend changes a shelf. Never at night, and you can turn it off any time.</p><div class="promo-row"><button class="pill sm" data-act="push-on">Turn on</button>${x('notify')}</div></div>`;
+  return '';
+}
+function refreshPromo(){ if(ui.tab==='me' && $('#me-dyn')) $('#me-dyn').innerHTML=meDyn(); }
+function iosSteps(){
+  sheet(`<div class="sheet-head"><div><h2>Add Palate to your home screen</h2><p>Takes ten seconds in Safari.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <ol class="steps"><li>Tap the <b>Share</b> button at the bottom of Safari (the square with an arrow).</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>, then open Palate from your home screen.</li></ol>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Got it</button></div></div>`,'install');
+}
+const b64u = s => { const p='='.repeat((4-s.length%4)%4), r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(r,c=>c.charCodeAt(0)); };
+async function sendSub(sub){
+  const j=sub.toJSON(); if(!j.keys) return false;
+  const r=await sb.rpc('push_subscribe',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth,p_tz:new Date().getTimezoneOffset()});
+  return !(r&&r.error);
+}
+async function enablePush(){
+  if(!canPush()){ toast(IS_IOS && !isStandalone() ? 'Add Palate to your home screen first' : 'This browser cannot do notifications'); return false; }
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){ toast(perm==='denied'?'Notifications are blocked in your settings':'No problem, maybe later'); return false; }
+    const reg=await navigator.serviceWorker.ready;
+    const sub=(await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(CFG.vapidPublicKey)});
+    if(!await sendSub(sub)) throw new Error('save failed');
+    pushOn=true; tipHide('notify'); track('push_on');
+    try{ reg.showNotification('Notifications are on',{body:'We will tell you when a friend updates a shelf.',icon:'icons/icon-192.png',badge:'icons/badge-96.png',tag:'palate-hello'}); }catch(e){}
+    return true;
+  }catch(e){ console.warn(e); toast("Couldn't turn on notifications. Try again."); return false; }
+}
+async function disablePush(){
+  try{
+    const reg=await navigator.serviceWorker.ready, sub=await reg.pushManager.getSubscription();
+    if(sub){ try{ await sb.rpc('push_unsubscribe',{p_endpoint:sub.endpoint}); }catch(e){} await sub.unsubscribe(); }
+    pushOn=false; track('push_off'); return true;
+  }catch(e){ console.warn(e); return false; }
+}
+/* Runs after sign-in: keeps an existing subscription fresh (new time zone, new phone token) */
+async function syncPush(){
+  try{
+    if(!canPush() || !sb || !me) return;
+    const reg=await navigator.serviceWorker.ready; let sub=await reg.pushManager.getSubscription();
+    if(Notification.permission==='granted'){
+      if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(CFG.vapidPublicKey)});
+      if(await sendSub(sub)) pushOn=true;
+    } else pushOn=false;
+    refreshPromo();
+  }catch(e){ console.warn(e); }
+}
+function notifyBox(){
+  let body;
+  if(canPush()){
+    const denied=Notification.permission==='denied';
+    body = denied ? `<p>Notifications are blocked for Palate. Turn them on in your phone or browser settings, then come back.</p>`
+      : `<p>${pushOn?'On. You get one short note when a friend changes a shelf, never between 10pm and 8am.':'Get one short note when a friend changes a shelf. Never between 10pm and 8am.'}</p><button class="pill soft sm" data-act="${pushOn?'push-off':'push-on'}" id="push-btn">${pushOn?'Turn off':'Turn on'}</button>`;
+  } else if(IS_IOS && !isStandalone()) body=`<p>On iPhone, notifications need Palate on your home screen first.</p><button class="pill soft sm" data-act="install">Show me how</button>`;
+  else body=`<p>This browser cannot receive notifications.</p>`;
+  return `<div class="acct-box" id="notify-box"><h3>Notifications</h3>${body}</div>`;
+}
 function openAccount(){
   const dv=prefs().defVis||'friends';
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="acct-box"><h3>Appearance</h3><p>Match your device, or pick light or dark. This is saved on this device.</p>
     <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
+  ${notifyBox()}
   <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
     <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
     <button class="pill soft sm" data-act="all-private">Make every shelf Only me</button></div>
@@ -4770,14 +4863,20 @@ async function enter(user){
   $('#view').innerHTML=BOOT_HTML;
   try{
     me={id:user.id,email:user.email||''};
-    let pr=await sb.from('profiles').select('*').eq('id',me.id).maybeSingle(); if(pr.error) throw pr.error;
+    const code=pendingJoin(); let joined=null;
+    const friendsP = code ? null : loadFriends(); if(friendsP) friendsP.catch(()=>{});     /* friends load alongside everything else, unless we are about to add one */
+    const soft = q => q.then(r=>r,()=>({error:true}));
+    const [pr,sh,ph,us,im,ci]=await Promise.all([
+      sb.from('profiles').select('*').eq('id',me.id).maybeSingle(),
+      sb.from('shelves').select('cat,years,vis,pos').eq('user_id',me.id).order('pos'),
+      sb.from('item_photos').select('cat,name,url,h,s').eq('user_id',me.id),
+      sb.from('user_settings').select('custom').eq('user_id',me.id).maybeSingle(),
+      soft(sb.from('item_images').select('cat,name,url,h,s').range(0,4999)),
+      soft(sb.from('catalog_items').select('cat,name,sub').range(0,4999))]);
+    if(pr.error) throw pr.error;
     let prof=pr.data;
     if(!prof){ const name=((user.user_metadata&&user.user_metadata.name)||(user.email||'friend').split('@')[0]).slice(0,40); const ins=await sb.from('profiles').insert({id:me.id,name}).select().single(); if(ins.error) throw ins.error; prof=ins.data; }
     me.name=prof.name; me.invite=prof.invite_code; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
-    const [sh,ph,us]=await Promise.all([
-      sb.from('shelves').select('cat,years,vis,pos').eq('user_id',me.id).order('pos'),
-      sb.from('item_photos').select('cat,name,url,h,s').eq('user_id',me.id),
-      sb.from('user_settings').select('custom').eq('user_id',me.id).maybeSingle()]);
     if(sh.error) throw sh.error; if(ph.error) throw ph.error; if(us.error) throw us.error;
     for(const r of sh.data||[]){ if(!CAT[r.cat]) continue; state.shelves[r.cat]={years:r.years||{}}; state.order.push(r.cat); if(r.vis!=='friends') state.vis[r.cat]=r.vis; }
     for(const p of ph.data||[]) state.photos[pkey(p.cat,p.name)]={src:p.url,h:p.h||0,s:p.s||30};
@@ -4785,16 +4884,15 @@ async function enter(user){
     synced.shelves={}; for(const c of state.order){ const r=shelfRow(c); synced.shelves[c]=JSON.stringify([r.years,r.vis,r.pos]); }
     synced.photos={}; for(const k in state.photos) synced.photos[k]=JSON.stringify(state.photos[k]);
     synced.custom=JSON.stringify(state.custom);
-    buildCatalog(); applyCustom();
-    AUTO.map={}; try{ const im=await sb.from('item_images').select('cat,name,url,h,s').range(0,4999); if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34}; }catch(e){}
-    const code=pendingJoin(); let joined=null;
-    if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; }
-    await loadFriends();
+    buildCatalog(); applyCustom(); applySharedCatalog(ci);
+    AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34};
+    if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
+    else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); }
+    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); syncPush();
     if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
@@ -5343,7 +5441,7 @@ function meDyn(){
   const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${CATS.length-shelfList(CURRENT).length} categories to choose from</small></button>` : '';
   const strip=(view==='me' && y===CURRENT && UPDATES.length && lateList(3)) ? `<div class="panel lately-strip"><h2>Friends lately <button class="pill ghost sm" data-act="tab" data-tab="friends">See all</button></h2><ul class="lately">${lateList(3)}</ul></div>` : '';
   const cap=(view==='me')?capsule(y):'';
-  return note + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
+  return note + promoCard() + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
 }
 function viewMe(){
   const y=ui.year;
@@ -5718,6 +5816,117 @@ async function nativeWiki(q,lang){
   const j=await getJSON('https://'+lang+'.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=prefixsearch&gpslimit=6&gpsnamespace=0&prop=pageimages|description|langlinks&lllang=en&piprop=thumbnail&pithumbsize=300&pilicense=any&gpssearch='+encodeURIComponent(q));
   return Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).map(pg=>({nat:pg.title,en:((pg.langlinks||[])[0]||{})['*']||'',desc:pg.description||'',img:pg.thumbnail&&pg.thumbnail.source||''}));
 }
+/* ---------- Shared catalog ----------
+   Anything someone adds that is not in the built-in lists gets its details looked up (year, creator, country...)
+   and is saved to a shared table, so every friend finds it in search from then on. */
+const KNOWN = new Set();                                            /* already in the shared table */
+function applySharedCatalog(r){
+  try{
+    if(!r || r.error) return;
+    for(const x of r.data||[]){ const l=CATALOG[x.cat]; const k=x.cat+'|'+x.name.toLowerCase(); KNOWN.add(k);
+      if(!l || l.some(i=>i.n.toLowerCase()===x.name.toLowerCase())) continue; l.push({n:x.name,s:x.sub||''}); }
+  }catch(e){}
+}
+async function shareItem(c,n,s){
+  if(!sb||!me||!CAT[c]||!n||!String(s||'').trim()||/^added by you$/i.test(s)) return; const k=c+'|'+n.toLowerCase();   /* only share items we found real details for */
+  if(STATIC.has(k)||KNOWN.has(k)) return; KNOWN.add(k);
+  try{ const {error}=await sb.from('catalog_items').upsert([{cat:c,name:String(n).slice(0,200),sub:String(s||'').slice(0,160)}],{onConflict:'cat,name',ignoreDuplicates:true}); if(error) throw error; }
+  catch(e){ KNOWN.delete(k); if(window.PALATE_DEBUG) console.warn('could not share item',e); }
+}
+const WORK_CATS = new Set(['movies','tv','anime','kdramas','games','mobilegames','albums','musicals','boardgames']);
+const BOOKISH = new Set(['books','manga','songs']);
+const PLACE_CATS = new Set(['cities','countries','wonders','themeparks','universities','cafes','restaurants']);
+const capFirst = t => String(t||'').replace(/^./,m=>m.toUpperCase());
+/* Wikipedia and Wikidata: description, year, creator and country for one thing */
+async function wikiFacts(c,n){
+  const cfg=IMG_SRC[c]||{}, df=IMG_DESC[c]; await gate('wiki',120);
+  const q=[n,cfg.w].filter(Boolean).join(' ');
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description|pageprops&ppprop=wikibase_item&gsrsearch='+encodeURIComponent(q));
+  const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+  const want=normT(n), bare=t=>normT(String(t).replace(/\s*\([^)]*\)\s*$/,''));
+  const pg=pages.find(p=>!/disambiguation|^list of/i.test((p.description||'')+p.title) && bare(p.title)===want && (!df||df.test(p.description||'')));
+  if(!pg) return null;
+  const out={title:pg.title.replace(/\s*\([^)]*\)\s*$/,''),desc:pg.description||'',year:'',creator:'',country:''};
+  const qid=pg.pageprops&&pg.pageprops.wikibase_item; if(!qid) return out;
+  try{
+    const w=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims&ids='+qid);
+    const cl=((w.entities||{})[qid]||{}).claims||{};
+    const val=p=>((cl[p]||[])[0]||{}).mainsnak&&((cl[p]||[])[0].mainsnak.datavalue||{}).value;
+    const time=val('P577')||val('P571')||val('P580'); if(time&&time.time) out.year=yr(time.time.replace(/^[+-]0*/,''));
+    const ids=[]; const pick=(props,key)=>{ for(const p of props){ const v=val(p); if(v&&v.id){ ids.push([key,v.id]); return; } } };
+    pick(['P57','P50','P175','P178','P176','P170'],'creator'); pick(['P495','P17','P27'],'country');
+    if(ids.length){
+      const lab=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=labels&languages=en&ids='+[...new Set(ids.map(x=>x[1]))].join('|'));
+      for(const [k,id] of ids) out[k]=(((lab.entities||{})[id]||{}).labels||{}).en?.value||'';
+    }
+  }catch(e){}
+  return out;
+}
+async function itunesYear(c,n,artist){
+  try{ await gate('itunes-live',1200);
+    const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({term:(n+' '+(artist||'')).trim(),media:'music',entity:c==='albums'?'album':'song',limit:'5',country:'us'}),true);
+    const hit=(j.results||[]).find(r=>normT(c==='albums'?r.collectionName:r.trackName)===normT(n)); return hit?yr(hit.releaseDate):'';
+  }catch(e){ return ''; }
+}
+/* Find the details for something the app has never heard of. Returns {s, name, img?, src?}; s is '' if nothing trustworthy was found. */
+async function enrichItem(c,raw){
+  const want=normT(raw); let best=null, s='', name=raw;
+  try{ const list=await liveSearch(c,raw);
+    best=list.find(x=>normT(x.n)===want) || list.find(x=>{ const t=normT(x.n); return t && (t.startsWith(want+' ')||want.startsWith(t+' ')); }) || null;
+  }catch(e){}
+  if(best){ if(normT(best.n)===want) name=best.n; if(best.s && !/^(artist|#\d+)$/i.test(best.s)) s=best.s; }
+  if(c==='albums' && best && !/\b(19|20)\d\d\b/.test(s)){ const y=await itunesYear(c,name,best.s); if(y) s=[s,y].filter(Boolean).join(' · '); }
+  if(!s || (WORK_CATS.has(c) && !/\b(19|20)\d\d\b/.test(s))){
+    try{ const f=await wikiFacts(c,raw);
+      if(f){
+        const alt = WORK_CATS.has(c) ? [f.creator,f.year].filter(Boolean).join(' · ')
+          : BOOKISH.has(c) ? f.creator
+          : PLACE_CATS.has(c) ? (f.country||capFirst(f.desc).slice(0,48))
+          : capFirst(f.desc).slice(0,48);
+        if(alt && (!s || alt.length>s.length)) s=alt;
+        if(normT(f.title)===want && f.title!==raw && !best) name=f.title;
+      }
+    }catch(e){}
+  }
+  return {s:String(s||'').slice(0,120), name, img:best&&best.full||'', src:best&&best.src||''};
+}
+function setItemSub(c,n,s){
+  const blank=t=>!t||/^added by you$/i.test(t); let hit=false;
+  const sh=state.shelves[c];
+  if(sh) for(const y in sh.years){ const sn=sh.years[y]; for(const it of [...(sn.top||[]),...(sn.hm||[])]) if(it.n===n && blank(it.s)){ it.s=s; hit=true; } }
+  for(const it of (state.custom[c]||[])) if(it.n===n && blank(it.s)) it.s=s;
+  for(const it of (CATALOG[c]||[])) if(it.n===n && blank(it.s)) it.s=s;
+  if(ed && ed.cat===c) for(const sl of ed.slots) if(sl && sl.n===n && blank(sl.s)) sl.s=s;
+  return hit;
+}
+async function fillDetails(c,n){
+  const r=await enrichItem(c,n);
+  if(r.s){ setItemSub(c,n,r.s); save(); if(sheetKind==='editor' && ed) renderEditor(); else render(); }
+  if(r.img && !photo(c,n)) adoptImage(c,n,r.img,r.src||'live').catch(()=>{});
+  shareItem(c,n,r.s);
+  return r;
+}
+function addCustom(c,n){
+  const it={n,s:''}; (state.custom[c] ||= []).push(it); CATALOG[c].push(it); save(); addItem(it);
+  fillDetails(c,n).catch(()=>{});
+}
+/* Older custom items still say "Added by you": fill in a few each time the app opens */
+function stripStrayNative(){
+  let changed=false;
+  for(const c of ['influencers','celebrities','athletes','comedians','authors']){ const sh=state.shelves[c]; if(!sh) continue;
+    for(const y in sh.years){ const sn=sh.years[y];
+      for(const it of [...(sn.top||[]),...(sn.hm||[])]){
+        if(!STATIC.has(c+'|'+it.n.toLowerCase()) || !segs(it.s).some(isNat) || segs(subOf(c,it.n)).some(isNat)) continue;
+        it.s=segs(it.s).filter(x=>!isNat(x)).join(' · '); changed=true; } } }
+  if(changed){ save(); render(); }
+}
+let legacyDone=false;
+async function upgradeLegacyCustom(){
+  if(legacyDone) return; legacyDone=true; let left=4;
+  for(const c in state.custom){ if(!Array.isArray(state.custom[c])) continue;
+    for(const it of [...state.custom[c]]){ if(left<=0) return; if(!/^added by you$/i.test(it.s||'')) continue; left--; try{ await fillDetails(c,it.n); }catch(e){} }
+  }
+}
 async function liveSearch(c,q){
   const lang=LANG_OF(q); if(!lang) return liveSearch1(c,q);
   let tr=[]; try{ tr=await nativeWiki(q,lang); }catch(e){}
@@ -5733,6 +5942,7 @@ async function liveSearch(c,q){
 }
 /* After you pick something, look up its native-language name so it shows both ("BLACKPINK · 블랙핑크"). */
 const NAT_CATS=new Set(['artists','albums','songs','movies','tv','kdramas','anime','manga','actors','celebrities','influencers','athletes','comedians','characters','authors','musicals']);
+const NO_GUESS = new Set(['influencers','celebrities','athletes','comedians','authors','actors','painters','characters']);   /* a person's native name only when the region is clear */
 async function findNative(c,n,sub){
   const hint = /k-?pop|korea|k-?drama|k-?hip/i.test(sub)||c==='kdramas'?'ko' : /j-?pop|j-?rock|japan|anime/i.test(sub)||c==='anime'||c==='manga'?'ja' : /c-?pop|mando|canto|chin|taiwan|hong kong/i.test(sub)?'zh' : null;
   await gate('wiki',120); const w=(IMG_SRC[c]||{}).w;
@@ -5743,7 +5953,7 @@ async function findNative(c,n,sub){
   pages.sort((x,y)=>(/\(/.test(y.title)?1:0)-(/\(/.test(x.title)?1:0));
   for(const pg of pages){
     const by={}; for(const l of pg.langlinks){ if(['ko','ja','zh'].includes(l.lang) && isNat(l['*'])) by[l.lang]=l['*'].replace(/\s*\([^)]*\)\s*$/,''); }
-    const keys=Object.keys(by); const k=hint&&by[hint]?hint : keys.length===1?keys[0] : null;
+    const keys=Object.keys(by); const k=hint&&by[hint]?hint : (keys.length===1 && !NO_GUESS.has(c))?keys[0] : null;
     if(k) return by[k];
   }
   return null;
@@ -5785,7 +5995,7 @@ function results(){
   ed.res=[...local,...extra];
   const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
   return ed.res.map((it,k)=>resBtn(it,k,q)).join('')
-    + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>Not listed yet · you can add your own photo</span></div><span class="add">Add</span></button></li>`);
+    + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>Not listed yet · we will look up the details</span></div><span class="add">Add</span></button></li>`);
 }
 function slotRow(i){
   const it=ed.slots[i], label=i<5?String(i+1):'·';
@@ -5893,6 +6103,7 @@ $('#photo-input').addEventListener('change', async e=>{
     const k=pkey(target.c,target.n), old=state.photos[k];
     state.photos[k]={src:url,h:p.h,s:p.s}; if(old) dropFile(old.src);
     save(); render(); rerenderSheet(); toast('Photo added');
+    if(SHARE_PHOTO_PICKS) sharePick(target.c,target.n,url,{h:p.h,s:p.s});   /* your upload becomes the photo everyone sees, until they add their own */
   }catch(err){ console.error(err); toast("Couldn't upload that photo. Try a JPG or PNG."); }
 });
 
@@ -5982,10 +6193,45 @@ document.addEventListener('keydown', e=>{
 });
 
 /* ---------- Render + events ---------- */
+/* Popular picks in every category are fetched quietly in the background, so they are already there when the picker opens. */
+let warmed=false;
+function warmPopular(){
+  if(warmed || !me) return; warmed=true;
+  const net=navigator.connection||{}; if(net.saveData) return;
+  const slow=/(^|-)(2g|3g)$/.test(net.effectiveType||'') || net.type==='cellular';
+  const PER=12, urls=[], missing=[];
+  const take=(cats,find)=>{ for(const c of cats) for(const it of (CATALOG[c.id]||[]).slice(0,PER)){ const p=photo(c.id,it.n); if(p) urls.push(dispSrc(c.id,p.src)); else if(find) missing.push([c.id,it.n]); } };
+  take(CATS.filter(c=>c.popular),true);             /* the categories everyone sees first */
+  if(!slow) take(CATS.filter(c=>!c.popular),false); /* the rest, only on Wi-Fi */
+  const idle=f=>('requestIdleCallback' in window)?requestIdleCallback(f,{timeout:3000}):setTimeout(f,500);
+  const uniq=[...new Set(urls)]; let i=0;
+  const step=()=>idle(()=>{
+    uniq.slice(i,i+8).forEach(u=>{ const im=new Image(); im.decoding='async'; im.src=u; }); i+=8;
+    if(i<uniq.length) setTimeout(step,300); else findMissing();
+  });
+  /* Popular things nobody has looked up yet: find their pictures now, once, and share them with everyone. */
+  const findMissing=async()=>{ for(const [c,n] of missing.slice(0,24)){ try{ await resolveOne(c,n); }catch(e){} await new Promise(r=>setTimeout(r,900)); } };
+  step();
+}
+/* The pictures on screen are remembered, so next time they start loading before the app has even signed in. */
+let imgT=null;
+function rememberImages(){
+  clearTimeout(imgT);
+  imgT=setTimeout(()=>{
+    try{
+      const tab=ui.tab, urls=[];
+      document.querySelectorAll('#view .art.photo').forEach(el=>{ const m=/url\(['"]?([^'")]+)['"]?\)/.exec(el.getAttribute('style')||''); if(m && /^https:/.test(m[1]) && !urls.includes(m[1])) urls.push(m[1]); });
+      if(!urls.length) return;
+      const all=JSON.parse(localStorage.getItem('palate-imgs')||'{}'); all[tab]=urls.slice(0,120);
+      localStorage.setItem('palate-imgs',JSON.stringify(all));
+    }catch(e){}
+  },600);
+}
 function render(){
   $('#view').innerHTML = ui.tab==='friends'?viewFriends():ui.tab==='recap'?viewRecap():viewMe();
   document.querySelectorAll('.tab[data-tab], .bottom-nav [data-tab]').forEach(b=>{ if(b.dataset.tab===ui.tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   try{ localStorage.setItem(KEY+'-tab',ui.tab); }catch(e){}
+  rememberImages();
   if(ui.tab==='friends'){ try{ localStorage.setItem(seenKey,String(Date.now())); }catch(e){} }
   const nu = ui.tab==='friends' ? 0 : unreadUpdates();
   document.querySelectorAll('[data-tab="friends"]').forEach(b=>{ if(nu) b.dataset.new=nu; else b.removeAttribute('data-new'); });
@@ -6030,7 +6276,7 @@ document.addEventListener('click',e=>{
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
-    case 'custom': { const n=ed.query.trim(); if(!n) break; const it={n,s:'Added by you'}; (state.custom[ed.cat] ||= []).push(it); CATALOG[ed.cat].push(it); save(); addItem(it); break; }
+    case 'custom': { const n=ed.query.trim(); if(!n) break; addCustom(ed.cat,n); break; }
     case 'rm': ed.slots[+el.dataset.i]=null; compact(); renderEditor(); break;
     case 'save': saveEditor(); break;
     case 'save-next': saveEditor(el.dataset.next); break;
@@ -6041,6 +6287,10 @@ document.addEventListener('click',e=>{
       const txt=`My palate ${CURRENT}\n`+shelfList(CURRENT,'friends').map(c=>`${CAT[c].name}: ${eff(c,CURRENT).snap.top[0].n}`).join('\n');
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
+    case 'install': if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.finally(()=>{ deferredInstall=null; refreshPromo(); }); } else iosSteps(); break;
+    case 'tip-x': tipHide(el.dataset.k); refreshPromo(); break;
+    case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(ok&&$('#notify-box')) $('#notify-box').outerHTML=notifyBox(); }); break;
+    case 'push-off': disablePush().then(()=>{ if($('#notify-box')) $('#notify-box').outerHTML=notifyBox(); toast('Notifications are off'); }); break;
     case 'theme': setTheme(el.dataset.v); document.querySelectorAll('[data-act="theme"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===el.dataset.v))); break;
     case 'account': openAccount(); break;
     case 'export-data': exportMyData(); break;

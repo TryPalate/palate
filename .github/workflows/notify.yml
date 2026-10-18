@@ -1,0 +1,29 @@
+name: Friend notifications
+# Every 10 minutes, tells people when friends changed their shelves (never between 10pm and 8am their time).
+# Needs two secrets: PUSH_KEY and VAPID_PRIVATE_KEY. Until they exist this does nothing.
+# Get PUSH_KEY by running in Supabase SQL Editor:  select value from app_config where key = 'push_key';
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: notify
+  cancel-in-progress: false
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Send notifications
+        env:
+          PUSH_KEY: ${{ secrets.PUSH_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+        run: |
+          if [ -z "$PUSH_KEY" ] || [ -z "$VAPID_PRIVATE_KEY" ]; then echo "Add the PUSH_KEY and VAPID_PRIVATE_KEY secrets to turn notifications on."; exit 0; fi
+          npm install --no-save --no-audit --no-fund web-push@3.6.7
+          node scripts/notify.mjs
