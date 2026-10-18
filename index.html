@@ -113,6 +113,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .story-sw input:focus-visible+.knob{outline:2px solid #fff;outline-offset:2px}
 .story-opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px}
 .story-actions{display:flex;gap:8px}.story-hint{margin:0;color:rgb(255 255 255 / .6);font-size:13px;min-height:16px;text-align:center}
+.pstat{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}.pstat:empty{display:none}
 .stack{display:flex}
 .nm .fr-tag{display:inline-flex;align-items:center;gap:5px;margin:0;overflow:visible;white-space:nowrap;font-size:12px;color:var(--muted);text-overflow:clip}
 .nm .fr-tag .av{display:grid;place-items:center;width:20px;height:20px;font-size:8.5px;margin:0;border:0;overflow:visible;white-space:nowrap}
@@ -4606,6 +4607,7 @@ function maybeShowMatch(){
 }
 function openAccount(){
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="acct-box"><h3>Download my data</h3><p>Get a file with all your shelves, notes and years. Keep it somewhere safe. It is yours.</p><button class="pill" data-act="export-data">Download</button></div>
   <div class="acct-box"><h3>Wipe my data</h3><p>Deletes all your shelves, photos and custom items. Your account and friends stay, so you can start over fresh. This cannot be undone.</p>
     <input id="wipe-in" placeholder='Type WIPE to confirm' autocomplete="off" aria-label="Type WIPE to confirm"><button class="pill danger-solid" id="wipe-btn" data-act="wipe" disabled>Wipe my data</button></div>
   <div class="acct-box"><h3>Delete my account</h3><p>Permanently deletes your account, shelves, photos and friendships. You will be signed out. This cannot be undone.</p>
@@ -5360,6 +5362,42 @@ function closeSheet(){ $('#sheet-root').innerHTML=''; document.body.style.overfl
 function frTags(c){ return it=>{ const sh=sharers(c,it.n); return (sh.length?`<div class="also-fr">${sh.map(x=>`<span class="fr-tag">${av(x.f)}${esc(first(x.f))} ${x.label}</span>`).join('')}</div>`:'') + (it.why?`<p class="why">${esc(it.why)}</p>`:''); }; }
 function photoBtn(c,n,size){ return `<button type="button" class="art-btn" data-act="photo" data-cat="${c}" data-n="${esc(n)}" aria-label="${photo(c,n)?'Change':'Add'} photo for ${esc(n)}">${art(n,c,size)}<span class="hint">${photo(c,n)?'Edit':'+ Photo'}</span></button>`; }
 
+/* Simple usage counts (what gets shared, which invite links get copied). Never blocks the app. */
+function track(kind,cat){ try{ if(sb&&me) sb.from('events').insert({kind,cat:cat||null}).then(()=>{},()=>{}); }catch(e){} }
+/* "Who else picked this": counts only, never names. */
+const PSTAT={};
+async function pickStats(c,names){
+  const key=c+'|'+names.join('|'); if(PSTAT[key]) return PSTAT[key];
+  const r=await sb.rpc('pick_stats',{p_cat:c,p_names:names.slice(0,10)}); if(r.error) throw r.error;
+  return PSTAT[key]=Object.fromEntries((r.data||[]).map(x=>[x.name,x]));
+}
+function pickLine(r,c,rank){
+  if(!r) return '';
+  const selfIn=visOf(c)!=='private', others=Math.max(0,r.picked-(selfIn?1:0)), firstOthers=Math.max(0,r.first_pick-(selfIn&&rank===0?1:0));
+  if(r.shelves>=30){ const pct=Math.max(1,Math.round(100*r.picked/r.shelves)); return `${pct}% of ${CAT[c].name.toLowerCase()} shelves have this`+(firstOthers>0?` · #1 for ${Math.max(1,Math.round(100*r.first_pick/r.shelves))}%`:''); }
+  if(!others) return 'You are the first on Palate to pick this';
+  return `${others} other${others===1?'':'s'} on Palate picked this`+(firstOthers>0?` · #1 for ${firstOthers}`:'');
+}
+async function fillPickStats(c,names){
+  try{ const st=await pickStats(c,names); names.forEach((n,i)=>{ const el=[...document.querySelectorAll('.pstat')].find(e=>e.dataset.n===n); if(el) el.textContent=pickLine(st[n],c,i); }); }catch(e){}
+}
+async function showInsights(c){
+  try{
+    const e=eff(c,CURRENT); if(!e||!sb||!me) return; const names=e.snap.top.slice(0,5).map(i=>i.n);
+    const st=await pickStats(c,names); if($('#sheet-root').firstChild||sty) return;
+    const total=Math.max(...Object.values(st).map(x=>x.shelves),0); if(total<2) return;
+    const rows=e.snap.top.slice(0,5).map((it,i)=>`<li class="row"><span class="rk">${i+1}</span>${art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><em class="pstat" style="display:block">${esc(pickLine(st[it.n],c,i))}</em></div></li>`).join('');
+    sheet(`<div class="sheet-head"><div><h2>How your ${esc(CAT[c].name.toLowerCase())} line up</h2><p>Just for fun: who else on Palate picked the same things.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <ol class="rows detail">${rows}</ol>
+    <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="share" data-cat="${c}">Share</button><button class="pill" data-act="close">Done</button></div></div>`,'insight');
+  }catch(err){}
+}
+function exportMyData(){
+  const data={app:'Palate',exported_at:new Date().toISOString(),name:state.name,shelves:state.shelves,order:state.order,visibility:state.vis,custom:state.custom,photos:Object.fromEntries(Object.entries(state.photos||{}).map(([k,v])=>[k,v.src]))};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  const a=document.createElement('a'); a.href=url; a.download='palate-my-data-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  track('export_data'); toast('Your data was downloaded');
+}
 /* ---------- Story pictures: 1080x1920 (Instagram story size), in the style of Apple Music Replay ---------- */
 const SW=1080, SH=1920;
 let sty=null;
@@ -5453,6 +5491,7 @@ async function renderStory(){
   const sw=$('#story-notes'); if(sw){ sw.disabled=!st.hasNotes; sw.checked=st.notes&&st.hasNotes; const l=$('#story-notes-l'); if(l) l.classList.toggle('off',!st.hasNotes); const h=$('#story-hint'); if(h) h.textContent=st.hasNotes?'':'No notes yet. Add a “why” when you edit a shelf.'; }
 }
 function openStory(kind,c){
+  track('share_open',kind==='shelf'?c:'profile');
   if(kind==='shelf' && !eff(c,ui.year===undefined?CURRENT:ui.year)) return;
   closeSheet(); sty={kind,cat:c,notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
   let box=$('#story-root'); if(!box){ box=document.createElement('div'); box.id='story-root'; document.body.appendChild(box); }
@@ -5477,19 +5516,19 @@ function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeOb
 function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
 async function storyShare(){
   if(!sty||!sty.blob) return; const f=storyFile();
-  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); track('share_native',sty.cat); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   storySave(); toast('Saved. Add it to your story from your photos.');
 }
 function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(()=>toast(msg),()=>toast("Couldn't copy. Long-press the link instead.")); }catch(e){ toast("Couldn't copy on this browser."); } }
 async function storyCopyImg(){
   if(!sty||!sty.blob) return;
-  try{ await navigator.clipboard.write([new ClipboardItem({'image/png':sty.blob})]); toast('Image copied'); }catch(e){ toast("This browser can't copy images. Use Save image."); }
+  try{ await navigator.clipboard.write([new ClipboardItem({'image/png':sty.blob})]); track('share_copy_image',sty.cat); toast('Image copied'); }catch(e){ toast("This browser can't copy images. Use Save image."); }
 }
 function storySms(){
-  if(!sty) return; const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
+  if(!sty) return; track('share_sms',sty.cat); const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
   location.href='sms:?&body='+encodeURIComponent('Check out '+what+' on Palate, and add me: '+inviteLink());
 }
-function storySave(){ if(!sty||!sty.url) return; const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
+function storySave(){ if(!sty||!sty.url) return; track('share_save',sty.cat); const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
 function openDetail(c, fid){
   detailArgs=[c,fid];
   let s, prev=null, who, y, own=!fid;
@@ -5497,12 +5536,13 @@ function openDetail(c, fid){
   else { y=ui.year; s=eff(c,y).snap; prev=prevFor(c,y); who=state.name; }
   const editable = own && y===CURRENT && ui.view==='me';
   const extra = it => frTags(c)(it);
-  const rows = s.top.map((it,i)=>`<li class="row"><span class="rk">${i+1}</span>${editable?photoBtn(c,it.n,'row'):art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${extra(it)}</div>${change(it,i,prev)}</li>`).join('');
+  const rows = s.top.map((it,i)=>`<li class="row"><span class="rk">${i+1}</span>${editable?photoBtn(c,it.n,'row'):art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${own&&y===CURRENT?`<em class="pstat" data-n="${esc(it.n)}"></em>`:''}${extra(it)}</div>${change(it,i,prev)}</li>`).join('');
   sheet(`<div class="sheet-head"><div><h2>${esc(CAT[c].name)}</h2><p>${esc(who)} · ${y}${own?' · '+VIS[visOf(c)]:''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <ol class="rows detail">${rows}</ol>
   ${s.hm.length?`<p class="also">Also · ${s.hm.map(h=>esc(h.n)).join(', ')}</p>`:''}
   <div class="sheet-foot">${editable?`<label class="confirm" for="vis-d">Who sees this <select id="vis-d" data-vis="${c}" style="background:var(--raise);border:0;border-radius:10px;padding:7px 10px">${Object.entries(VIS).map(([k,l])=>`<option value="${k}" ${visOf(c)===k?'selected':''}>${l}</option>`).join('')}</select></label>`:'<span></span>'}${own?`<div class="foot-right"><button class="pill soft" data-act="share" data-cat="${c}">Share</button>${editable?`<button class="pill" data-act="edit" data-cat="${c}">Edit</button>`:''}</div>`:''}</div>`, 'detail');
   setTimeout(()=>$('.sheet .x')?.focus(),20);
+  if(own&&y===CURRENT&&sb&&me) fillPickStats(c,s.top.slice(0,5).map(i=>i.n));
 }
 
 /* Editor */
@@ -5715,7 +5755,7 @@ function saveEditor(next){
   const c=ed.cat, flow=ed.flow; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(!state.order.includes(c)) state.order=[...state.order, c];
   save(); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
-  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(!maybeShowMatch()) toast('Saved'); }
+  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
 function removeShelf(){
   const c=ed.cat, sh=state.shelves[c];
@@ -5880,7 +5920,7 @@ document.addEventListener('click',e=>{
     case 'story-save': storySave(); break;
     case 'story-share': storyShare(); break;
     case 'story-copy-img': storyCopyImg(); break;
-    case 'story-copy-link': copyText(inviteLink(),'Link copied'); break;
+    case 'story-copy-link': track('invite_copy'); copyText(inviteLink(),'Link copied'); break;
     case 'story-sms': storySms(); break;
     case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
@@ -5911,12 +5951,13 @@ document.addEventListener('click',e=>{
       try{ navigator.clipboard.writeText(txt).then(()=>toast('Copied'),()=>toast('Copy was blocked here')); }catch(err){ toast('Copy was blocked here'); }
       break; }
     case 'account': openAccount(); break;
+    case 'export-data': exportMyData(); break;
     case 'wipe': wipeData(); break;
     case 'delete-account': deleteAccount(); break;
     case 'signout': sb.auth.signOut().finally(()=>location.reload()); break;
     case 'reload': location.reload(); break;
     case 'auth-mode': showAuth(authMode==='in'?'up':'in'); break;
-    case 'copy-invite': { const link=inviteLink(); try{ navigator.clipboard.writeText(link).then(()=>toast('Link copied'),()=>{ el.closest('.invite').querySelector('input').select(); toast('Press copy on the selected link'); }); }catch(err){ toast('Press copy on the selected link'); } break; }
+    case 'copy-invite': { track('invite_copy'); const link=inviteLink(); try{ navigator.clipboard.writeText(link).then(()=>toast('Link copied'),()=>{ el.closest('.invite').querySelector('input').select(); toast('Press copy on the selected link'); }); }catch(err){ toast('Press copy on the selected link'); } break; }
     case 'new-invite': sb.rpc('rotate_invite_code').then(r=>{ if(r.error){ toast("Couldn't make a new link"); return; } me.invite=r.data; render(); toast('New link made. The old one no longer works.'); }); break;
     case 'toggle-close': { const f=FRIENDS.find(x=>x.id===el.dataset.f); if(!f) break; const v=!f.close;
       sb.from('friendships').update({close:v}).eq('user_id',me.id).eq('friend_id',f.id).then(r=>{ if(r.error){ toast("Couldn't change that"); return; } f.close=v; render(); toast(v?`${first(f)} can now see your close-friends shelves`:`${first(f)} is no longer a close friend`); }); break; }

@@ -1,0 +1,39 @@
+name: Growth milestones
+# Once a week, reads your user count and opens a GitHub issue (you get an email) when it's time for the next step.
+# Needs one secret: STATS_KEY. Get it by running in Supabase SQL Editor:  select value from app_config where key = 'stats_key';
+on:
+  schedule:
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read stats and open issues at milestones
+        env:
+          STATS_KEY: ${{ secrets.STATS_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$STATS_KEY" ]; then echo "Add the STATS_KEY secret to turn this on."; exit 0; fi
+          URL=$(grep -o 'https://[a-z0-9]*\.supabase\.co' config.js | head -1)
+          KEY=$(grep -oE 'sb_publishable_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9._-]+' config.js | head -1)
+          curl -sS -X POST "$URL/rest/v1/rpc/growth_snapshot" -H "apikey: $KEY" -H "Content-Type: application/json" -d "{\"p_key\":\"$STATS_KEY\"}" -o stats.json
+          cat stats.json; echo
+          USERS=$(jq -r '.total_users // empty' stats.json)
+          [ -n "$USERS" ] || { echo "Could not read stats. Did you run supabase/growth.sql?"; exit 1; }
+          BODY="Current numbers: $(jq -c . stats.json)"
+          open_issue () {
+            title="$1"; text="$2"
+            if [ -z "$(gh issue list --state all --search "\"$title\" in:title" --json number --jq '.[0].number')" ]; then
+              gh issue create --title "$title" --body "$text"$'\n\n'"$BODY"
+            fi
+          }
+          [ "$USERS" -ge 25 ]   && open_issue "Palate hit 25 people: get the legal basics in place" "Before sharing Palate beyond friends: privacy policy, terms, a minimum signup age, and a support email. See the Launch readiness doc in your Side projects project."
+          [ "$USERS" -ge 100 ]  && open_issue "Palate hit 100 people: add error monitoring and plan for backups" "Add error monitoring (e.g. Sentry), a short FAQ, and decide on a paid Supabase plan (daily backups). Test that data export and account deletion work."
+          [ "$USERS" -ge 500 ]  && open_issue "Palate hit 500 people: upgrade Supabase and own your images" "Move to the paid Supabase plan, store pictures yourself instead of relying on free sources, and set up moderation and takedown handling."
+          [ "$USERS" -ge 2000 ] && open_issue "Palate hit 2,000 people: time for help" "Get a legal review, load test the app, and consider a partner or first hire."
+          exit 0
