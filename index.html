@@ -4751,7 +4751,7 @@ function emptyRow(i){ return `<li class="row empty"><span class="rk">${i+1}</spa
    A result is saved once to a shared table, so everyone after that gets it instantly. Your own uploads always win. */
 const AUTO = {map:{}, tried:new Set(), pending:[], flushT:null};
 const IMG_TIMEOUT = CFG.imgTimeout || 7000;
-const NOIMG_KEY = 'palate-noimg2', NOIMG_DAYS = 14;
+const NOIMG_KEY = 'palate-noimg3', NOIMG_DAYS = 14;
 let noimg = {}; try{ noimg = JSON.parse(localStorage.getItem(NOIMG_KEY)||'{}'); }catch(e){}
 function rememberNone(k){ noimg[k]=Date.now(); try{ localStorage.setItem(NOIMG_KEY, JSON.stringify(noimg)); }catch(e){} }
 const recentNone = k => noimg[k] && (Date.now()-noimg[k] < NOIMG_DAYS*864e5);
@@ -5006,13 +5006,19 @@ async function logoFiles(c,n,sub){
   const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh|fc|afc|cf)$/;
   const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description&gsrsearch='+encodeURIComponent(q));
   const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
-  const pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); });
+  let pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); });
+  if(!pg){ const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=description&titles='+encodeURIComponent(n));
+    pg=Object.values((t.query&&t.query.pages)||{}).find(p=>p.pageid && (!df||df.test(p.description||''))); }
   if(!pg) return [];
   const im=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&imlimit=60&titles='+encodeURIComponent(pg.title));
   const files=[]; for(const p of Object.values((im.query&&im.query.pages)||{})) for(const f of (p.images||[])) files.push(f.title);
   const tokens=want.split(' ').filter(x=>x.length>2);
-  const scored=files.filter(f=>LOGO_NAME.test(f) && /\.(svg|png|jpg|jpeg)$/i.test(f) && !/\b(old|former|history|historic|protest|store|building|headquarters|stadium|truck|plane|aircraft|livery|boycott)\b|\b(19|20)\d\d\b/i.test(f))
-    .map(f=>{ const fn=normT(f.replace(/^File:/i,'')); return {f,sc:(tokens.every(t=>fn.includes(t))?4:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\bicon\b|symbol|logo/i.test(f)?1:0)}; })
+  const JUNK=/\b(flag|map|commons|wikimedia|wikiquote|wikidata|ambox|edit|question|folder|padlock|increase|decrease|steady|symbol support|portal|stub|crystal|nuvola)\b/i;
+  const OLD=/\b(old|former|history|historic|protest|store|building|headquarters|stadium|truck|plane|aircraft|livery|boycott|interior|exterior|menu|food|drive.?thru)\b/i;
+  const cands=files.filter(f=>/\.(svg|png|jpg|jpeg)$/i.test(f) && !JUNK.test(f) && !OLD.test(f));
+  const scored=cands.map(f=>{ const fn=normT(f.replace(/^File:/i,'').replace(/\.[a-z]+$/i,'')); const hasName=tokens.length&&tokens.every(t=>fn.includes(t)), isLogo=LOGO_NAME.test(f);
+      return {f,sc:(hasName?4:0)+(isLogo?3:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\b(19[0-9]\d|200\d)\b/.test(f)?-1:0)+(/\b(202\d)\b/.test(f)?0.5:0)}; })
+    .filter(x=>x.sc>=4 || (x.sc>=3&&LOGO_NAME.test(x.f)))   /* the company's name in the file name, or a file called logo/icon/symbol */
     .sort((a,b)=>b.sc-a.sc).slice(0,5);
   if(!scored.length) return [];
   const ii=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&iiurlwidth=300&titles='+encodeURIComponent(scored.map(x=>x.f).join('|')));
