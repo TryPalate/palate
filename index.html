@@ -97,20 +97,21 @@ button,select,input,textarea{font:inherit;color:inherit}
 .card-share{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:50%;background:rgb(255 255 255 / .12);color:inherit;cursor:pointer;padding:0}
 .card-share svg{width:16px;height:16px}.card-share:hover{background:rgb(255 255 255 / .22)}
 #story-root{position:fixed;inset:0;z-index:200}
-.sty-view{position:absolute;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.sty-view{position:absolute;inset:0;height:100dvh;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))}
 .story-x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgb(255 255 255 / .16);color:#fff;font-size:17px;cursor:pointer}
-.story-stage{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center}
-.story-stage img{max-width:100%;max-height:100%;aspect-ratio:9/16;object-fit:contain;border-radius:22px;box-shadow:0 20px 60px rgb(0 0 0 / .5);transition:opacity .2s}
+.story-stage{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center;overflow:hidden}
+.story-stage img{width:min(100%,calc((100dvh - 215px) * 9 / 16));height:auto;aspect-ratio:9/16;object-fit:cover;border-radius:22px;box-shadow:0 20px 60px rgb(0 0 0 / .5);transition:opacity .2s;background:#111}
 .busy .story-stage img{opacity:.35}
 .story-busy{position:absolute;color:#fff;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}.busy .story-busy{opacity:1}
 .story-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:480px;flex-wrap:wrap}
-.story-sw{display:flex;align-items:center;gap:10px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;user-select:none}
+.story-sw{position:relative;display:flex;align-items:center;gap:10px;color:#fff;font-weight:600;font-size:15px;cursor:pointer;user-select:none}
 .story-sw.off{opacity:.45;cursor:not-allowed}
 .story-sw input{position:absolute;opacity:0;pointer-events:none}
 .story-sw .knob{width:44px;height:26px;border-radius:13px;background:rgb(255 255 255 / .25);position:relative;transition:background .15s}
 .story-sw .knob::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
 .story-sw input:checked+.knob{background:var(--good)}.story-sw input:checked+.knob::after{transform:translateX(18px)}
 .story-sw input:focus-visible+.knob{outline:2px solid #fff;outline-offset:2px}
+.story-opts{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:480px}
 .story-actions{display:flex;gap:8px}.story-hint{margin:0;color:rgb(255 255 255 / .6);font-size:13px;min-height:16px;text-align:center}
 .stack{display:flex}
 .nm .fr-tag{display:inline-flex;align-items:center;gap:5px;margin:0;overflow:visible;white-space:nowrap;font-size:12px;color:var(--muted);text-overflow:clip}
@@ -162,6 +163,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .alt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px}
 .alt-opt{background:none;border:0;padding:4px;border-radius:12px;cursor:pointer;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
 .alt-opt:hover{background:var(--card)}
+.alt-opt.cur{outline:2px solid var(--accent);outline-offset:-2px}.alt-opt.cur small{color:var(--text);font-weight:700}
 .alt-opt small{font-size:11.5px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sz-row{--w:52px;--ht:52px}.sz-row.sh-poster{--w:38px;--ht:54px}.sz-row.sh-wide{--w:58px;--ht:42px}
 .sz-sm{--w:38px;--ht:38px}.sz-sm.sh-poster{--w:28px;--ht:40px}.sz-sm.sh-wide{--w:44px;--ht:32px}
@@ -4908,37 +4910,55 @@ async function nativeWikiImage(c,n,sub){
 }
 /* Every candidate picture we can find for a name, so you can choose the right one yourself. */
 async function altCandidates(c,n,sub){
-  const cfg=IMG_SRC[c]||{}; const out=[], seen=new Set();
-  const add=(img,full,label)=>{ if(!img||seen.has(full||img)||badImg(c,full||img)) return; seen.add(full||img); out.push({img,full:full||img,label}); };
-  const nat=natives(n,sub)[0];
-  if(c==='albums'||c==='songs'){
-    const hits=await musicHits(c,n,sub).catch(()=>[]); const art=artistOf(sub);
-    hits.forEach(h=>add(h.thumb,h.url,[h.title,h.artist,h.ok?'':'other artist'].filter(Boolean).join(' · ')));
-    return out.slice(0,12);
-  }
-  if(LOGO_CATS.has(c)){ const l=await logoFiles(c,n,sub).catch(()=>[]); l.forEach(x=>add(x.url,x.url,x.label)); if(out.length) return out.slice(0,12); }
-  if(c==='characters'||c==='villains'||c==='superheroes'){ try{ for(const ch of (await anilistCharacters(n)).slice(0,5)) if(ch.image&&ch.image.large) add(ch.image.large,ch.image.large,[ch.name.full,((ch.media&&ch.media.nodes[0]||{}).title||{}).romaji].filter(Boolean).join(' · ')); }catch(e){} }
-  if(c==='superheroes'||c==='villains'){
-    const film=HERO_FILM_N[normT(n)]; if(film){ try{ const p=await filmPosters(film); if(p) add(p.img,p.full,n+' · '+p.film+' (film poster)'); }catch(e){} }
-  }
-  const jobs=[
-    liveSearch1(c,n).then(r=>r.forEach(x=>add(x.img,x.full,[x.n,x.s].filter(Boolean).join(' · ')))).catch(()=>{}),
-    (async()=>{ await gate('wiki',120);
-      const q=[n,cfg.sub?firstPart(sub):'',cfg.w].filter(Boolean).join(' ');
-      const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=10&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&gsrsearch='+encodeURIComponent(q));
-      Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail) add(pg.thumbnail.source,pg.thumbnail.source,[pg.title,pg.description].filter(Boolean).join(' · ')); }); })().catch(()=>{}),
-    c==='games' ? robloxCandidates(n).then(r=>r.forEach(x=>add(x.img,x.full,x.label))).catch(()=>{}) : null,
-    nat && LANG_OF(nat) ? (async()=>{ const x=await nativeWikiImage(c,n,sub); if(x) add(x,x,nat); })().catch(()=>{}) : null
-  ].filter(Boolean);
+  const cfg=IMG_SRC[c]||{}, out=[], seen=new Set(), want=normT(n), tokens=want.split(' ').filter(x=>x.length>2), nat=natives(n,sub)[0];
+  const add=(img,full,source,label)=>{ full=full||img; if(!img||seen.has(full)||badImg(c,full)) return; seen.add(full); out.push({img,full,source,label:label||source}); };
+  const cur=photo(c,n); if(cur){ seen.add(cur.src); out.push({img:cur.src,full:cur.src,source:'Current',label:'Your current picture',current:true}); }
+  const JUNK=/\b(flag|map|commons|wikimedia|wikiquote|wikidata|ambox|edit|question|folder|padlock|increase|decrease|steady|portal|stub|crystal|nuvola|signature|autograph|diagram|chart|poster)\b/i;
+  const imgFile=f=>/\.(jpe?g|png|webp)$/i.test(f)||(/\.svg$/i.test(f)&&LOGO_CATS.has(c));
+  const hasName=f=>tokens.every(t=>normT(String(f).replace(/^File:/i,'')).includes(t));
+  const pageP=findWikiPage(c,n,sub).catch(()=>null);
+  const jobs=[];
+  const job=(fn)=>jobs.push((async()=>{ try{ await fn(); }catch(e){} })());
+  /* the databases that know this exact thing */
+  if(c==='albums'||c==='songs') job(async()=>{ (await musicHits(c,n,sub)).filter(h=>h.ok).forEach(h=>add(h.thumb,h.url,h.src,[h.title,h.artist].filter(Boolean).join(' · '))); });
+  if(c==='pokemon') job(async()=>{ const u=await pokemonImage(c,n); if(u) add(u,u,'PokéAPI',n); });
+  if(cfg.a) job(async()=>{ const u=await anilistImage(c,n); if(u) add(u,u,'AniList',n); });
+  if(cfg.i&&c!=='albums'&&c!=='songs') job(async()=>{ const u=await itunesImage(c,n,sub); if(u) add(u,u,'Apple',n); });
+  if(c==='artists') job(async()=>{ const u=await deezerImage(c,n,sub); if(u) add(u,u,'Deezer',n); });
+  if(cfg.o) job(async()=>{ const u=await openLibImage(c,n,sub); if(u) add(u,u,'Open Library',n); });
+  if(c==='characters'||c==='villains'||c==='superheroes') job(async()=>{ for(const ch of await anilistCharacters(n)){ const names=[ch.name.full,ch.name.native,...(ch.name.alternative||[])].filter(Boolean).map(normT); if(ch.image&&ch.image.large&&names.includes(want)) add(ch.image.large,ch.image.large,'AniList',ch.name.full); } });
+  if(c==='superheroes'||c==='villains') job(async()=>{ const film=HERO_FILM_N[want]; if(film){ const p=await filmPosters(film); if(p) add(p.img,p.full,'Film poster',p.film); } });
+  if(c==='games') { job(async()=>{ (await robloxCandidates(n)).filter(x=>normT(x.label.split(' · ')[0])===want).forEach(x=>add(x.img,x.full,'Roblox',x.label)); });
+    job(async()=>{ const u=await robloxWikiImage(c,n,sub); if(u) add(u,u,'Wikipedia',n); }); job(async()=>{ const u=await robloxFandomImage(c,n,sub); if(u) add(u,u,'Roblox wiki',n); }); }
+  if(LOGO_CATS.has(c)) job(async()=>{ (await logoFiles(c,n,sub)).forEach(x=>add(x.url,x.url,'Logo',x.label)); });
+  if(nat&&LANG_OF(nat)) job(async()=>{ const u=await nativeWikiImage(c,n,sub); if(u) add(u,u,'Wikipedia ('+LANG_OF(nat)+')',nat); });
+  /* Wikipedia: the matched page's own picture, then the other pictures on that page, then its Wikidata image */
+  job(async()=>{ const pg=await pageP; if(!pg) return;
+    const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=500&pilicense=any&titles='+encodeURIComponent(pg.title));
+    for(const p of Object.values((t.query&&t.query.pages)||{})) if(p.thumbnail&&!LOGO_CATS.has(c)) add(p.thumbnail.source,p.thumbnail.source,'Wikipedia',pg.title);
+    if(!LOGO_CATS.has(c)){ const im=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&imlimit=200&titles='+encodeURIComponent(pg.title));
+      const files=[]; for(const p of Object.values((im.query&&im.query.pages)||{})) for(const f of (p.images||[])) files.push(f.title);
+      const top=files.filter(f=>imgFile(f)&&!JUNK.test(f)).sort((a,b)=>(hasName(b)?1:0)-(hasName(a)?1:0)).slice(0,8);
+      const by=await commonsInfo('en.wikipedia.org',top); top.forEach(f=>add(by[f],by[f],'Wikipedia page',f.replace(/^File:/i,''))); }
+    const qid=pg.pageprops&&pg.pageprops.wikibase_item;
+    if(qid){ const w=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity='+qid+'&property='+(LOGO_CATS.has(c)?'P154':'P18'));
+      const names=(((w.claims||{})[LOGO_CATS.has(c)?'P154':'P18'])||[]).map(x=>x.mainsnak&&x.mainsnak.datavalue&&x.mainsnak.datavalue.value).filter(Boolean).slice(0,3).map(v=>'File:'+v);
+      const by=await commonsInfo('commons.wikimedia.org',names); names.forEach(f=>add(by[f],by[f],'Wikidata',f.replace(/^File:/i,''))); } });
+  /* Wikimedia Commons: only files whose name contains the name of the thing */
+  job(async()=>{ const q=LOGO_CATS.has(c)?n+' logo':[n,PERSON_CATS.has(c)?'':cfg.w].filter(Boolean).join(' ');
+    const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&iiurlwidth=400&gsrsearch='+encodeURIComponent(q));
+    Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&hasName(p.title)&&(!LOGO_CATS.has(c)||LOGO_NAME.test(p.title))).slice(0,8)
+      .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,'')); }); });
   await Promise.all(jobs);
-  const exact=x=>x.label.split(' · ')[0].toLowerCase()===String(n).toLowerCase()?0:1;
-  return out.sort((a,b)=>exact(a)-exact(b)).slice(0,12);   /* the page named exactly like the item comes first */
+  const ORDER=['Current','Apple Music','Apple','Deezer','AniList','Film poster','PokéAPI','Open Library','Roblox','Logo','Wikidata','Wikipedia','Roblox wiki','Wikipedia page','Wikimedia Commons'];
+  const rank=x=>{ const i=ORDER.indexOf(x.source); return i<0?ORDER.length:i; };
+  return out.map((x,i)=>({x,i})).sort((a,b)=>rank(a.x)-rank(b.x)||a.i-b.i).map(o=>o.x).slice(0,18);
 }
 function altPanel(){
   const a=ed.alt; if(!a) return '';
-  const body = !a.list ? '<p class="muted">Looking for pictures…</p>' : !a.list.length ? '<p class="muted">Nothing else found. Tap the picture to upload your own.</p>'
-    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.label.split(' · ')[0])}</small></button>`).join('')}</div>`;
-  return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div>${body}</div>`;
+  const body = !a.list ? '<p class="muted">Looking through Wikipedia, Wikimedia and the other databases…</p>' : !a.list.length ? '<p class="muted">Nothing found. Tap the picture to upload your own.</p>'
+    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt${x.current?' cur':''}" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.source)}</small></button>`).join('')}</div>`;
+  return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div><p class="muted" style="margin:0 0 8px;font-size:12.5px">Your current picture comes first. The rest are the same thing from other sources.</p>${body}</div>`;
 }
 async function wikiTitleImage(c,n){
   const cfg=IMG_SRC[c]||{}; if(!cfg.w) return null; await gate('wiki',120);
@@ -4974,11 +4994,11 @@ async function musicHits(c,n,sub){
   const kind=c==='albums'?'album':'song', artist=artistOf(sub), nat=natives(n,sub), wants=new Set([n,...nat].map(normT).filter(Boolean));
   const aParts=String(artist).split(/\s+(?:ft\.?|feat\.?|featuring|with|x|and)\s+|\s*[&,]\s*/i).map(normT).filter(Boolean), natA=segs(sub).filter(isNat).map(normT);
   const artistOk=a=>!aParts.length||isNat(artist)||aParts.some(p=>normT(a).includes(p))||natA.some(x=>normT(a).includes(x));
-  const out=[];
+  const out=[]; let curSrc='Apple Music';
   const push=(title,art,album,year,url,thumb)=>{ if(!title||!url) return; const tn=normT(title); if(!wants.has(tn)) return;
     if(MUSIC_BAD.test(title+' '+album+' '+art)) return;
     const ok=artistOk(art||''); let score=(ok?0:100)+(kind==='song'&&MUSIC_COMP.test(album||'')?10:0)+(kind==='song'&&/ - single$|\(single\)/i.test(album||'')?1:0)+((+year||2100)-1900)/1000;
-    out.push({title,artist:art,album,year,url,thumb:thumb||url,ok,score}); };
+    out.push({title,artist:art,album,year,url,thumb:thumb||url,ok,score,src:curSrc}); };
   const ctys=['us',...new Set(nat.map(x=>STORE_OF[LANG_OF(x)]).filter(Boolean))].slice(0,2);
   for(const cty of ctys){
     try{ await gate('itunes',3100);
@@ -4989,7 +5009,7 @@ async function musicHits(c,n,sub){
     if(out.some(x=>x.ok)) break;
   }
   if(!out.some(x=>x.ok)){
-    try{ await gate('deezer',250);
+    try{ curSrc='Deezer'; await gate('deezer',250);
       const qs=artist&&!isNat(artist)?[kind==='album'?`artist:"${artist}" album:"${n}"`:`artist:"${artist}" track:"${n}"`, n+' '+artist]:[n];
       for(const q of qs){ const list=await deezer(kind==='album'?'album':'track',q,10);
         for(const r of list){ const al=kind==='album'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue; push(r.title,r.artist&&r.artist.name,al.title,'',al.cover_big,al.cover_medium); }
@@ -5025,6 +5045,17 @@ async function commonsInfo(host,titles){   /* File: titles -> picture URLs on up
   const by={}; for(const p of Object.values((ii.query&&ii.query.pages)||{})){ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) by[String(p.title).replace(/_/g,' ')]=u; }
   return by;
 }
+async function findWikiPage(c,n,sub){
+  const cfg=IMG_SRC[c]||{}, want=normT(n), df=IMG_DESC[c]; await gate('wiki',120);
+  const q=[n,cfg.sub?sub:'',cfg.w].filter(Boolean).join(' ');
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description|pageprops&ppprop=wikibase_item&gsrsearch='+encodeURIComponent(q));
+  const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+  const PERSON=PERSON_CATS.has(c);
+  let pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||(!PERSON&&(t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')))); })||null;
+  if(!pg){ const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=description|pageprops&ppprop=wikibase_item&titles='+encodeURIComponent(n));
+    pg=Object.values((t.query&&t.query.pages)||{}).find(p=>p.pageid && (!df||df.test(p.description||'')))||null; }
+  return pg;
+}
 async function logoFiles(c,n,sub){
   if(!LOGO_CATS.has(c)) return []; await gate('wiki',120);
   const cfg=IMG_SRC[c]||{}, want=normT(n), df=IMG_DESC[c], tokens=want.split(' ').filter(x=>x.length>2);
@@ -5034,16 +5065,7 @@ async function logoFiles(c,n,sub){
   const fileOk=f=>/\.(svg|png|jpg|jpeg)$/i.test(f) && !JUNK.test(f) && !OLD.test(f);
   const score=f=>{ const fn=normT(String(f).replace(/^File:/i,'').replace(/\.[a-z]+$/i,'')); return (tokens.length&&tokens.every(t=>fn.includes(t))?4:0)+(LOGO_NAME.test(f)?3:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\b(19[0-9]\d|200\d)\b/.test(f)?-1:0)+(/\b202\d\b/.test(f)?.5:0); };
   const good=f=>fileOk(f) && score(f)>=4;
-  /* 1. find the Wikipedia page */
-  let pg=null;
-  try{
-    const q=[n,cfg.sub?sub:'',cfg.w].filter(Boolean).join(' ');
-    const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description|pageprops&ppprop=wikibase_item&gsrsearch='+encodeURIComponent(q));
-    const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
-    pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); })||null;
-    if(!pg){ const t=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=description|pageprops&ppprop=wikibase_item&titles='+encodeURIComponent(n));
-      pg=Object.values((t.query&&t.query.pages)||{}).find(p=>p.pageid && (!df||df.test(p.description||'')))||null; }
-  }catch(e){}
+  const pg=await findWikiPage(c,n,sub).catch(()=>null);
   /* 2. Wikidata's "logo image" for that page: the cleanest source */
   try{
     const qid=pg&&pg.pageprops&&pg.pageprops.wikibase_item;
@@ -5414,12 +5436,19 @@ function openStory(kind,c){
   closeSheet(); sty={kind,cat:c,notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
   let box=$('#story-root'); if(!box){ box=document.createElement('div'); box.id='story-root'; document.body.appendChild(box); }
   box.className='busy'; document.body.style.overflow='hidden';
-  box.innerHTML=`<div class="sty" role="dialog" aria-modal="true" aria-label="Share picture">
+  box.innerHTML=`<div class="sty-view" data-act="story-bg" role="dialog" aria-modal="true" aria-label="Share picture">
     <button class="story-x" data-act="story-close" aria-label="Close">✕</button>
     <div class="story-stage"><img id="story-img" alt="Your picture to share"><div class="story-busy">Making your picture…</div></div>
     <div class="story-bar">
       <label class="story-sw" id="story-notes-l"><input type="checkbox" id="story-notes" ${sty.notes?'checked':''}><span class="knob"></span><span>Show my notes</span></label>
-      <div class="story-actions"><button class="pill soft" data-act="story-save">Save</button><button class="pill" data-act="story-share">Share</button></div>
+      <button class="pill soft sm" data-act="story-close">Done</button>
+    </div>
+    <div class="story-opts">
+      <button class="pill" data-act="story-share">Share…</button>
+      <button class="pill soft" data-act="story-save">Save image</button>
+      <button class="pill soft" data-act="story-copy-img">Copy image</button>
+      <button class="pill soft" data-act="story-copy-link">Copy link</button>
+      <button class="pill soft" data-act="story-sms">Text a friend</button>
     </div><p id="story-hint" class="story-hint"></p></div>`;
   renderStory();
 }
@@ -5429,6 +5458,15 @@ async function storyShare(){
   if(!sty||!sty.blob) return; const f=storyFile();
   try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   storySave(); toast('Saved. Add it to your story from your photos.');
+}
+function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(()=>toast(msg),()=>toast("Couldn't copy. Long-press the link instead.")); }catch(e){ toast("Couldn't copy on this browser."); } }
+async function storyCopyImg(){
+  if(!sty||!sty.blob) return;
+  try{ await navigator.clipboard.write([new ClipboardItem({'image/png':sty.blob})]); toast('Image copied'); }catch(e){ toast("This browser can't copy images. Use Save image."); }
+}
+function storySms(){
+  if(!sty) return; const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
+  location.href='sms:?&body='+encodeURIComponent('Check out '+what+' on Palate, and add me: '+inviteLink());
 }
 function storySave(){ if(!sty||!sty.url) return; const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
 function openDetail(c, fid){
@@ -5806,6 +5844,7 @@ document.addEventListener('click',e=>{
   const el=e.target.closest('[data-act]'); if(!el) return;
   const a=el.dataset.act;
   if(a==='scrim'){ if(e.target===el) closeSheet(); return; }
+  if(a==='story-bg'){ if(e.target===el) closeStory(); return; }
   switch(a){
     case 'tab': ui.tab=el.dataset.tab; ui.compare=null; render(); window.scrollTo(0,0); break;
     case 'view': ui.view=el.dataset.v; render(); break;
@@ -5819,6 +5858,9 @@ document.addEventListener('click',e=>{
     case 'story-close': closeStory(); break;
     case 'story-save': storySave(); break;
     case 'story-share': storyShare(); break;
+    case 'story-copy-img': storyCopyImg(); break;
+    case 'story-copy-link': copyText(inviteLink(),'Link copied'); break;
+    case 'story-sms': storySms(); break;
     case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
@@ -5829,7 +5871,7 @@ document.addEventListener('click',e=>{
     case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
       altCandidates(cat,n,it.s).then(list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n){ ed.alt.list=list; renderEditor(); } }).catch(()=>{ if(ed&&ed.alt){ ed.alt.list=[]; renderEditor(); } }); break; }
     case 'alt-close': ed.alt=null; renderEditor(); break;
-    case 'alt-pick': { const x=ed.alt&&ed.alt.list&&ed.alt.list[+el.dataset.i]; if(!x) break; const k=pkey(ed.cat,ed.alt.n), old=state.photos[k];
+    case 'alt-pick': { const x=ed.alt&&ed.alt.list&&ed.alt.list[+el.dataset.i]; if(!x) break; if(x.current){ ed.alt=null; renderEditor(); break; } const k=pkey(ed.cat,ed.alt.n), old=state.photos[k];
       state.photos[k]={src:x.full,h:hue(ed.alt.n),s:34}; if(old) dropFile(old.src); const cat=ed.cat, n=ed.alt.n; ed.alt=null; save(); render(); renderEditor(); toast('Photo changed');
       sampleTint(x.full).then(tn=>{ if(tn && state.photos[k] && state.photos[k].src===x.full){ state.photos[k].h=tn.h; state.photos[k].s=tn.s; save(); render(); } if(SHARE_PHOTO_PICKS) sharePick(cat,n,x.full,tn); }); break; }
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
