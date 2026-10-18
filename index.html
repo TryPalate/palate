@@ -49,8 +49,8 @@ button,select,input,textarea{font:inherit;color:inherit}
 /* Top bar */
 header.top{padding-top:env(safe-area-inset-top,0px)}
 body:not(.in) #view{padding-top:env(safe-area-inset-top,0px)}
-/* Installed on an iPhone the status bar floats over the page: fill the space behind it with the page colour. */
-body::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:250;pointer-events:none}
+/* Installed on an iPhone the status bar floats over the page: once you are in, fill the space behind it with the page colour. The loading screen stays full screen. */
+body.in::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:250;pointer-events:none}
 .top .wrap{display:flex;align-items:center;gap:20px;padding-block:14px}
 .logo{background:none;border:0;padding:0;cursor:pointer;color:var(--text);line-height:0;display:block}
 .logo .mark{display:block;height:34px;width:auto;aspect-ratio:1048/300}
