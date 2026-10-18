@@ -4961,7 +4961,7 @@ async function enter(user){
       sb.from('shelves').select('cat,years,vis,pos').eq('user_id',me.id).order('pos'),
       sb.from('item_photos').select('cat,name,url,h,s').eq('user_id',me.id),
       sb.from('user_settings').select('custom').eq('user_id',me.id).maybeSingle(),
-      soft(sb.from('item_images').select('cat,name,url,h,s').range(0,4999)),
+      soft(sb.from('item_images').select('cat,name,url,h,s,src').range(0,4999)),
       soft(sb.from('catalog_items').select('cat,name,sub').range(0,4999))]);
     if(pr.error) throw pr.error;
     let prof=pr.data;
@@ -4975,7 +4975,7 @@ async function enter(user){
     synced.photos={}; for(const k in state.photos) synced.photos[k]=JSON.stringify(state.photos[k]);
     synced.custom=JSON.stringify(state.custom);
     buildCatalog(); applyCustom(); applySharedCatalog(ci);
-    AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34};
+    AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34,by:r.src||''};
     if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
@@ -5285,21 +5285,32 @@ async function wikiImage(c,n,sub){
 const artistOf = sub => { const a=firstPart(sub); return /^added by you$/i.test(a||'') ? '' : a; };
 const MUSIC_BAD = /karaoke|tribute|originally performed|made famous|in the style of|cover version|lullaby|instrumental|8.?bit|workout|party tune|string quartet|backing track|sound.?alike|piano version|remix(es)? of/i;
 const MUSIC_COMP = /greatest hits|best of|essentials|the very best|compilation|anthology|collection|now that|\bhits\b|playlist|sessions|live at|unplugged|karaoke/i;
+/* Which release of a song or album to show: the original album, not a single, compilation, live, remaster or deluxe copy. Lower is better. */
+const VERSION_BAD = /\b(remaster(?:ed)?|deluxe|expanded|anniversary|edition|live|remix(?:es)?|acoustic|demo|mono|stereo|bonus|reissue|extended|radio edit|sped up|slowed|re-?recorded|from the vault)\b/i;
+function versionPenalty(want,album,recType,albumArtist){
+  const at=String(album||''), w=String(want||''); let p=0;
+  if(VERSION_BAD.test(at) && !VERSION_BAD.test(w)) p+=50;
+  if(MUSIC_COMP.test(at) && !MUSIC_COMP.test(w)) p+=30;
+  if(/ - (single|ep)$|\((single|ep)\)/i.test(at) || /^(single|ep)$/i.test(recType||'')) p+=15;
+  if(/^compile$/i.test(recType||'') || /^various artists$/i.test(albumArtist||'')) p+=30;
+  if(/soundtrack|\bost\b|motion picture|original score|music from/i.test(at) && !/soundtrack|\bost\b/i.test(w)) p+=8;
+  return p;
+}
 async function musicHits(c,n,sub){
   const kind=c==='albums'?'album':'song', artist=artistOf(sub), nat=natives(n,sub), wants=new Set([n,...nat].map(normT).filter(Boolean));
   const aParts=String(artist).split(/\s+(?:ft\.?|feat\.?|featuring|with|x|and)\s+|\s*[&,]\s*/i).map(normT).filter(Boolean), natA=segs(sub).filter(isNat).map(normT);
   const artistOk=a=>!aParts.length||isNat(artist)||aParts.some(p=>normT(a).includes(p))||natA.some(x=>normT(a).includes(x));
   const out=[]; let curSrc='Apple Music';
-  const push=(title,art,album,year,url,thumb)=>{ if(!title||!url) return; const tn=normT(title); if(!wants.has(tn)) return;
+  const push=(title,art,album,year,url,thumb,recType,albumArtist)=>{ if(!title||!url) return; const tn=normT(title); if(!wants.has(tn)) return;
     if(MUSIC_BAD.test(title+' '+album+' '+art)) return;
-    const ok=artistOk(art||''); let score=(ok?0:100)+(kind==='song'&&MUSIC_COMP.test(album||'')?10:0)+(kind==='song'&&/ - single$|\(single\)/i.test(album||'')?1:0)+((+year||2100)-1900)/1000;
+    const ok=artistOk(art||''); let score=(ok?0:100)+versionPenalty(n,album,recType,albumArtist)+((+year||2100)-1900)/1000;
     out.push({title,artist:art,album,year,url,thumb:thumb||url,ok,score,src:curSrc}); };
   const ctys=['us',...new Set(nat.map(x=>STORE_OF[LANG_OF(x)]).filter(Boolean))].slice(0,2);
   for(const cty of ctys){
     try{ await gate('itunes',3100);
       const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({term:(n+' '+artist).trim(),media:'music',entity:kind==='album'?'album':'song',limit:'25',country:cty}),true);
       for(const r of (j.results||[])){ const u=r.artworkUrl100||r.artworkUrl60; if(!u) continue;
-        push(kind==='album'?r.collectionName:r.trackName,r.artistName,r.collectionName,String(r.releaseDate||'').slice(0,4),u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:')); }
+        push(kind==='album'?r.collectionName:r.trackName,r.artistName,r.collectionName,String(r.releaseDate||'').slice(0,4),u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:'),'',r.collectionArtistName); }
     }catch(e){ if(cty==='us') out.failed=true; }
     if(out.some(x=>x.ok)) break;
   }
@@ -5307,7 +5318,7 @@ async function musicHits(c,n,sub){
     try{ curSrc='Deezer'; await gate('deezer',250);
       const qs=artist&&!isNat(artist)?[kind==='album'?`artist:"${artist}" album:"${n}"`:`artist:"${artist}" track:"${n}"`, n+' '+artist]:[n];
       for(const q of qs){ const list=await deezer(kind==='album'?'album':'track',q,10);
-        for(const r of list){ const al=kind==='album'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue; push(r.title,r.artist&&r.artist.name,al.title,'',al.cover_big,al.cover_medium); }
+        for(const r of list){ const al=kind==='album'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue; push(r.title,r.artist&&r.artist.name,al.title,'',al.cover_big,al.cover_medium,al.record_type||r.record_type); }
         if(out.some(x=>x.ok)) break; }
     }catch(e){ out.failed=true; }
   }
@@ -5876,9 +5887,13 @@ async function liveSearch1(c,q,cty){
     const list=await deezer('artist',q,8);
     for(const r of list) if(DZ_OK(r.picture_big)) out.push({n:r.name,s:'Artist',img:r.picture_medium||r.picture_big,full:r.picture_big,src:'deezer'});
   } else if(c==='albums'||c==='songs'){
-    const list=await deezer(c==='albums'?'album':'track',q,8);
+    const list=await deezer(c==='albums'?'album':'track',q,25), best=new Map();
     for(const r of list){ const al=c==='albums'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue;
-      out.push({n:r.title_short||r.title,s:(r.artist&&r.artist.name)||'',img:al.cover_medium||al.cover_big,full:al.cover_big,src:'deezer'}); }
+      const title=r.title_short||r.title, who=(r.artist&&r.artist.name)||'', key=normT(title)+'|'+normT(who);
+      const pen=versionPenalty(title,al.title,al.record_type||r.record_type)-Math.min(5,(r.rank||0)/200000);   /* same song listed many times: keep the original album's cover */
+      const row={n:title,s:who,img:al.cover_medium||al.cover_big,full:al.cover_big,src:'deezer',pen};
+      const old=best.get(key); if(!old||pen<old.pen) best.set(key,row); }
+    for(const r of best.values()){ delete r.pen; out.push(r); if(out.length>=8) break; }
   } else if(cfg.i){
     const t=cfg.i; await gate('itunes-live',1200);
     const qs=t==='movie'?{media:'movie',entity:'movie'}:t==='tv'?{media:'tvShow',entity:'tvSeason'}:{media:'software',entity:'software'};
@@ -6070,8 +6085,28 @@ async function curateAlpha(){
     await wait(1200);
   }
   /* 3. Things with no picture yet: find one for everybody */
+  repairMusic(list).catch(()=>{});
   let pics=30;
   for(const x of list){ if(pics<=0) break; if(photo(x.c,x.n)||recentNone(pkey(x.c,x.n))) continue; pics--; try{ await resolveOne(x.c,x.n,realSub(x.s)?x.s:''); }catch(e){} await wait(900); }
+}
+/* Older album and song covers were picked before we ranked releases. Re-check a few each visit and swap in the original album's cover. */
+async function repairMusic(list){
+  let left=8, done={}; try{ done=JSON.parse(localStorage.getItem('palate-music2')||'{}'); }catch(e){}
+  for(const x of list){
+    if(left<=0) break; if(x.c!=='albums' && x.c!=='songs') continue;
+    const k=pkey(x.c,x.n), cur=AUTO.map[k]; if(!cur || state.photos[k] || shared[k] || done[k] || /^(user-pick|user-upload|music2)$/.test(cur.by||'')) continue;
+    const sub=((CATALOG[x.c]||[]).find(i=>i.n===x.n)||{}).s||x.s||''; if(!artistOf(sub)) continue;
+    left--; done[k]=1;
+    try{
+      const hits=await musicHits(x.c,x.n,sub), best=hits.find(h=>h.ok); if(!best) continue;
+      const tn=best.url!==cur.src?await sampleTint(best.url):null, h=tn?tn.h:cur.h, sat=tn?tn.s:cur.s;
+      AUTO.map[k]={src:best.url,h,s:sat,by:'music2'};
+      try{ await sb.from('item_images').upsert([{cat:x.c,name:x.n,url:best.url,h,s:sat,src:'music2',created_by:me.id}],{onConflict:'cat,name'}); }catch(e){}
+      if(best.url!==cur.src) applyImg(x.c,x.n);
+    }catch(e){}
+    try{ localStorage.setItem('palate-music2',JSON.stringify(done)); }catch(e){}
+    await new Promise(r=>setTimeout(r,900));
+  }
 }
 let fbKind='idea';
 function openFeedback(kind){
@@ -6208,7 +6243,7 @@ function addItem(it){
   }
   if(!photo(ed.cat,it.n)){                                                                     /* the photo loads now, because you picked it */
     const cat=ed.cat;
-    if(cat==='books'){ resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); }); }
+    if(cat==='books'||cat==='albums'||cat==='songs'){ resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); }); }
     else if(it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{});
   }
   renderEditor();
