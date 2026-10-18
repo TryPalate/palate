@@ -4909,16 +4909,19 @@ async function nativeWikiImage(c,n,sub){
   return null;
 }
 /* Every candidate picture we can find for a name, so you can choose the right one yourself. */
-async function altCandidates(c,n,sub){
+async function altCandidates(c,n,sub,onUpdate){
   const cfg=IMG_SRC[c]||{}, out=[], seen=new Set(), want=normT(n), tokens=want.split(' ').filter(x=>x.length>2), nat=natives(n,sub)[0];
-  const add=(img,full,source,label)=>{ full=full||img; if(!img||seen.has(full)||badImg(c,full)) return; seen.add(full); out.push({img,full,source,label:label||source}); };
-  const cur=photo(c,n); if(cur){ seen.add(cur.src); out.push({img:cur.src,full:cur.src,source:'Current',label:'Your current picture',current:true}); }
+  const add=(img,full,source,label,tier)=>{ full=full||img; if(!img||seen.has(full)||badImg(c,full)) return; seen.add(full); out.push({img,full,source,label:label||source,tier:tier||1}); };
+  const cur=photo(c,n); if(cur){ seen.add(cur.src); out.push({img:cur.src,full:cur.src,source:'Current',label:'Your current picture',current:true,tier:0}); }
   const JUNK=/\b(flag|map|commons|wikimedia|wikiquote|wikidata|ambox|edit|question|folder|padlock|increase|decrease|steady|portal|stub|crystal|nuvola|signature|autograph|diagram|chart|poster)\b/i;
   const imgFile=f=>/\.(jpe?g|png|webp)$/i.test(f)||(/\.svg$/i.test(f)&&LOGO_CATS.has(c));
   const hasName=f=>tokens.every(t=>normT(String(f).replace(/^File:/i,'')).includes(t));
   const pageP=findWikiPage(c,n,sub).catch(()=>null);
   const jobs=[];
-  const job=(fn)=>jobs.push((async()=>{ try{ await fn(); }catch(e){} })());
+  const ORDER=['Current','Apple Music','Apple','Deezer','AniList','Film poster','PokéAPI','Open Library','Roblox','Logo','Wikidata','Wikipedia','Roblox wiki','Wikipedia page','Wikimedia Commons'];
+  const rank=x=>{ const i=ORDER.indexOf(x.source); return i<0?ORDER.length:i; };
+  const snap=()=>out.map((x,i)=>({x,i})).sort((a,b)=>a.x.tier-b.x.tier||rank(a.x)-rank(b.x)||a.i-b.i).map(o=>o.x).slice(0,24);
+  const job=(fn)=>jobs.push((async()=>{ try{ await fn(); }catch(e){} if(onUpdate) onUpdate(snap()); })());
   /* the databases that know this exact thing */
   if(c==='albums'||c==='songs') job(async()=>{ (await musicHits(c,n,sub)).filter(h=>h.ok).forEach(h=>add(h.thumb,h.url,h.src,[h.title,h.artist].filter(Boolean).join(' · '))); });
   if(c==='pokemon') job(async()=>{ const u=await pokemonImage(c,n); if(u) add(u,u,'PokéAPI',n); });
@@ -4949,16 +4952,25 @@ async function altCandidates(c,n,sub){
     const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&iiurlwidth=400&gsrsearch='+encodeURIComponent(q));
     Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&hasName(p.title)&&(!LOGO_CATS.has(c)||LOGO_NAME.test(p.title))).slice(0,8)
       .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,'')); }); });
+  /* wider net, shown after the exact matches: more pictures to choose from */
+  if(c==='albums'||c==='songs') job(async()=>{ (await musicHits(c,n,sub)).filter(h=>!h.ok).forEach(h=>add(h.thumb,h.url,h.src,[h.title,h.artist].filter(Boolean).join(' · '),2)); });
+  else job(async()=>{ (await liveSearch1(c,n)).forEach(x=>add(x.img,x.full,'Search',[x.n,x.s].filter(Boolean).join(' · '),2)); });
+  job(async()=>{ await gate('wiki',120);
+    for(const q of [...new Set([[n,cfg.w].filter(Boolean).join(' '),n])]){
+      const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=15&prop=pageimages|description&piprop=thumbnail&pithumbsize=500&pilicense=any&gsrsearch='+encodeURIComponent(q));
+      Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail&&!/disambiguation/i.test(pg.description||'')) add(pg.thumbnail.source,pg.thumbnail.source,'Wikipedia',[pg.title,pg.description].filter(Boolean).join(' · '),normT(pg.title)===want?1:2); }); } });
+  job(async()=>{ const q=LOGO_CATS.has(c)?n+' logo':[n,PERSON_CATS.has(c)?'':cfg.w].filter(Boolean).join(' ');
+    const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&iiurlwidth=400&gsrsearch='+encodeURIComponent(q));
+    Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&tokens.some(t=>normT(p.title).includes(t))).slice(0,12)
+      .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,''),2); }); });
   await Promise.all(jobs);
-  const ORDER=['Current','Apple Music','Apple','Deezer','AniList','Film poster','PokéAPI','Open Library','Roblox','Logo','Wikidata','Wikipedia','Roblox wiki','Wikipedia page','Wikimedia Commons'];
-  const rank=x=>{ const i=ORDER.indexOf(x.source); return i<0?ORDER.length:i; };
-  return out.map((x,i)=>({x,i})).sort((a,b)=>rank(a.x)-rank(b.x)||a.i-b.i).map(o=>o.x).slice(0,18);
+  return snap();
 }
 function altPanel(){
   const a=ed.alt; if(!a) return '';
-  const body = !a.list ? '<p class="muted">Looking through Wikipedia, Wikimedia and the other databases…</p>' : !a.list.length ? '<p class="muted">Nothing found. Tap the picture to upload your own.</p>'
-    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt${x.current?' cur':''}" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.source)}</small></button>`).join('')}</div>`;
-  return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div><p class="muted" style="margin:0 0 8px;font-size:12.5px">Your current picture comes first. The rest are the same thing from other sources.</p>${body}</div>`;
+  const body = !a.list ? '<p class="muted">Looking for pictures…</p>' : !a.list.length ? '<p class="muted">Nothing found. Tap the picture to upload your own.</p>'
+    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt${x.current?' cur':''}" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.current?'Current':String(x.label).split(' · ')[0])}</small></button>`).join('')}</div>`;
+  return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div><p class="muted" style="margin:0 0 8px;font-size:12.5px">Current picture first, then the best matches, then more to choose from.</p>${body}</div>`;
 }
 async function wikiTitleImage(c,n){
   const cfg=IMG_SRC[c]||{}; if(!cfg.w) return null; await gate('wiki',120);
@@ -5869,7 +5881,8 @@ document.addEventListener('click',e=>{
     case 'back-friends': ui.compare=null; render(); break;
     case 'year-now': $('#year').value=CURRENT; setYear(CURRENT); break;
     case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
-      altCandidates(cat,n,it.s).then(list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n){ ed.alt.list=list; renderEditor(); } }).catch(()=>{ if(ed&&ed.alt){ ed.alt.list=[]; renderEditor(); } }); break; }
+      const live=list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n && list.length>(ed.alt.list||[]).length){ ed.alt.list=list; renderEditor(); } };
+      altCandidates(cat,n,it.s,live).then(list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n){ ed.alt.list=list; renderEditor(); } }).catch(()=>{ if(ed&&ed.alt){ ed.alt.list=[]; renderEditor(); } }); break; }
     case 'alt-close': ed.alt=null; renderEditor(); break;
     case 'alt-pick': { const x=ed.alt&&ed.alt.list&&ed.alt.list[+el.dataset.i]; if(!x) break; if(x.current){ ed.alt=null; renderEditor(); break; } const k=pkey(ed.cat,ed.alt.n), old=state.photos[k];
       state.photos[k]={src:x.full,h:hue(ed.alt.n),s:34}; if(old) dropFile(old.src); const cat=ed.cat, n=ed.alt.n; ed.alt=null; save(); render(); renderEditor(); toast('Photo changed');
