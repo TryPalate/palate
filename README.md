@@ -29,3 +29,9 @@ Make an account, add a shelf, then open **Friends**, copy your invite link, and 
 - Changes go live a minute after you commit to GitHub.
 - Photos are resized to about 30 KB and stored in Supabase Storage (1 GB free).
 - There is no password reset yet. Don't forget your password while testing.
+
+## Before going public (reminder)
+Friends can currently replace the shared photo for an item via "Wrong photo?". Before opening the app up:
+1. Set `SHARE_PHOTO_PICKS = false` in `index.html`.
+2. Run `supabase/images4_revert.sql` in the Supabase SQL Editor.
+Also review image licensing (see earlier notes) before charging for anything.

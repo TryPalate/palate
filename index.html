@@ -4997,6 +4997,16 @@ async function adoptImage(c,n,url,src){
   applyImg(c,n);
   if(sb && me){ AUTO.pending.push({cat:c,name:n,url,h:AUTO.map[k].h,s:AUTO.map[k].s,src}); clearTimeout(AUTO.flushT); AUTO.flushT=setTimeout(flushImages,1500); }
 }
+/* TEMPORARY: while the app is friends-only, a photo someone picks in "Wrong photo?" becomes the shared photo for everyone.
+   TURN THIS OFF (set false, and run supabase/images4_revert.sql) before the app is opened to the public. */
+const SHARE_PHOTO_PICKS = true;
+async function sharePick(c,n,url,tn){
+  if(!sb||!me||!/^https:\/\//.test(url)) return;
+  const k=pkey(c,n), h=tn?tn.h:hue(n), sat=tn?tn.s:34;
+  AUTO.map[k]={src:url,h,s:sat};
+  try{ const {error}=await sb.from('item_images').upsert([{cat:c,name:n,url,h,s:sat,src:'user-pick',created_by:me.id}],{onConflict:'cat,name'}); if(error) throw error; }
+  catch(e){ if(window.PALATE_DEBUG) console.warn('could not share picked photo',e); }
+}
 async function flushImages(){
   const rows=AUTO.pending.splice(0); if(!rows.length||!sb||!me) return;
   try{ const {error}=await sb.from('item_images').upsert(rows,{onConflict:'cat,name',ignoreDuplicates:true}); if(error) throw error; }
@@ -5598,7 +5608,7 @@ document.addEventListener('click',e=>{
     case 'alt-close': ed.alt=null; renderEditor(); break;
     case 'alt-pick': { const x=ed.alt&&ed.alt.list&&ed.alt.list[+el.dataset.i]; if(!x) break; const k=pkey(ed.cat,ed.alt.n), old=state.photos[k];
       state.photos[k]={src:x.full,h:hue(ed.alt.n),s:34}; if(old) dropFile(old.src); const cat=ed.cat, n=ed.alt.n; ed.alt=null; save(); render(); renderEditor(); toast('Photo changed');
-      sampleTint(x.full).then(tn=>{ if(tn && state.photos[k] && state.photos[k].src===x.full){ state.photos[k].h=tn.h; state.photos[k].s=tn.s; save(); render(); } }); break; }
+      sampleTint(x.full).then(tn=>{ if(tn && state.photos[k] && state.photos[k].src===x.full){ state.photos[k].h=tn.h; state.photos[k].s=tn.s; save(); render(); } if(SHARE_PHOTO_PICKS) sharePick(cat,n,x.full,tn); }); break; }
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
