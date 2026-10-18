@@ -4952,17 +4952,26 @@ async function altCandidates(c,n,sub,onUpdate){
     const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&iiurlwidth=400&gsrsearch='+encodeURIComponent(q));
     Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&hasName(p.title)&&(!LOGO_CATS.has(c)||LOGO_NAME.test(p.title))).slice(0,8)
       .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,'')); }); });
-  /* wider net, shown after the exact matches: more pictures to choose from */
-  if(c==='albums'||c==='songs') job(async()=>{ (await musicHits(c,n,sub)).filter(h=>!h.ok).forEach(h=>add(h.thumb,h.url,h.src,[h.title,h.artist].filter(Boolean).join(' · '),2)); });
-  else job(async()=>{ (await liveSearch1(c,n)).forEach(x=>add(x.img,x.full,'Search',[x.n,x.s].filter(Boolean).join(' · '),2)); });
+  /* Wikimedia Commons keeps a gallery category for most things (every photo of Tom Holland, of the Porsche 911, of a company's logos) */
+  job(async()=>{ const pg=await pageP; let cat=null; const qid=pg&&pg.pageprops&&pg.pageprops.wikibase_item;
+    if(qid){ const w=await getJSON('https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity='+qid+'&property=P373'); const v=(((w.claims||{}).P373||[])[0]||{}).mainsnak; cat=v&&v.datavalue&&v.datavalue.value; }
+    if(!cat&&pg) cat=pg.title; if(!cat) return;
+    const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=categorymembers&gcmtitle='+encodeURIComponent('Category:'+cat)+'&gcmtype=file&gcmlimit=50&prop=imageinfo&iiprop=url&iiurlwidth=400');
+    Object.values((j.query&&j.query.pages)||{}).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&(!LOGO_CATS.has(c)||LOGO_NAME.test(p.title))).sort((a,b)=>(hasName(b.title)?1:0)-(hasName(a.title)?1:0)).slice(0,14)
+      .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,''),1); }); });
+  await Promise.all(jobs); jobs.length=0;
+  if(out.length<6){   /* only when the exact matches are thin: cast a wider net so there is always something to choose */
+  if(c==='albums'||c==='songs'){}
+  else if(!LOGO_CATS.has(c)&&!PERSON_CATS.has(c)) job(async()=>{ (await liveSearch1(c,n)).forEach(x=>add(x.img,x.full,'Search',[x.n,x.s].filter(Boolean).join(' · '),2)); });
   job(async()=>{ await gate('wiki',120);
     for(const q of [...new Set([[n,cfg.w].filter(Boolean).join(' '),n])]){
       const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=15&prop=pageimages|description&piprop=thumbnail&pithumbsize=500&pilicense=any&gsrsearch='+encodeURIComponent(q));
-      Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail&&!/disambiguation/i.test(pg.description||'')) add(pg.thumbnail.source,pg.thumbnail.source,'Wikipedia',[pg.title,pg.description].filter(Boolean).join(' · '),normT(pg.title)===want?1:2); }); } });
+      Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).forEach(pg=>{ if(pg.thumbnail&&!/disambiguation/i.test(pg.description||'')&&!((LOGO_CATS.has(c)||PERSON_CATS.has(c))&&!tokens.some(t=>normT(pg.title).includes(t)))) add(pg.thumbnail.source,pg.thumbnail.source,'Wikipedia',[pg.title,pg.description].filter(Boolean).join(' · '),normT(pg.title)===want?1:2); }); } });
   job(async()=>{ const q=LOGO_CATS.has(c)?n+' logo':[n,PERSON_CATS.has(c)?'':cfg.w].filter(Boolean).join(' ');
     const j=await getJSON('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=20&prop=imageinfo&iiprop=url&iiurlwidth=400&gsrsearch='+encodeURIComponent(q));
     Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99)).filter(p=>imgFile(p.title)&&!JUNK.test(p.title)&&tokens.some(t=>normT(p.title).includes(t))).slice(0,12)
       .forEach(p=>{ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) add(u,u,'Wikimedia Commons',p.title.replace(/^File:/i,''),2); }); });
+  }
   await Promise.all(jobs);
   return snap();
 }
