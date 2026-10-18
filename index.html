@@ -354,18 +354,18 @@ const CATS = [
  ['characters','Fictional characters','Film & TV','square',0],['musicals','Musicals','Film & TV','poster',0],
  ['celebrities','Celebrities','People','round',1],['actors','Actors','People','round',0],['influencers','Influencers','People','round',1],['athletes','Athletes','People','round',0],['comedians','Comedians','People','round',0],['painters','Visual artists','People','round',0],
  ['games','Video games','Games','square',1],['mobilegames','Mobile games','Games','square',0],['boardgames','Board & card games','Games','square',0],['pokemon','Pokémon','Games','square',0],
- ['fastfood','Fast food','Food & drink','round',1],['restaurants','Restaurants','Food & drink','wide',0,1],['cafes','Cafés','Food & drink','wide',0,1],['snacks','Snacks','Food & drink','square',0],['drinks','Drinks','Food & drink','square',0],
+ ['fastfood','Fast food','Food & drink','round',1],['restaurants','Restaurants','Food & drink','round',0,1],['cafes','Cafés','Food & drink','round',0,1],['snacks','Snacks','Food & drink','square',0],['drinks','Drinks','Food & drink','square',0],
  ['cuisines','Cuisines','Food & drink','wide',0],['desserts','Desserts','Food & drink','square',0],['icecream','Ice cream flavors','Food & drink','square',0],['breakfast','Breakfast foods','Food & drink','wide',0],
  ['cereal','Cereals','Food & drink','square',0],['fruits','Fruits','Food & drink','square',0],['pizza','Pizza toppings','Food & drink','square',0],['sauces','Sauces','Food & drink','square',0],
- ['countries','Countries','Places','wide',1,1],['cities','Cities','Places','wide',1,1],['themeparks','Theme parks','Places','wide',0,1],
+ ['countries','Countries','Places','wide',1,1],['cities','Cities','Places','wide',1,1],['themeparks','Theme parks','Places','round',0,1],
  ['books','Books','Reading & listening','poster',1],['authors','Authors','Reading & listening','round',0],['manga','Manga & webtoons','Reading & listening','poster',0],['podcasts','Podcasts','Reading & listening','square',0],
  ['clubs','Football clubs','Sport','round',0],['teams','NBA, NFL & MLB teams','Sport','round',0],['sports','Sports','Sport','wide',0],
  ['brands','Brands','Style & stuff','round',0],['sneakers','Sneakers','Style & stuff','wide',0],['fragrances','Fragrances','Style & stuff','square',0],['watches','Watches','Style & stuff','square',0],
  ['cars','Cars','Style & stuff','wide',0],['tech','Tech & gadgets','Style & stuff','square',0],['apps','Apps','Style & stuff','square',0],
  ['cocktails','Cocktails','Food & drink','square',0],['spirits','Spirits & beer','Food & drink','square',0],['cheese','Cheeses','Food & drink','square',0],['pasta','Pasta','Food & drink','square',0],
- ['aircraft','Aircraft','Vehicles','wide',0],['motorcycles','Motorcycles','Vehicles','wide',0],['airlines','Airlines','Vehicles','wide',0],
+ ['aircraft','Aircraft','Vehicles','wide',0],['motorcycles','Motorcycles','Vehicles','wide',0],['airlines','Airlines','Vehicles','round',0],
  ['civilizations','Historical civilizations','History & ideas','wide',0],['mythology','Gods & mythology','History & ideas','round',0],['philosophers','Philosophers','History & ideas','round',0],['scientists','Scientists & thinkers','History & ideas','round',0],['weapons','Weapons','History & ideas','wide',0],
- ['wonders','Landmarks & wonders','Places','wide',0,1],['universities','Universities','Places','wide',0,1],
+ ['wonders','Landmarks & wonders','Places','wide',0,1],['universities','Universities','Places','round',0,1],
  ['superheroes','Superheroes','Film & TV','square',0],['villains','Villains','Film & TV','square',0],['dinosaurs','Dinosaurs','Nature','wide',0],['catbreeds','Cat breeds','Nature','square',0],['flowers','Flowers','Nature','square',0],
  ['instruments','Instruments','Music','square',0],['languages','Languages','Life','wide',0],['proglangs','Programming languages','Life','square',0],
  ['hobbies','Hobbies','Life','wide',0],['subjects','School subjects','Life','wide',0],['holidays','Holidays','Life','wide',0],['seasons','Seasons','Life','wide',0],
@@ -4790,9 +4790,13 @@ const IMG_DESC = {
   mythology:/god|goddess|deity|mythology|titan|figure|hero|spirit|monster|myth|legend|demigod|sorceress|gorgon/i, superheroes:/character|superhero|fictional|comic/i, villains:/character|villain|fictional|antagonist|comic|film|serial/i,
   instruments:/instrument|keyboard|string|woodwind|brass|percussion/i, catbreeds:/cat|breed/i, flowers:/flower|plant|genus|species/i
 };
-const badImg = (c,u) => PERSON_CATS.has(c) && /logo|wordmark|\.svg|symbol|signature|autograph|emblem/i.test(u||'');
+const LOGO_CATS = new Set(['fastfood','restaurants','cafes','brands','airlines','clubs','teams','universities','themeparks']);
+const LOGO_NAME = /logo|icon|symbol|emblem|crest|badge|wordmark|seal|roundel/i;
+const WHITE_CATS = new Set(['cars','motorcycles','watches','fragrances','weapons','aircraft','tech','sneakers']);
+const badImg = (c,u) => (PERSON_CATS.has(c) && /logo|wordmark|\.svg|symbol|signature|autograph|emblem/i.test(u||'')) || (WHITE_CATS.has(c) && /logo|wordmark|\.svg|emblem|badge|interior|dashboard|cockpit|engine|steering|wheel|cutaway|diagram|rendering|concept|race|racing|rally|crash|museum/i.test(decodeURIComponent(u||'').split('/').pop()));
 /* Faces: Wikipedia portraits are often wide shots, so those are re-cropped around the most prominent part of the picture. */
-const dispSrc = (c,u) => (PERSON_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=400&h=400&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(u) : u;
+const dispSrc = (c,u) => (LOGO_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=300&h=300&fit=contain&cbg=white&output=jpg&url='+encodeURIComponent(u)
+  : (WHITE_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?'+((CAT[c]&&CAT[c].shape==='wide')?'w=440&h=300':'w=400&h=400')+'&fit=contain&cbg=white&output=jpg&url='+encodeURIComponent(u) : (PERSON_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=400&h=400&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(u) : u;
 const normT = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/&/g,' and ').replace(/[^\p{L}\p{N}\p{M}]+/gu,' ').trim().replace(/^the /,'');
 /* Names in other scripts: Korean, Chinese, Japanese, Arabic, Hindi, Thai, Russian... The English name is the main one; the native name rides along in the subtitle. */
 const firstPart = sub => { const a=segs(sub); return a.find(x=>x && !isNat(x)) ?? a[0] ?? ''; };
@@ -4814,6 +4818,7 @@ async function deezer(kind,q,limit){
   if(!j||j.error) throw new Error('deezer'); return j.data||[];
 }
 async function deezerImage(c,n,sub){
+  if(c==='albums'||c==='songs') return null;
   const kind = c==='artists'?'artist' : c==='albums'?'album' : c==='songs'?'track' : null; if(!kind) return null;
   await gate('deezer',250); const nat=natives(n,sub), wants=new Set([n,...nat].map(normT).filter(Boolean)), artist=firstPart(sub);
   const artistOk=r=>!artist||isNat(artist)||normT(r.artist&&r.artist.name).includes(normT(artist))||nat.some(x=>normT(r.artist&&r.artist.name)===normT(x));
@@ -4887,6 +4892,16 @@ async function altCandidates(c,n,sub){
   const cfg=IMG_SRC[c]||{}; const out=[], seen=new Set();
   const add=(img,full,label)=>{ if(!img||seen.has(full||img)||badImg(c,full||img)) return; seen.add(full||img); out.push({img,full:full||img,label}); };
   const nat=natives(n,sub)[0];
+  if(c==='albums'||c==='songs'){
+    const hits=await musicHits(c,n,sub).catch(()=>[]); const art=artistOf(sub);
+    hits.forEach(h=>add(h.thumb,h.url,[h.title,h.artist,h.ok?'':'other artist'].filter(Boolean).join(' · ')));
+    return out.slice(0,12);
+  }
+  if(LOGO_CATS.has(c)){ const l=await logoFiles(c,n,sub).catch(()=>[]); l.forEach(x=>add(x.url,x.url,x.label)); if(out.length) return out.slice(0,12); }
+  if(c==='characters'||c==='villains'||c==='superheroes'){ try{ for(const ch of (await anilistCharacters(n)).slice(0,5)) if(ch.image&&ch.image.large) add(ch.image.large,ch.image.large,[ch.name.full,((ch.media&&ch.media.nodes[0]||{}).title||{}).romaji].filter(Boolean).join(' · ')); }catch(e){} }
+  if(c==='superheroes'||c==='villains'){
+    const film=HERO_FILM_N[normT(n)]; if(film){ try{ const p=await filmPosters(film); if(p) add(p.img,p.full,n+' · '+p.film+' (film poster)'); }catch(e){} }
+  }
   const jobs=[
     liveSearch1(c,n).then(r=>r.forEach(x=>add(x.img,x.full,[x.n,x.s].filter(Boolean).join(' · ')))).catch(()=>{}),
     (async()=>{ await gate('wiki',120);
@@ -4932,7 +4947,95 @@ async function wikiImage(c,n,sub){
     if(t===want || (t.startsWith(want+' ') && CORP.test(t.slice(want.length+1).split(' ')[0]))) return pg.thumbnail.source; }
   return wikiTitleImage(c,n);
 }
+/* Albums and songs: the cover must belong to the artist. Apple first, Deezer second; karaoke, tribute and compilation versions are skipped. */
+const artistOf = sub => { const a=firstPart(sub); return /^added by you$/i.test(a||'') ? '' : a; };
+const MUSIC_BAD = /karaoke|tribute|originally performed|made famous|in the style of|cover version|lullaby|instrumental|8.?bit|workout|party tune|string quartet|backing track|sound.?alike|piano version|remix(es)? of/i;
+const MUSIC_COMP = /greatest hits|best of|essentials|the very best|compilation|anthology|collection|now that|\bhits\b|playlist|sessions|live at|unplugged|karaoke/i;
+async function musicHits(c,n,sub){
+  const kind=c==='albums'?'album':'song', artist=artistOf(sub), nat=natives(n,sub), wants=new Set([n,...nat].map(normT).filter(Boolean));
+  const aParts=String(artist).split(/\s+(?:ft\.?|feat\.?|featuring|with|x|and)\s+|\s*[&,]\s*/i).map(normT).filter(Boolean), natA=segs(sub).filter(isNat).map(normT);
+  const artistOk=a=>!aParts.length||isNat(artist)||aParts.some(p=>normT(a).includes(p))||natA.some(x=>normT(a).includes(x));
+  const out=[];
+  const push=(title,art,album,year,url,thumb)=>{ if(!title||!url) return; const tn=normT(title); if(!wants.has(tn)) return;
+    if(MUSIC_BAD.test(title+' '+album+' '+art)) return;
+    const ok=artistOk(art||''); let score=(ok?0:100)+(kind==='song'&&MUSIC_COMP.test(album||'')?10:0)+(kind==='song'&&/ - single$|\(single\)/i.test(album||'')?1:0)+((+year||2100)-1900)/1000;
+    out.push({title,artist:art,album,year,url,thumb:thumb||url,ok,score}); };
+  const ctys=['us',...new Set(nat.map(x=>STORE_OF[LANG_OF(x)]).filter(Boolean))].slice(0,2);
+  for(const cty of ctys){
+    try{ await gate('itunes',3100);
+      const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({term:(n+' '+artist).trim(),media:'music',entity:kind==='album'?'album':'song',limit:'25',country:cty}),true);
+      for(const r of (j.results||[])){ const u=r.artworkUrl100||r.artworkUrl60; if(!u) continue;
+        push(kind==='album'?r.collectionName:r.trackName,r.artistName,r.collectionName,String(r.releaseDate||'').slice(0,4),u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:')); }
+    }catch(e){ if(cty==='us') out.failed=true; }
+    if(out.some(x=>x.ok)) break;
+  }
+  if(!out.some(x=>x.ok)){
+    try{ await gate('deezer',250);
+      const qs=artist&&!isNat(artist)?[kind==='album'?`artist:"${artist}" album:"${n}"`:`artist:"${artist}" track:"${n}"`, n+' '+artist]:[n];
+      for(const q of qs){ const list=await deezer(kind==='album'?'album':'track',q,10);
+        for(const r of list){ const al=kind==='album'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue; push(r.title,r.artist&&r.artist.name,al.title,'',al.cover_big,al.cover_medium); }
+        if(out.some(x=>x.ok)) break; }
+    }catch(e){ out.failed=true; }
+  }
+  out.sort((a,b)=>a.score-b.score); return out;
+}
+async function musicImage(c,n,sub){
+  if(c!=='albums'&&c!=='songs') return null;
+  const hits=await musicHits(c,n,sub); const best=hits.find(h=>h.ok)||(artistOf(sub)?null:hits[0]);
+  if(!best && hits.failed) throw new Error('music lookup failed');
+  return best?best.url:null;
+}
+/* Superheroes and villains: a poster from the film they are known for, so the picture shows the character as people know them. */
+const HERO_FILM = {'Spider-Man':'Spider-Man: No Way Home','Batman':'The Batman','Superman':'Man of Steel','Iron Man':'Iron Man','Captain America':'Captain America: The Winter Soldier','Thor':'Thor: Ragnarok','Hulk':'The Incredible Hulk','Black Panther':'Black Panther','Wonder Woman':'Wonder Woman','The Flash':'The Flash','Aquaman':'Aquaman','Deadpool':'Deadpool','Wolverine':'Logan','Doctor Strange':'Doctor Strange','Black Widow':'Black Widow','Miles Morales':'Spider-Man: Into the Spider-Verse','Green Lantern':'Green Lantern','Captain Marvel':'Captain Marvel','Ant-Man':'Ant-Man','Star-Lord':'Guardians of the Galaxy',
+  'Joker':'Joker',"Heath Ledger's Joker":'The Dark Knight','Darth Vader':'Star Wars: The Empire Strikes Back','Thanos':'Avengers: Infinity War','Voldemort':'Harry Potter and the Deathly Hallows: Part 2','Sauron':'The Lord of the Rings: The Fellowship of the Ring','Loki':'Thor: The Dark World','Magneto':'X-Men: Days of Future Past','Lex Luthor':'Batman v Superman: Dawn of Justice','Green Goblin':'Spider-Man','Hannibal Lecter':'The Silence of the Lambs','Anton Chigurh':'No Country for Old Men','Scar':'The Lion King','Ursula':'The Little Mermaid','Maleficent':'Maleficent','Cruella de Vil':'Cruella','Hades':'Hercules','Jafar':'Aladdin','Gru':'Despicable Me','Freddy Krueger':'A Nightmare on Elm Street','Jason Voorhees':'Friday the 13th','Michael Myers':'Halloween','Pennywise':'It','Ghostface':'Scream'};
+const HERO_FILM_N = Object.fromEntries(Object.entries(HERO_FILM).map(([k,v])=>[normT(k),v]));
+async function filmPosters(film){
+  await gate('itunes',3100);
+  const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({term:film,media:'movie',entity:'movie',limit:'8',country:'us'}),true);
+  const want=normT(film); const r=(j.results||[]).find(x=>normT(x.trackName)===want && (x.artworkUrl100||x.artworkUrl60)); if(!r) return null;
+  const u=r.artworkUrl100||r.artworkUrl60; return {full:u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),img:u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:'),film:r.trackName};
+}
+async function heroFilmImage(c,n){
+  if(c!=='superheroes'&&c!=='villains') return null; const film=HERO_FILM_N[normT(n)]; if(!film) return null;
+  const p=await filmPosters(film); return p?p.full:null;
+}
+/* Logos: the logo file on the company's Wikipedia page, shown in a circle. Never a photo of a storefront. */
+async function logoFiles(c,n,sub){
+  if(!LOGO_CATS.has(c)) return []; await gate('wiki',120);
+  const cfg=IMG_SRC[c]||{}, q=[n,cfg.sub?sub:'',cfg.w].filter(Boolean).join(' '), want=normT(n), df=IMG_DESC[c];
+  const CORP=/^(inc|incorporated|corp|corporation|company|co|ltd|limited|llc|plc|group|sa|ag|gmbh|fc|afc|cf)$/;
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=6&prop=description&gsrsearch='+encodeURIComponent(q));
+  const pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+  const pg=pages.find(p=>{ const t=normT(p.title); return (!df||df.test(p.description||'')) && (t===want||t.startsWith(want+' ')||t.endsWith(' '+want)||want.startsWith(t+' ')); });
+  if(!pg) return [];
+  const im=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=images&imlimit=60&titles='+encodeURIComponent(pg.title));
+  const files=[]; for(const p of Object.values((im.query&&im.query.pages)||{})) for(const f of (p.images||[])) files.push(f.title);
+  const tokens=want.split(' ').filter(x=>x.length>2);
+  const scored=files.filter(f=>LOGO_NAME.test(f) && /\.(svg|png|jpg|jpeg)$/i.test(f) && !/\b(old|former|history|historic|protest|store|building|headquarters|stadium|truck|plane|aircraft|livery|boycott)\b|\b(19|20)\d\d\b/i.test(f))
+    .map(f=>{ const fn=normT(f.replace(/^File:/i,'')); return {f,sc:(tokens.every(t=>fn.includes(t))?4:0)+(/\.svg$/i.test(f)?1:0)+(/wordmark/i.test(f)?-1:0)+(/\bicon\b|symbol|logo/i.test(f)?1:0)}; })
+    .sort((a,b)=>b.sc-a.sc).slice(0,5);
+  if(!scored.length) return [];
+  const ii=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url&iiurlwidth=300&titles='+encodeURIComponent(scored.map(x=>x.f).join('|')));
+  const by={}; for(const p of Object.values((ii.query&&ii.query.pages)||{})){ const u=p.imageinfo&&p.imageinfo[0]&&(p.imageinfo[0].thumburl||p.imageinfo[0].url); if(u&&/^https:\/\/upload\.wikimedia\.org\//.test(u)) by[p.title]=u; }
+  return scored.map(x=>({url:by[x.f]||by[x.f.replace(/_/g,' ')],label:pg.title+' · '+x.f.replace(/^File:/i,'')})).filter(x=>x.url);
+}
+async function logoImage(c,n,sub){ const l=await logoFiles(c,n,sub); return l[0]?l[0].url:null; }
+/* Fictional characters: AniList has a close-up portrait for most anime and manga characters. */
+async function anilistCharacters(n){
+  await gate('anilist',800);
+  const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+    body:JSON.stringify({query:'query($s:String){Page(perPage:8){characters(search:$s,sort:SEARCH_MATCH){name{full native alternative}image{large}media(perPage:1){nodes{title{romaji english}}}}}}',variables:{s:n}})});
+  if(!r.ok) throw new Error('http '+r.status);
+  return (((await r.json()).data||{}).Page||{}).characters||[];
+}
+async function anilistCharImage(c,n){
+  if(c!=='characters'&&c!=='villains'&&c!=='superheroes') return null;
+  const want=normT(n); for(const ch of await anilistCharacters(n)){ const names=[ch.name.full,ch.name.native,...(ch.name.alternative||[])].filter(Boolean).map(normT);
+    if(ch.image&&ch.image.large&&!/default/.test(ch.image.large)&&names.includes(want)) return ch.image.large; }
+  return null;
+}
 async function itunesImage(c,n,sub){
+  if(c==='albums'||c==='songs') return null;
   const t=(IMG_SRC[c]||{}).i; if(!t) return null; await gate('itunes',3100);
   const artist=firstPart(sub), nat=natives(n,sub), wants=new Set([n,...nat].map(normT).filter(Boolean));
   const ctys=['us',...new Set(nat.map(x=>STORE_OF[LANG_OF(x)]).filter(Boolean))].slice(0,2);
@@ -4982,9 +5085,11 @@ async function sampleTint(url){
 async function resolveOne(c,n,subHint){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
-  const order=[['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
+  const order=[['music',musicImage],['logo',logoImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
   for(const [name,fn] of order){
+    if((c==='albums'||c==='songs') && artistOf(sub) && /^wikipedia/.test(name)) continue;   /* Wikipedia pages for songs are too easy to mix up with other songs of the same name */
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
+    if(url && LOGO_CATS.has(c) && /^wikipedia/.test(name) && !LOGO_NAME.test(decodeURIComponent(url).split('/').pop())) url=null;   /* logos only, no storefront photos */
     if(url){ src=name; break; }
   }
   if(!url){ if(!failed) rememberNone(k); return; }
