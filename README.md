@@ -35,3 +35,10 @@ Friends can currently replace the shared photo for an item via "Wrong photo?". B
 1. Set `SHARE_PHOTO_PICKS = false` in `index.html`.
 2. Run `supabase/images4_revert.sql` in the Supabase SQL Editor.
 Also review image licensing (see earlier notes) before charging for anything.
+
+
+## Safety checklist before sharing beyond friends
+- Run `supabase/hardening.sql` and `supabase/images4_revert.sql`, and set `SHARE_PHOTO_PICKS = false` in `index.html`.
+- Supabase > Authentication: minimum password length 8, turn on CAPTCHA, keep email confirmation on.
+- Supabase > Advisors > Security Advisor: fix anything it lists.
+- Never commit the `service_role` key.
