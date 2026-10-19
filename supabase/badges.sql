@@ -5,8 +5,11 @@
 
 create table if not exists public.badges (id text primary key, name text not null);
 insert into public.badges (id, name) values ('alpha', 'Alpha'), ('creator', 'Creator'), ('supporter', 'Supporter'),
-  ('dayone', 'Day One'), ('builder', 'Catalog Builder'), ('hunter', 'Bug Hunter'), ('contrarian', 'Contrarian'), ('timetraveler', 'Time Traveler')
+  ('dayone', 'Day One'), ('builder', 'Catalog Builder'), ('hunter', 'Bug Hunter'), ('contrarian', 'Contrarian'),
+  ('year1', '1 Year'), ('year2', '2 Years'), ('year3', '3 Years'), ('year4', '4 Years'), ('year5', '5 Years'),
+  ('year6', '6 Years'), ('year7', '7 Years'), ('year8', '8 Years'), ('year9', '9 Years'), ('year10', '10 Years')
   on conflict (id) do update set name = excluded.name;
+delete from public.badges where id = 'timetraveler';   -- replaced by the years badges
 
 create table if not exists public.user_badges (
   user_id    uuid not null references public.profiles(id) on delete cascade,
@@ -51,47 +54,33 @@ create trigger give_dayone_badge after insert on public.profiles for each row ex
 insert into public.user_badges (user_id, badge, awarded_at)
   select id, 'dayone', created_at from public.profiles order by created_at limit 10 on conflict do nothing;
 
--- Earned badges. The app asks for a check when you open it; the rules are decided here, so nobody can fake them.
---   Catalog Builder: 25+ researched items you added to the shared catalog.
---   Time Traveler:   shelves kept in 3 different years, with an account at least 2 calendar years old (earliest: Jan 2028).
---   Contrarian:      once 10+ people are here: your #1 is a pick nobody else ranks, in 3 topics (each with 3+ other people), held for 7 days.
+-- Years on Palate: 1 Year ... 10 Years, earned on each anniversary of joining. The app asks for a check when you open it;
+-- the rule is decided here, so nobody can fake it. (Nobody can have 1 Year before October 2027.)
 create or replace function public.refresh_my_badges() returns void language plpgsql security definer set search_path = public as $$
-declare uid uuid := auth.uid(); cnt int;
+declare uid uuid := auth.uid(); yrs int; joined timestamptz;
 begin
   if uid is null then return; end if;
-
-  if (select count(*) from public.catalog_items where created_by = uid and sub <> '') >= 25 then
-    insert into public.user_badges (user_id, badge) values (uid, 'builder') on conflict do nothing;
-  end if;
-
-  if (select extract(year from created_at)::int from public.profiles where id = uid) <= extract(year from now())::int - 2 then
-    select count(distinct k) into cnt from public.shelves s, jsonb_object_keys(s.years) k
-     where s.user_id = uid and k ~ '^[0-9]{4}$' and coalesce(s.years -> k ->> 'removed', 'false') <> 'true'
-       and jsonb_typeof(s.years -> k -> 'top') = 'array' and jsonb_array_length(s.years -> k -> 'top') > 0;
-    if cnt >= 3 then insert into public.user_badges (user_id, badge) values (uid, 'timetraveler') on conflict do nothing; end if;
-  end if;
-
-  if (select count(*) from public.profiles) >= 10 then
-    with latest as (
-      select s.user_id, s.cat, s.updated_at,
-             s.years -> (select k from jsonb_object_keys(s.years) k where k ~ '^[0-9]{4}$' and k::int <= extract(year from now())::int order by k::int desc limit 1) as snap
-        from public.shelves s),
-    live as (
-      select user_id, cat, updated_at, snap -> 'top' as top from latest
-       where snap is not null and coalesce(snap ->> 'removed', 'false') <> 'true'
-         and jsonb_typeof(snap -> 'top') = 'array' and jsonb_array_length(snap -> 'top') > 0),
-    mine as (select cat, top -> 0 ->> 'n' as pick from live where user_id = uid and updated_at <= now() - interval '7 days')
-    select count(*) into cnt from mine m
-     where (select count(*) from live l where l.cat = m.cat and l.user_id <> uid) >= 3
-       and not exists (select 1 from live l, jsonb_array_elements(l.top) e
-                        where l.cat = m.cat and l.user_id <> uid and lower(e ->> 'n') = lower(m.pick));
-    if cnt >= 3 then insert into public.user_badges (user_id, badge) values (uid, 'contrarian') on conflict do nothing; end if;
+  select created_at into joined from public.profiles where id = uid;
+  if joined is null then return; end if;
+  yrs := least(10, extract(year from age(now(), joined))::int);
+  if yrs >= 1 then
+    insert into public.user_badges (user_id, badge, awarded_at)
+      select uid, 'year' || g, joined + make_interval(years => g) from generate_series(1, yrs) g
+    on conflict do nothing;
   end if;
 end $$;
 revoke all on function public.refresh_my_badges() from public, anon;
 grant execute on function public.refresh_my_badges() to authenticated;
 
--- Bug Hunter is by hand: when someone's feedback leads to a real fix, run the Supporter-style line below with 'hunter'.
+-- NOT TURNED ON YET (kept here for later; both rules were tested):
+--   Catalog Builder (beta):  25+ researched items you added to the shared catalog. Add to refresh_my_badges:
+--     if (select count(*) from public.catalog_items where created_by = uid and sub <> '') >= 25 then
+--       insert into public.user_badges (user_id, badge) values (uid, 'builder') on conflict do nothing; end if;
+--   Contrarian (publish):    once 10+ people are here, your #1 is a pick nobody else ranks, in 3 topics that each have 3+ other
+--     people, held for 7 days. The full query is in this repo's git history (badges.sql, commit "Five earned badges").
+--   Supporter (beta):        by hand until there is a way to chip in.
+
+-- Bug Hunter is by hand: when someone's feedback leads to a real fix, give it with the line at the bottom of this file.
 
 -- Who has which badge (only for people you are allowed to see).
 create or replace function public.badge_board() returns table (user_id uuid, badge text, awarded_at timestamptz)
@@ -112,9 +101,9 @@ revoke all on function public.badge_board(), public.badge_stats() from public, a
 grant execute on function public.badge_board(), public.badge_stats() to authenticated;
 
 -- ---- Your controls (run these yourself in the SQL editor) ----
--- Give someone the Supporter badge (find their id with:  select id, name from profiles;):
+-- Give someone a badge (find their id with:  select id, name from profiles;). Supporter waits until there is a way to chip in:
 --   insert into user_badges (user_id, badge) values ('PASTE-THEIR-ID', 'supporter') on conflict do nothing;
--- Give Bug Hunter the same way (swap 'supporter' for 'hunter'). Find who sent which bug:  select * from alpha_feedback;
+-- Bug Hunter works the same way (swap 'supporter' for 'hunter'). Find who sent which bug:  select * from alpha_feedback;
 -- Take a badge away:
 --   delete from user_badges where user_id = 'PASTE-THEIR-ID' and badge = 'supporter';
 -- Stop handing out Alpha to new sign-ups (do this when the alpha ends):
