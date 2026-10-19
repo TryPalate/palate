@@ -370,7 +370,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .auth-err{min-height:1.2em;margin:0;color:#E5484D;font-size:14px}
 .auth-ok{margin:0;color:var(--good);font-size:14px}
 .auth .swap{background:none;border:0;color:var(--muted);cursor:pointer;text-align:left;padding:4px 0;text-decoration:underline;font-size:14.5px}
-.auth .invited{background:var(--raise);border-radius:12px;padding:10px 14px;font-size:14.5px}
+.auth .invited{display:flex;align-items:center;gap:10px;text-align:left;background:var(--raise);border-radius:12px;padding:10px 14px;font-size:14.5px;line-height:1.4}.auth .invited .av{flex:none}
 .invite{padding-bottom:16px}
 .invite p{margin:4px 0 10px;font-size:14px}
 .link-row{display:flex;gap:8px}
@@ -460,6 +460,9 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 @keyframes ios-left{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
 @keyframes ios-ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 0 0 2px var(--accent)}100%{box-shadow:0 0 0 10px transparent,0 0 0 2px var(--accent)}}
 @media (prefers-reduced-motion:reduce){.ios-arr,.mk-lines,.mk-share{animation:none!important}}
+.vs-note{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--raise);font-size:14.5px;line-height:1.35}.vs-note b{font-weight:700}
+.vs-cols{margin-bottom:6px}
+.story-msg{margin:0;max-width:440px;text-align:center;color:rgb(255 255 255 / .85);font-size:13.5px;line-height:1.4;padding:0 12px}
 .credit{margin:0 0 28px;font-size:12px;color:var(--faint)}
 </style>
 
@@ -5018,7 +5021,8 @@ function openPerson(id){
 /* The shareable match picture, same size as the story pictures */
 async function makeMatchStory(st,font){
   const f=FRIENDS.find(x=>x.id===st.cat); if(!f) return null;
-  const {pct,per}=compat(f), nShared=per.reduce((n,p)=>n+p.shared.length,0), rows=[];
+  const pc=compat(f), per=st.mcat?pc.per.filter(p=>p.c===st.mcat):pc.per, nShared=per.reduce((n,p)=>n+p.shared.length,0), rows=[];
+  const pct=st.mcat?(per[0]?Math.round(100*per[0].score):0):pc.pct;
   for(const p of [...per].sort((a,b)=>b.score-a.score)) for(const n of p.shared) if(rows.length<3) rows.push({n,s:CAT[p.c].name,why:'',c:p.c,shape:CAT[p.c].shape,rank:0,p:photo(p.c,n),im:null});
   await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); }));
   const mySeed=(me&&me.id)||state.name, gm=gradParts(mySeed,me&&me.avatar), gf=gradParts(f.id,f.avatar);
@@ -5036,11 +5040,28 @@ async function makeMatchStory(st,font){
   x.font=`800 290px ${font}`; x.fillText(pct+'%',SW/2,1000);
   x.fillStyle='rgba(255,255,255,.86)'; x.font=`700 68px ${font}`; x.fillText(matchLabel(pct,per.length),SW/2,1090);
   x.fillStyle='rgba(255,255,255,.55)'; x.font=`500 38px ${font}`;
-  x.fillText(per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shelf${per.length===1?'':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
+  x.fillText(st.mcat?`${CAT[st.mcat].name} · ${nShared} shared pick${nShared===1?'':'s'}`:per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shelf${per.length===1?'':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
   x.textAlign='left';
   if(rows.length){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`700 34px ${font}`; x.letterSpacing='4px'; x.fillText('YOU BOTH PICKED',90,1250); x.letterSpacing='0px'; drawRows(x,rows,font,false,1272,rows.length*120); }
   x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Find your match · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
   return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
+}
+/* ---------- Coming from a friend's shared shelf: rank the same topic right away, then see the match ---------- */
+function startVs(vs){
+  if(eff(vs.cat,CURRENT)){ ui.tab='friends'; ui.profile=vs.id; ui.compare=null; render(); openVsResult(vs.id,vs.cat); return; }
+  ui.tab='me'; render(); openEditor(vs.cat,false); ed.vs=vs; renderEditor(); toast(`You and ${vs.name} are now friends`);
+}
+function openVsResult(fid,c){
+  const f=FRIENDS.find(x=>x.id===fid), mine=eff(c,CURRENT); if(!f||!mine||!CAT[c]) return;
+  const theirs=f.shelves[c], nm=CAT[c].name.toLowerCase();
+  if(!theirs){
+    sheet(`<div class="sheet-head"><div><h2>You and ${esc(first(f))} are friends</h2><p>Your ${esc(nm)} are saved.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <p class="muted" style="margin:0 0 14px">${esc(first(f))} has not shared their ${esc(nm)} with you, so there is nothing to compare yet. Their other shelves are on their profile.</p>
+    <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="close">Done</button><button class="pill" data-act="profile" data-f="${f.id}">See ${esc(first(f))}'s profile</button></div></div>`,'vs'); return; }
+  const per=compat(f).per.find(p=>p.c===c), pct=per?Math.round(100*per.score):0, set=new Set(per?per.shared:[]);
+  sheet(`<div class="sheet-head"><div><h2>You & ${esc(first(f))}: ${pct}%</h2><p>${esc(matchLabel(pct,1))} in ${esc(nm)}${set.size?` · ${set.size} shared pick${set.size===1?'':'s'}`:''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="cols vs-cols"><div><h3>You</h3>${mini(mine.snap.top,c,set)}</div><div><h3>${esc(first(f))}</h3>${mini(theirs.top,c,set)}</div></div>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="vs-profile" data-f="${f.id}">See ${esc(first(f))}'s profile</button><button class="pill" data-act="share-match" data-f="${f.id}" data-cat="${c}">Share our match</button></div></div>`,'vs');
 }
 function openAccount(){
   const dv=prefs().defVis||'friends';
@@ -5104,17 +5125,35 @@ async function deleteAccount(){
     await sb.auth.signOut().catch(()=>{}); location.reload();
   }catch(e){ console.error(e); toast(/delete_my_account|function/i.test(String(e.message||e))?'Run supabase/delete_account.sql in Supabase first.':"Couldn't delete the account. Try again."); if(btn) btn.disabled=false; }
 }
-const inviteLink = () => location.origin + location.pathname.replace(/index\.html$/,'') + '?join=' + (me?me.invite:'');
+const inviteLink = cat => location.origin + location.pathname.replace(/index\.html$/,'') + '?join=' + (me?me.invite:'') + (cat&&CAT[cat]?'&c='+encodeURIComponent(cat):'');
 
 /* Sign in / sign up screens */
 let authMode='in';
-function captureJoin(){ try{ const c=new URLSearchParams(location.search).get('join'); if(c){ sessionStorage.setItem('palate-join',c); history.replaceState(null,'',location.pathname); } }catch(e){} }
-const pendingJoin = () => { try{ return sessionStorage.getItem('palate-join'); }catch(e){ return null; } };
+/* An invite link can carry a topic: ?join=CODE&c=albums. We keep it (also across an email-confirmation detour) for up to 3 days. */
+const JOIN_KEY='palate-join';
+function captureJoin(){ try{ const q=new URLSearchParams(location.search), c=q.get('join'); if(c){ const v=JSON.stringify({code:c.slice(0,40),cat:(q.get('c')||'').slice(0,40),t:Date.now()}); localStorage.setItem(JOIN_KEY,v); sessionStorage.setItem(JOIN_KEY,v); history.replaceState(null,'',location.pathname); } }catch(e){} }
+const joinInfo = () => { try{ const raw=sessionStorage.getItem(JOIN_KEY)||localStorage.getItem(JOIN_KEY); if(!raw) return null; const o=JSON.parse(raw); return (o&&o.code&&Date.now()-o.t<3*864e5)?o:null; }catch(e){ return null; } };
+const pendingJoin = () => { const j=joinInfo(); return j?j.code:null; };
+const clearJoin = () => { try{ localStorage.removeItem(JOIN_KEY); sessionStorage.removeItem(JOIN_KEY); }catch(e){} };
+let JOINPREV=null;
+function inviteBanner(){
+  const j=joinInfo(), cat=j&&CAT[j.cat]; if(!j) return '';
+  if(JOINPREV&&JOINPREV.name){ const who=esc(JOINPREV.name.split(' ')[0]);
+    return `${av({id:JOINPREV.id,name:JOINPREV.name},'s')}<span>`+(cat?`<b>${who}</b> shared their top 5 ${esc(cat.name.toLowerCase())}. Make an account, rank yours, and see how well you match.`:`<b>${who}</b> invited you to Palate. Make an account to connect and compare your taste.`)+`</span>`; }
+  return `<span>${cat?`A friend shared their top 5 ${esc(cat.name.toLowerCase())}. Make an account, rank yours, and see how well you match.`:'You were invited by a friend. Make an account or sign in to connect.'}</span>`;
+}
+async function loadJoinPreview(){
+  const j=joinInfo(); if(!j||!sb||JOINPREV) return;
+  try{ const r=await sb.rpc('invite_preview',{p_code:j.code}); if(r&&!r.error&&r.data&&r.data[0]) JOINPREV=r.data[0]; }catch(e){}
+  const el=$('#invited'); if(el&&JOINPREV) el.innerHTML=inviteBanner();
+}
 function showAuth(mode,msg){
+  if(!showAuth.seen && !mode && pendingJoin()) authMode='up';   /* someone arriving from a friend's link most likely needs an account */
+  showAuth.seen=true;
   authMode=mode||authMode; document.body.classList.remove('in'); $('#sheet-root').innerHTML='';
   const up=authMode==='up';
   $('#view').innerHTML=`<section class="auth">${LOGO_H1}<span class="alpha-tag static">alpha</span><p class="tag">Your taste, ranked. Just for your friends.</p>
-    ${pendingJoin()?'<div class="invited">You were invited by a friend. Make an account or sign in to connect.</div>':''}
+    ${pendingJoin()?`<div class="invited" id="invited">${inviteBanner()}</div>`:''}
     <form id="auth-form" novalidate>
       ${up?'<label>Your name<input id="au-name" autocomplete="name" maxlength="40" placeholder="What your friends call you"></label>':''}
       <label>Email<input id="au-email" type="email" autocomplete="email" inputmode="email"></label>
@@ -5126,6 +5165,7 @@ function showAuth(mode,msg){
     ${up?'':'<button class="swap" data-act="forgot">Forgot password?</button>'}
     <button class="swap" data-act="auth-mode">${up?'I already have an account':'New here? Create an account'}</button>
     <p class="muted" style="font-size:12px;margin:8px 0 0">build 2</p></section>`;
+  loadJoinPreview();
 }
 function showFatal(text,err){
   document.body.classList.remove('in');
@@ -5186,7 +5226,7 @@ async function enter(user){
   $('#view').innerHTML=BOOT_HTML;
   try{
     me={id:user.id,email:user.email||''};
-    const code=pendingJoin(); let joined=null;
+    const jinfo=joinInfo(), code=jinfo?jinfo.code:null; let joined=null;
     const friendsP = code ? null : loadFriends(); if(friendsP) friendsP.catch(()=>{});     /* friends load alongside everything else, unless we are about to add one */
     const soft = q => q.then(r=>r,()=>({error:true}));
     const [pr,sh,ph,us,im,ci]=await Promise.all([
@@ -5209,7 +5249,12 @@ async function enter(user){
     synced.custom=JSON.stringify(state.custom);
     buildCatalog(); applyCustom(); applySharedCatalog(ci);
     AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34,by:r.src||''};
-    if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
+    if(code){
+      clearJoin(); let pv=JOINPREV;
+      if(!pv){ try{ const q0=await sb.rpc('invite_preview',{p_code:code}); if(q0&&!q0.error&&q0.data&&q0.data[0]) pv=q0.data[0]; }catch(e){} }
+      const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data,id:pv&&pv.id,cat:jinfo.cat};
+      await loadFriends(); if(joined.name&&!joined.id){ const f0=FRIENDS.find(x=>x.name===joined.name); if(f0) joined.id=f0.id; }
+    }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
     await Promise.all([loadPeople(),loadBadges()]);
@@ -5219,7 +5264,9 @@ async function enter(user){
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
     render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500);
     if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
-    if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
+    const vs = joined&&!joined.err&&joined.id&&joined.cat&&CAT[joined.cat] ? {id:joined.id,name:joined.name,cat:joined.cat} : null;
+    if(vs) startVs(vs);
+    else if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
 
@@ -6031,11 +6078,11 @@ async function renderStory(){
   const img=$('#story-img'); if(img) img.src=st.url; if(box) box.classList.remove('busy');
   const sw=$('#story-notes'); if(sw){ sw.disabled=!st.hasNotes; sw.checked=st.notes&&st.hasNotes; const l=$('#story-notes-l'); if(l) l.classList.toggle('off',!st.hasNotes); const h=$('#story-hint'); if(h) h.textContent=(st.hasNotes||st.kind==='match')?'':'No notes yet. Add a “why” when you edit a shelf.'; }
 }
-function openStory(kind,c){
+function openStory(kind,c,mcat){
   track('share_open',kind==='shelf'?c:kind);
   if(kind==='shelf' && !eff(c,ui.year===undefined?CURRENT:ui.year)) return;
   if(kind==='match' && !FRIENDS.find(x=>x.id===c)) return;
-  closeSheet(); sty={kind,cat:c,notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
+  closeSheet(); sty={kind,cat:c,mcat:(kind==='match'&&mcat&&CAT[mcat])?mcat:'',notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
   let box=$('#story-root'); if(!box){ box=document.createElement('div'); box.id='story-root'; document.body.appendChild(box); }
   box.className='busy'; document.body.style.overflow='hidden';
   box.innerHTML=`<div class="sty-view" data-act="story-bg" role="dialog" aria-modal="true" aria-label="Share picture">
@@ -6049,17 +6096,27 @@ function openStory(kind,c){
       <button class="pill" data-act="story-share">Share…</button>
       <button class="pill soft" data-act="story-save">Save image</button>
       <button class="pill soft" data-act="story-copy-img">Copy image</button>
-      <button class="pill soft" data-act="story-copy-link">Copy link</button>
+      <button class="pill soft" data-act="story-copy-link">Copy message</button>
       <button class="pill soft" data-act="story-sms">Text a friend</button>
-    </div><p id="story-hint" class="story-hint"></p></div>`;
+    </div><p class="story-msg">“${esc(shareMsg())}”</p><p id="story-hint" class="story-hint"></p></div>`;
   renderStory();
 }
 function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null; if(box) box.remove(); if(!$('#sheet-root').firstChild) document.body.style.overflow=''; }
 function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:sty.kind==='match'?'match':'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
+/* The short note that goes with anything shared: iMessage, Instagram, WhatsApp, and so on. The link inside it opens straight into ranking the same topic. */
+function shareMsg(){
+  if(!sty) return '';
+  if(sty.kind==='shelf'){ const e=eff(sty.cat,ui.year===undefined?CURRENT:ui.year), n=e?e.snap.top.length:5, nm=CAT[sty.cat].name.toLowerCase();
+    return `This is my ${n>=2?'top '+n+' ':''}${nm} on Palate. Rank yours and see how well we match.`; }
+  if(sty.kind==='match'){ const f=FRIENDS.find(x=>x.id===sty.cat); if(f){ const pc=compat(f), per=sty.mcat?pc.per.find(p=>p.c===sty.mcat):null, pct=sty.mcat?(per?Math.round(100*per.score):0):pc.pct;
+      return `We are a ${pct}% taste match${sty.mcat?' in '+CAT[sty.mcat].name.toLowerCase():''} on Palate. Rank yours and see how we compare.`; } }
+  return 'These are my favorites on Palate. Rank yours and see how well we match.';
+}
+const shareLink = () => sty ? inviteLink(sty.kind==='shelf'?sty.cat:(sty.mcat||'')) : inviteLink();
 async function storyShare(){
-  if(!sty||!sty.blob) return; const f=storyFile();
-  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); track('share_native',sty.cat); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
-  storySave(); toast('Saved. Add it to your story from your photos.');
+  if(!sty||!sty.blob) return; const f=storyFile(), text=shareMsg()+'\n'+shareLink();
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text}); track('share_native',sty.cat); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  storySave(); try{ navigator.clipboard.writeText(text); }catch(e){} toast('Saved, and the message is copied. Paste it with the picture.');
 }
 function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(()=>toast(msg),()=>toast("Couldn't copy. Long-press the link instead.")); }catch(e){ toast("Couldn't copy on this browser."); } }
 async function storyCopyImg(){
@@ -6068,9 +6125,7 @@ async function storyCopyImg(){
 }
 function storySms(){
   if(!sty) return; track('share_sms',sty.cat);
-  if(sty.kind==='match'){ const f=FRIENDS.find(x=>x.id===sty.cat); if(f){ location.href='sms:?&body='+encodeURIComponent(`We are a ${compat(f).pct}% taste match on Palate. See yours: `+inviteLink()); return; } }
-  const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
-  location.href='sms:?&body='+encodeURIComponent('Check out '+what+' on Palate, and add me: '+inviteLink());
+  location.href='sms:?&body='+encodeURIComponent(shareMsg()+' '+shareLink());
 }
 function storySave(){ if(!sty||!sty.url) return; track('share_save',sty.cat); const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
 function openDetail(c, fid){
@@ -6454,8 +6509,10 @@ function renderEditor(){
   const left = ed.isNew ? '<span></span>' : ed.confirm
     ? `<div class="confirm">Remove for ${CURRENT}?<button class="pill soft danger sm" data-act="del-yes">Remove</button><button class="pill ghost sm" data-act="del-no">Keep</button></div>`
     : `<button class="pill ghost danger" data-act="del-ask">Remove shelf</button>`;
-  const nx = (ed.flow || ed.isNew) ? nextCat() : null;
+  const nx = ((ed.flow || ed.isNew) && !ed.vs) ? nextCat() : null;
+  const vsF = ed.vs ? FRIENDS.find(x=>x.id===ed.vs.id) : null;
   sheet(`<div class="sheet-head"><div><h2>${esc(c.name)}</h2><p>${CURRENT}${ed.flow?' · quick start':''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    ${ed.vs?`<div class="vs-note">${vsF?av(vsF,'s'):''}<span>Rank your top 5 ${esc(c.name.toLowerCase())} to see how well you match <b>${esc(ed.vs.name.split(' ')[0])}</b>.</span></div>`:''}
     <div class="search"><input id="ed-q" type="search" autocomplete="off" aria-label="Search ${esc(c.name.toLowerCase())}" placeholder="Search ${esc(c.name.toLowerCase())}" value="${esc(ed.query)}"><ul id="ed-results" class="results">${results()}</ul></div>
     ${c.photo?`<p class="tipline">Tap any pick's image to use your own photo.</p>`:''}
     <div class="dz" data-dz="editor">
@@ -6495,11 +6552,11 @@ function saveEditor(next){
   const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
   const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
-  const c=ed.cat, flow=ed.flow; const isNew=!state.order.includes(c); (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
+  const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c); (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
   save(); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
-  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
+  if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(vs&&vs.cat===c){ toast('Saved'); setTimeout(()=>openVsResult(vs.id,c),250); } else if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
 function removeShelf(){
   const c=ed.cat, sh=state.shelves[c];
@@ -6700,7 +6757,7 @@ document.addEventListener('click',e=>{
     case 'story-save': storySave(); break;
     case 'story-share': storyShare(); break;
     case 'story-copy-img': storyCopyImg(); break;
-    case 'story-copy-link': track('invite_copy'); copyText(inviteLink(),'Link copied'); break;
+    case 'story-copy-link': track('invite_copy'); copyText(shareMsg()+'\n'+shareLink(),'Message and link copied'); break;
     case 'story-sms': storySms(); break;
     case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
@@ -6711,7 +6768,8 @@ document.addEventListener('click',e=>{
     case 'back-friends': if(ui.compare) ui.compare=null; else ui.profile=null; render(); break;
     case 'person': openPerson(el.dataset.id); break;
     case 'badge': openBadge(el.dataset.b,el.dataset.u); break;
-    case 'share-match': openStory('match',el.dataset.f); break;
+    case 'share-match': openStory('match',el.dataset.f,el.dataset.cat); break;
+    case 'vs-profile': closeSheet(); ui.tab='friends'; ui.profile=el.dataset.f; ui.compare=null; render(); window.scrollTo(0,0); break;
     case 'year-now': $('#year').value=CURRENT; setYear(CURRENT); break;
     case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
       const live=list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n && list.length>(ed.alt.list||[]).length){ ed.alt.list=list; renderEditor(); } };
@@ -6797,8 +6855,8 @@ document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.prevent
   if(!sb){ document.body.classList.remove('in'); $('#view').innerHTML='<section class="auth">'+LOGO_H1+'<p class="auth-err" style="min-height:0">Setup needed: open config.js and paste in your Supabase URL and publishable key.</p></section>'; return; }
   recovering=/type=recovery/.test(location.hash);
   sb.auth.onAuthStateChange(ev=>{ if(ev==='SIGNED_OUT' && me) location.reload(); if(ev==='PASSWORD_RECOVERY'){ recovering=true; showRecovery(); } });
-  try{ const {data}=await sb.auth.getSession(); if(recovering){ if(data.session) showRecovery(); else showAuth('in','That reset link expired. Request a new one.'); } else if(data.session) await enter(data.session.user); else showAuth('in'); }
-  catch(e){ console.error(e); showAuth('in'); }
+  try{ const {data}=await sb.auth.getSession(); if(recovering){ if(data.session) showRecovery(); else showAuth('in','That reset link expired. Request a new one.'); } else if(data.session) await enter(data.session.user); else showAuth(); }
+  catch(e){ console.error(e); showAuth(); }
 })();
 })();
 </script>
