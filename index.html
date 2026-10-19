@@ -381,9 +381,9 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .av.xl{width:104px;height:104px;font-size:36px}
 .bdg{--c1:#EDBB6A;--c2:#EE9A6E;display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;line-height:1;flex:none;text-shadow:0 1px 2px rgb(0 0 0 / .2);background:linear-gradient(140deg,var(--c1),var(--c2));box-shadow:var(--ring,0 0 #0000)}
 .bdg.two{font-size:.78em}
-.bdg.xl{width:96px;height:96px;font-size:46px;box-shadow:var(--ring,0 0 #0000),0 10px 30px -10px rgb(0 0 0 / .45)}
-.bdg.xl.two{font-size:36px}
-.bdg.sm{width:34px;height:34px;font-size:15px}.bdg.sm.two{font-size:12px}
+.bdg.xl{width:68px;height:68px;font-size:32px;box-shadow:var(--ring,0 0 #0000),0 8px 22px -10px rgb(0 0 0 / .45)}
+.bdg.xl.two{font-size:25px}
+.bdg.sm{width:30px;height:30px;font-size:14px}.bdg.sm.two{font-size:11px}
 .bdg.sh-ring{--ring:inset 0 0 0 .1em rgb(255 255 255 / .6)}
 .bdg.sh-rings{--ring:inset 0 0 0 .07em rgb(255 255 255 / .75),inset 0 0 0 .17em rgb(0 0 0 / .12),inset 0 0 0 .23em rgb(255 255 255 / .55)}
 .bdg.sh-hex{border-radius:0;clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
@@ -397,13 +397,14 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .profile > .bdg-row{margin:12px 0 2px}
 .bdg-chip{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--raise);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px 3px 3px;cursor:pointer}
 .bdg-chip .bdg{width:20px;height:20px;font-size:11px}
-.bdg-detail{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:10px 6px 4px}
-.bdg-detail p{margin:0;font-size:15.5px;color:var(--text);max-width:34ch}
-.bdg-rare{font-size:13px;font-weight:700;color:var(--accent);background:var(--raise);border-radius:999px;padding:6px 12px}
-.bdg-detail small{color:var(--muted);font-size:13px;max-width:34ch}
+.bdg-detail{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:0 4px 8px}
+.bdg-detail p{margin:0;font-size:14.5px;color:var(--text);max-width:34ch;line-height:1.35}
+.sheet-head.compact{margin-bottom:8px}
+.bdg-rare{font-size:12px;font-weight:700;color:var(--accent);background:var(--raise);border-radius:999px;padding:4px 10px}
+.bdg-detail small{color:var(--muted);font-size:12.5px;max-width:36ch;line-height:1.35}
 .bdg-how b{color:var(--text)}
 .bdg-chip.locked{opacity:.45}.bdg-chip.locked .bdg{filter:grayscale(1)}
-.bdg-ladder{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:6px;max-width:260px}
+.bdg-ladder{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:2px;max-width:230px}
 .bdg-ladder .locked{opacity:.35;filter:grayscale(1)}
 .pf-top{padding-block:6px 4px}
 .pf-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 18px}
@@ -4932,20 +4933,20 @@ async function pickAvatar(v){
 /* ---------- Badges ---------- */
 /* What each badge looks like and says. Who has which one comes from the database (supabase/badges.sql). */
 const BADGES={
-  creator:{name:'Creator',glyph:'✦',c:['#B992E3','#E5799B'],blurb:'Built Palate from scratch. There is only one.',how:'Not available.'},
-  dayone:{name:'Day One',glyph:'1',c:['#6BB9E0','#9483E6'],blurb:'One of the first 10 people on Palate.',how:'Closed. Only the first 10 accounts ever got it.'},
-  hunter:{name:'Bug Hunter',glyph:'✱',c:['#EE9A6E','#E5799B'],blurb:'Found a real bug and helped get it fixed.',how:'Given by hand when your feedback leads to a fix.'},
-  alpha:{name:'Alpha',glyph:'α',c:['#EDBB6A','#EE9A6E'],blurb:'Was here during the alpha, before Palate opened up. It is only handed out during the alpha, so no one can get it later.',how:'Closed when the alpha ends.'},
-  supporter:{name:'Supporter',glyph:'♥',c:['#E5799B','#EE9A6E'],blurb:'Helped keep Palate running without ads.',how:'Given to people who chip in to keep Palate free.',soon:'in the beta'},
-  builder:{name:'Catalog Builder',glyph:'+',c:['#EDBB6A','#EE9A6E'],blurb:'Added 25 or more things to the shared catalog that nobody had added before. Everyone searches with their picks.',how:'Add things that are missing from search. Reach 25 to earn it.',soon:'in the beta'},
-  contrarian:{name:'Contrarian',glyph:'≠',c:['#E5799B','#9483E6'],blurb:'Has a #1 pick in three topics that no one else on Palate ranks at all.',how:'Be #1 in 3 topics with a pick nobody else has on their shelf, and keep it for a week.',soon:'when Palate publishes'}
+  creator:{name:'Creator',glyph:'✦',c:['#F7D774','#D9961A'],blurb:'Built Palate. There is only one.',how:'It cannot be earned. It belongs to the person who made Palate.'},
+  dayone:{name:'Day One',glyph:'1',c:['#3DDBC6','#0E9AA7'],blurb:'One of the first 10 people to join Palate.',how:'Closed. It was only given to the first 10 accounts ever made, so it can no longer be earned.'},
+  hunter:{name:'Bug Hunter',glyph:'✱',c:['#EE9A6E','#E5799B'],blurb:'Found a real bug and helped get it fixed.',how:'Report a bug with Account → Send feedback. If it is real and gets fixed, you get the badge.'},
+  alpha:{name:'Alpha',glyph:'α',c:['#6DB3FF','#2F6BE0'],blurb:'Joined Palate during the alpha stage.',how:'Sign up while Palate is in alpha. When the alpha ends, this badge closes for good.'},
+  supporter:{name:'Supporter',glyph:'♥',c:['#E5799B','#EE9A6E'],blurb:'Chipped in to help keep Palate running.',how:'Opens when there is a way to support Palate. Anyone who does gets this badge.',soon:'in the beta'},
+  builder:{name:'Catalog Builder',glyph:'+',c:['#3ED68F','#2F86E0'],blurb:'Added 25 or more things to Palate\'s shared catalog.',how:'Search for something Palate is missing and add it. Once 25 of your additions are saved, you earn it.',soon:'in the beta'},
+  contrarian:{name:'Contrarian',glyph:'≠',c:['#E5799B','#9483E6'],blurb:'Ranks things nobody else on Palate does.',how:'Be #1 in 3 topics with a pick no one else has anywhere on their shelf, and keep each for a week. Needs 10+ people on Palate.',soon:'when Palate publishes'}
 };
 /* Years on Palate: ten tiers, each with its own look. You only ever show the highest one you have. */
 const YEAR_LOOKS=[
   ['#EDBB6A','#EE9A6E','round'],['#EE9A6E','#E5799B','ring'],['#E5799B','#B992E3','rings'],['#B992E3','#9483E6','hex'],['#9483E6','#6BB9E0','shield'],
   ['#6BB9E0','#9483E6','diamond'],['#EDBB6A','#E5799B','conic'],['#E5799B','#9483E6','star'],['#6BB9E0','#B992E3','holo'],['#EDBB6A','#B992E3','legend']];
 YEAR_LOOKS.forEach(([c1,c2,shape],i)=>{ const n=i+1; BADGES['year'+n]={name:n+(n===1?' Year':' Years'),glyph:String(n),c:[c1,c2],shape,year:n,
-  blurb:`Has been on Palate for ${n===1?'a whole year':n+' years'}.`,how:'Earned automatically on each anniversary of joining, up to 10 years.'}; });
+  blurb:`Has been on Palate for ${n===1?'a whole year':n+' years'}.`,how:'Comes automatically on each anniversary of the day you joined. Nothing to do. Goes up to 10 years.'}; });
 const BADGE_ORDER=['creator',...YEAR_LOOKS.map((_,i)=>'year'+(10-i)),'dayone','hunter','supporter','builder','contrarian','alpha'];   /* rarest first */
 let BADGE_OF={}, BSTAT={};
 async function loadBadges(){
@@ -4982,9 +4983,8 @@ function openBadge(id,uid){
   const who = uid===(me&&me.id) ? 'You' : (((FRIENDS.find(f=>f.id===uid)||DIRECTORY.find(p=>p.id===uid)||{}).name||'They').split(' ')[0]);
   const ladder = b.year ? `<div class="bdg-ladder" aria-label="All years badges">${YEAR_LOOKS.map((_,i)=>{ const yid='year'+(i+1), has=(BADGE_OF[uid]||[]).some(x=>x.id===yid); return `<span class="${has?'':'locked'}" title="${esc(BADGES[yid].name)}">${bdgIcon(yid,'sm')}</span>`; }).join('')}</div>` : '';
   const since = mine&&mine.at ? new Date(mine.at).toLocaleDateString(undefined,{month:'long',year:'numeric'}) : '';
-  sheet(`<div class="sheet-head"><div><h2>${esc(b.name)} badge</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <div class="bdg-detail">${bdgIcon(id,'xl')}<p>${esc(b.blurb)}</p>${line&&!(b.soon&&!mine)?`<span class="bdg-rare">${esc(line)}</span>`:''}${since?`<small>${esc(who)} earned this in ${esc(since)}</small>`:''}${b.soon&&!mine?`<small class="bdg-how"><b>Not available yet.</b> Opens ${esc(b.soon)}.</small>`:b.how?`<small class="bdg-how"><b>How to earn:</b> ${esc(b.how)}</small>`:''}${ladder}</div>
-  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Close</button></div></div>`,'badge');
+  sheet(`<div class="sheet-head compact"><div><h2>${esc(b.name)} badge</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="bdg-detail">${bdgIcon(id,'xl')}<p>${esc(b.blurb)}</p>${line&&!(b.soon&&!mine)?`<span class="bdg-rare">${esc(line)}</span>`:''}${since?`<small>${esc(who)} earned this in ${esc(since)}</small>`:''}${b.soon&&!mine?`<small class="bdg-how"><b>Not available yet.</b> Opens ${esc(b.soon)}.</small>`:b.how?`<small class="bdg-how"><b>How to earn:</b> ${esc(b.how)}</small>`:''}${ladder}</div>`,'badge');
 }
 
 /* ---------- Profiles ---------- */
