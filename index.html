@@ -427,6 +427,36 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .pf-no1 b{color:var(--text)}
 .pf-sheet{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:6px 0 4px}
 .person-open{display:flex;align-items:center;gap:12px;flex:1;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ios-steps{list-style:none;margin:8px 0 6px;padding:0;display:grid;gap:20px}
+.ios-steps li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start}
+.ios-n{width:28px;height:28px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:14px}
+.ios-steps p{margin:3px 0 10px;font-size:15.5px;line-height:1.4}
+.ios-warn{margin:6px 0 0;padding:10px 12px;border-radius:12px;background:var(--raise);color:var(--text);font-size:14px;font-weight:600}
+.mk{position:relative;background:var(--raise);border-radius:16px;padding:12px 12px 14px;overflow:hidden}
+.mk-bar{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:999px;padding:7px 8px}
+.mk-url{flex:1;text-align:center;font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-b{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;gap:3px;background:var(--raise);color:var(--text);font-size:18px;flex:none}
+.mk-b i{width:4.5px;height:4.5px;border-radius:50%;background:currentColor;display:block}
+.mk-b.dim{color:var(--faint)}
+.mk-pill{flex:1;min-width:0;display:flex;align-items:center;gap:8px;background:var(--raise);border-radius:999px;padding:3px 12px 3px 3px}
+.mk-lines{width:34px;height:34px;border-radius:50%;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex:none;background:var(--card);animation:ios-ring 1.6s ease-out infinite}
+.mk-lines i{display:block;height:2px;background:var(--text);border-radius:2px}.mk-lines i:nth-child(1){width:14px}.mk-lines i:nth-child(2){width:11px}.mk-lines i:nth-child(3){width:14px}
+.mk-rl{color:var(--muted);font-size:16px;flex:none}
+.mk-bar .mk-b{background:var(--card)}
+.mk-menu{background:var(--card);border-radius:14px;overflow:hidden}
+.mk-row{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;font-size:15px;border-top:1px solid var(--line)}
+.mk-row:first-child{border-top:0}
+.mk-row.dim{color:var(--faint)}
+.mk-row.hot{font-weight:700;background:var(--raise);box-shadow:inset 0 0 0 2px var(--accent)}
+.ios-arr{color:var(--accent);position:absolute;pointer-events:none}
+.ios-arr.pos1{left:36px;bottom:6px;animation:ios-up 1.1s ease-in-out infinite}
+.mk:has(.pos1){padding-bottom:50px}
+.mk-row{justify-content:flex-start}.mk-row span{flex:1;min-width:0}.mk-row .ic{flex:none}
+.ios-arr.l{position:static;margin-left:auto;flex:none;animation:ios-left 1.1s ease-in-out infinite}
+@keyframes ios-up{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes ios-left{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
+@keyframes ios-ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 0 0 2px var(--accent)}100%{box-shadow:0 0 0 10px transparent,0 0 0 2px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.ios-arr,.mk-lines{animation:none!important}}
 .credit{margin:0 0 28px;font-size:12px;color:var(--faint)}
 </style>
 
@@ -4769,8 +4799,31 @@ function promoCard(){
 }
 function refreshPromo(){ if(ui.tab==='me' && $('#me-dyn')) $('#me-dyn').innerHTML=meDyn(); }
 function iosSteps(){
-  sheet(`<div class="sheet-head"><div><h2>Add Palate to your home screen</h2><p>Takes ten seconds in Safari.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <ol class="steps"><li>Tap the <b>Share</b> button at the bottom of Safari (the square with an arrow).</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>, then open Palate from your home screen.</li></ol>
+  const svg=d=>`<svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const IC={
+    share:svg('<path d="M12 15V3.5M8 7l4-4 4 4"/><path d="M7 10.5H6a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6.5a2 2 0 0 0-2-2h-1"/>'),
+    mark:svg('<path d="M6.5 3.5h11v17L12 16l-5.5 4.5z"/>'),
+    book:svg('<path d="M3 5.5c3-1 6-.8 9 1 3-1.8 6-2 9-1V19c-3-1-6-.8-9 1-3-1.8-6-2-9-1z"/><path d="M12 6.5V20"/>'),
+    find:svg('<rect x="5" y="3" width="12" height="17" rx="2"/><circle cx="14.5" cy="15.5" r="3.2"/><path d="m17 18 3 3"/>'),
+    star:svg('<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8z"/>'),
+    plus:svg('<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>'),
+    zoom:svg('<circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5M10.5 8v5M8 10.5h5"/>'),
+    bell:svg('<path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15z"/><path d="M10 21h4"/>')
+  };
+  const row=(ic,label,hot)=>`<div class="mk-row${hot?' hot':' dim'}">${IC[ic]}<span>${label}</span>${hot?`<svg class="ios-arr l" viewBox="0 0 40 24" width="40" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M38 12H4M13 3 4 12l9 9"/></svg>`:''}</div>`;
+  const arrU='<svg class="ios-arr u" viewBox="0 0 24 40" width="24" height="40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 38V4M3 13l9-9 9 9"/></svg>';
+  const notSafari=/CriOS|FxiOS|EdgiOS|OPiOS/i.test(navigator.userAgent);
+  sheet(`<div class="sheet-head"><div><h2>Add Palate to your home screen</h2><p>Three taps in Safari. Takes ten seconds.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  ${notSafari?'<p class="ios-warn">You are not in Safari. Open this page in Safari first, then follow these steps.</p>':''}
+  <ol class="ios-steps">
+    <li><span class="ios-n">1</span><div><p>At the bottom of Safari, tap the <b>three lines</b> on the left of the address bar.</p>
+      <div class="mk mk-top"><div class="mk-bar"><span class="mk-b dim">‹</span><span class="mk-pill"><span class="mk-lines hot" aria-label="Three lines"><i></i><i></i><i></i></span><span class="mk-url">trypalate.github.io</span><span class="mk-rl">↻</span></span><span class="mk-b dim">⧉</span></div>${arrU.replace('class="ios-arr u"','class="ios-arr u pos1"')}</div></div></li>
+    <li><span class="ios-n">2</span><div><p>In the menu that pops up, tap <b>Share</b>.</p>
+      <div class="mk"><div class="mk-menu">${row('find','Translate Website…')}${row('share','Share',true)}${row('mark','Add to Bookmarks')}${row('book','Add Bookmark to…')}</div></div></div></li>
+    <li><span class="ios-n">3</span><div><p>Scroll down in the share sheet and tap <b>Add to Home Screen</b>, the last one in the list.</p>
+      <div class="mk"><div class="mk-menu">${row('book','Add Bookmark to…')}${row('star','Add to Favorites')}${row('find','Find on Page')}${row('plus','Add to Home Screen',true)}</div></div></div></li>
+    <li><span class="ios-n">4</span><div><p>If you see <b>Open as Web App</b>, leave it on. Tap <b>Add</b>, then open Palate from your home screen.</p></div></li>
+  </ol>
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Got it</button></div></div>`,'install');
 }
 const b64u = s => { const p='='.repeat((4-s.length%4)%4), r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(r,c=>c.charCodeAt(0)); };
