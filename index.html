@@ -318,6 +318,26 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .pk{border:0;border-radius:999px;background:var(--raise);padding:9px 14px;font-size:15px;font-weight:500;cursor:pointer}
 .pk:hover:not(:disabled){background:var(--text);color:var(--bg)}
 .pk:disabled{opacity:.35;cursor:default}
+
+/* unlocks */
+.pk.locked{position:relative;opacity:.6;display:inline-flex;align-items:center;gap:6px;background:var(--raise)}
+.pk-lock{display:inline-flex;width:13px;height:13px;color:var(--muted);font-style:normal}.pk-lock svg{width:13px;height:13px}
+.own-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.5px dashed var(--faint);background:transparent;color:var(--text);border-radius:16px;padding:12px 14px;margin-top:12px;cursor:pointer;font:inherit}
+.own-btn .plus{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--raise);font-size:20px}
+.own-btn b{display:block;font-size:15px}.own-btn small{color:var(--muted);font-size:13px}.own-btn .pk-lock{margin-left:auto}
+.own-ex{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.unl-card{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:var(--raise);color:var(--text);border-radius:16px;padding:12px 14px;margin-top:12px;cursor:pointer;font:inherit}
+.unl-ic{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--card);color:var(--muted);font-weight:700}.unl-ic svg{width:15px;height:15px}
+.unl-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.unl-main b{font-size:15px}.unl-main b em{font-style:normal;color:var(--muted);font-weight:500;font-size:13px;margin-left:4px}
+.unl-main>span{font-size:13px;color:var(--muted)}.unl-go{font-size:13px;color:var(--muted);white-space:nowrap}
+.unl-bar{height:6px;border-radius:99px;background:var(--card);overflow:hidden;margin-top:4px}.unl-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#6DB3FF,#3DDBC6);min-width:4px}
+.unl-bar.big{height:10px;margin:14px 0 6px}
+.unl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.unl-row{display:flex;gap:12px;background:var(--raise);border-radius:16px;padding:14px}.unl-row.done{opacity:.75}.unl-row.soon{opacity:.6}
+.unl-row .pill{align-self:flex-start;margin-top:8px}.unl-ok{color:#3DDBC6!important;font-weight:600}.unl-need{color:var(--text)!important}.unl-tip{margin-top:4px}
+.unl-prog{font-size:12px;color:var(--muted)}
+.unl-pop{text-align:center;padding:10px 4px 6px}.unl-pop h2{margin:10px 0 6px}
+.unl-burst{display:grid;place-items:center;width:64px;height:64px;margin:6px auto 0;border-radius:50%;background:linear-gradient(135deg,#6DB3FF,#3DDBC6);color:#fff}.unl-burst svg{width:28px;height:28px}
 .quick{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--raise);border-radius:16px;padding:14px 16px;margin-top:12px}
 .quick b{display:block;font-size:16px}
 .quick span{color:var(--muted);font-size:13.5px}
@@ -532,7 +552,7 @@ const CATS = [
  ['superheroes','Superheroes','Film & TV','square',0],['villains','Villains','Film & TV','square',0],['dinosaurs','Dinosaurs','Nature','wide',0],['catbreeds','Cat breeds','Nature','square',0],['flowers','Flowers','Nature','square',0],
  ['instruments','Instruments','Music','square',0],['languages','Languages','Life','wide',0],['proglangs','Programming languages','Life','square',0],
  ['hobbies','Hobbies','Life','wide',0],['subjects','School subjects','Life','wide',0],['holidays','Holidays','Life','wide',0],['seasons','Seasons','Life','wide',0],
- ['animals','Animals','Life','square',0],['dogs','Dog breeds','Life','square',0]
+ ['animals','Animals','Life','square',0],['dogs','Dog breeds','Nature','square',0]
 ].map(([id,name,group,shape,popular,photo])=>({id,name,group,shape,popular:!!popular,photo:!!photo}));
 /* Most-picked first. Everything not listed keeps its original order after these. */
 const POP = ['artists','albums','movies','tv','songs','games','anime','books','fastfood','countries','cities','celebrities','athletes','restaurants','brands','sneakers','cars','pokemon','fragrances','cocktails','influencers','actors','kdramas','characters','manga','podcasts','clubs','teams','drinks','snacks','desserts','cafes','tech','apps','mobilegames','boardgames','cuisines','pizza','icecream','sports','watches','hobbies','holidays','superheroes','villains','comedians','authors','musicals','painters','languages','proglangs','universities','wonders','themeparks','aircraft','motorcycles','airlines','mythology','civilizations','philosophers','scientists','weapons','dinosaurs','catbreeds','flowers','instruments','spirits','cheese','pasta'];
@@ -4086,6 +4106,1819 @@ Michigan Wolverines|College football`
 };
 const isNat = x => /[Ͱ-῿⺀-﷿ﹰ-￯]/.test(x||'');
 const segs = sub => String(sub||'').split(/\s*[·\/]\s*/);
+/* ---------- Models and trims: people are specific about vehicles and gear ("Taycan Turbo S", "911 (992) GT3 RS", "AK-47 Type 56").
+   One line each: Make|Model|Class|trim, trim, trim. Each line becomes the model itself plus one entry per trim. ---------- */
+const MODEL_SRC = {
+cars:`Porsche|911 (964)|Sports car|Carrera 2, Carrera 4, Carrera RS, Turbo 3.6, Speedster
+Porsche|911 (993)|Sports car|Carrera, Carrera S, Carrera 4S, Targa, Turbo, Turbo S, GT2
+Porsche|911 (996)|Sports car|Carrera, Carrera 4S, Targa, Turbo, Turbo S, GT3, GT3 RS, GT2
+Porsche|911 (997)|Sports car|Carrera S, Carrera 4S, Carrera GTS, Targa 4S, Turbo, Turbo S, GT3, GT3 RS, GT3 RS 4.0, GT2, GT2 RS, Speedster, Sport Classic
+Porsche|911 (991)|Sports car|Carrera, Carrera S, Carrera GTS, Targa 4 GTS, Turbo, Turbo S, GT3, GT3 RS, GT3 Touring, GT2 RS, R, Speedster
+Porsche|911 (992)|Sports car|Carrera, Carrera S, Carrera 4 GTS, Targa 4 GTS, Turbo, Turbo S, GT3, GT3 Touring, GT3 RS, Dakar, Sport Classic, S/T, GTS T-Hybrid
+Porsche|718 Cayman|Sports car|S, GTS 4.0, GT4, GT4 RS
+Porsche|718 Boxster|Roadster|S, GTS 4.0, Spyder, Spyder RS
+Porsche|Taycan|Electric sedan|4S, GTS, Turbo, Turbo S, Turbo GT, Turbo GT with Weissach Package, 4 Cross Turismo, Turbo Cross Turismo, 4S Sport Turismo, GTS Sport Turismo
+Porsche|Panamera|Luxury sedan|4, GTS, Turbo, Turbo S E-Hybrid, Turbo S Executive, 4 E-Hybrid
+Porsche|Macan|SUV|S, GTS, Turbo, Electric 4, Electric Turbo
+Porsche|Cayenne|SUV|S, GTS, Turbo, Turbo GT, Turbo E-Hybrid, Coupé
+Porsche|Carrera GT|Supercar|
+Porsche|918 Spyder|Hypercar|Weissach Package
+Porsche|959|Supercar|
+Porsche|356|Classic sports car|Speedster, Carrera 2, 1500 GS
+BMW|M2|Coupe|(F87) Competition, (F87) CS, (G87), (G87) CS
+BMW|M3 (E30)|Sports sedan|Sport Evolution, Cecotto
+BMW|M3 (E36)|Sports sedan|3.0, 3.2, GT
+BMW|M3 (E46)|Sports sedan|Coupe, Convertible, CSL, GTR
+BMW|M3 (E92)|Sports coupe|Coupe, GTS, Competition
+BMW|M3 (F80)|Sports sedan|Competition, CS, 30 Jahre
+BMW|M3 (G80)|Sports sedan|Competition, Competition xDrive, CS, Touring, Competition Touring
+BMW|M4|Sports coupe|(F82) Competition, (F82) GTS, (F82) CS, (G82) Competition, (G82) CSL, (G82) CS
+BMW|M5|Sports sedan|(E28), (E34), (E39), (E60), (F10) Competition, (F90) Competition, (F90) CS, (G90), Touring
+BMW|M6|Grand tourer|(E63), (F12), (F13) Gran Coupe
+BMW|M8|Grand tourer|Competition Coupe, Competition Gran Coupe, Competition Convertible
+BMW|1M|Sports coupe|Coupe
+BMW|2002|Classic sports sedan|Turbo, tii
+BMW|M1|Supercar|Procar
+BMW|Z4|Roadster|M40i, sDrive30i, M, Coupe M
+BMW|Z8|Roadster|
+BMW|i4|Electric sedan|M50, eDrive40
+BMW|i7|Electric sedan|M70 xDrive, xDrive60
+BMW|XM|SUV|Label, Label Red
+BMW|X5 M|SUV|Competition
+BMW|X6 M|SUV|Competition
+BMW|M240i|Coupe|xDrive
+BMW|M340i|Sedan|xDrive
+BMW|M550i|Sedan|xDrive
+BMW|M760Li|Luxury sedan|xDrive
+Mercedes-Benz|AMG GT|Sports car|, S, C, R, R Pro, Black Series, GT 43 4-Door, GT 53 4-Door, GT 63 4-Door, GT 63 S E Performance 4-Door, GT 63 Pro 4MATIC+ Coupe, GT 63 S E Performance
+Mercedes-Benz|SLS AMG|Supercar|Coupe, Roadster, GT3, Black Series, Electric Drive
+Mercedes-Benz|C 63 AMG|Sports sedan|(W204), (W204) Black Series, (W205) S, (W205) Coupe, (W205) Black Series, (W206) S E Performance
+Mercedes-Benz|E 63 AMG|Sports sedan|(W212), (W213) S, (W213) S Wagon
+Mercedes-Benz|S 63 AMG|Luxury sedan|, S 65 AMG, S 580, Maybach S 680
+Mercedes-Benz|G-Class|SUV|G 500, G 550, G 63 AMG, G 63 AMG 6x6, G 650 Landaulet, G 580 EQ, 4x4², 300 GD, 280 GE, G 55 AMG, G 500 Professional
+Mercedes-Benz|SL|Roadster|(W113) Pagoda, 300 SL Gullwing, 300 SL Roadster, (R107) 560 SL, (R129) SL 500, (R230) SL 65 AMG Black Series, (R232) SL 63
+Mercedes-Benz|CLK GTR|Hypercar|
+Mercedes-Benz|One-Eleven|Concept|
+Mercedes-Benz|A 45 AMG|Hot hatch|S 4MATIC+, (W176), (W177)
+Mercedes-Benz|CLA 45 AMG|Sedan|S 4MATIC+
+Mercedes-Benz|GLE 63 AMG|SUV|S Coupe, S
+Mercedes-Benz|GLS 600|SUV|Maybach
+Mercedes-Benz|EQS|Electric sedan|450+, 580 4MATIC, AMG 53, AMG 53 SUV
+Mercedes-Benz|Maybach|Luxury sedan|S 580, S 680, GLS 600, EQS 680 SUV
+Mercedes-Benz|190E|Classic sedan|2.5-16 Evolution II, 2.3-16, Cosworth
+Audi|R8|Supercar|V8, V10, V10 Plus, V10 Performance, V10 GT, V10 Spyder, LMS GT3, Decennium
+Audi|RS 3|Hot hatch|(8V), (8Y), (8Y) Sedan, Performance Edition
+Audi|RS 4|Wagon|(B5) Avant, (B7), (B8) Avant, (B9) Avant, (B9) Competition, Nogaro
+Audi|RS 5|Coupe|(B8), (B9), Competition, Sportback
+Audi|RS 6|Wagon|(C5) Avant, (C6) Avant, (C7) Avant Performance, (C8) Avant, (C8) Avant Performance, GT
+Audi|RS 7|Sportback|(C7) Performance, (C8), (C8) Performance
+Audi|RS Q8|SUV|, Performance
+Audi|RS e-tron GT|Electric sedan|, Performance
+Audi|e-tron GT|Electric sedan|quattro
+Audi|TT RS|Sports coupe|(8J), (8S), Roadster, Iconic Edition
+Audi|S3|Hot hatch|(8Y), Sedan
+Audi|S4|Sedan|(B9), Avant
+Audi|S5|Coupe|Sportback, Cabriolet
+Audi|S6|Sedan|Avant
+Audi|S8|Luxury sedan|(D5), Plus
+Audi|Quattro|Rally legend|Sport, S1, Ur-Quattro 20V
+Audi|Sport Quattro S1 E2|Rally car|
+Volkswagen|Golf GTI|Hot hatch|(Mk1), (Mk2), (Mk3), (Mk4), (Mk5) Edition 30, (Mk6), (Mk7) Performance, (Mk7.5) TCR, (Mk8) Clubsport, (Mk8) Edition 50, (Mk8.5)
+Volkswagen|Golf R|Hot hatch|(Mk5) R32, (Mk6), (Mk7), (Mk7.5), (Mk8), (Mk8) 20 Years, (Mk8.5) R Black Edition
+Volkswagen|Scirocco|Sports coupe|R, GT24, Mk1
+Volkswagen|Polo GTI|Hot hatch|, R WRC, G40
+Volkswagen|Beetle|Classic car|Type 1, Baja Bug, Herbie, Dune Buggy, 2012 Turbo R-Line
+Volkswagen|Bus|Classic van|T1 Samba, T2, T3 Syncro, Type 2 Westfalia, ID. Buzz
+Volkswagen|Karmann Ghia|Classic coupe|
+Volkswagen|Touareg|SUV|V10 TDI, R50, R
+Volkswagen|ID.4|Electric SUV|GTX
+Volkswagen|Phaeton|Luxury sedan|W12
+Volkswagen|Passat|Sedan|W8, R36
+Toyota|Supra|Sports car|(A40) 2000GT, (A60) Celica Supra, (A70) 3.0 Turbo, (A80) Twin Turbo, (A80) Targa, (A90) 3.0, (A90) 2.0, (A90) GR 45 Edition, (A91) Manual, (A91-CF) Edition
+Toyota|AE86|Classic coupe|Corolla Levin GT-S, Sprinter Trueno GT Apex, Sprinter Trueno 3-Door
+Toyota|GR86|Sports coupe|, Premium, Trueno
+Toyota|GR Yaris|Hot hatch|Circuit, Rally, Morizo Edition, GRMN
+Toyota|GR Corolla|Hot hatch|Core, Circuit, Premium, Morizo Edition
+Toyota|Celica|Sports coupe|GT-Four ST205, GT-Four ST185, Mk 1 GT, SS-II, TA22
+Toyota|MR2|Sports car|(AW11) Supercharged, (SW20) Turbo, (SW20) T-bar, (W30) Spyder
+Toyota|2000GT|Classic sports car|
+Toyota|Land Cruiser|SUV|FJ40, FJ60, FJ80, 100 Series, 200 Series GX, 200 Series VX, 70 Series, 250 Series, 300 Series GR Sport, 300 Series ZX, Prado, FJ Cruiser
+Toyota|4Runner|SUV|SR5, TRD Off-Road, TRD Pro, Limited, TRD Sport, Trailhunter
+Toyota|Tacoma|Pickup|TRD Pro, TRD Off-Road, TRD Sport, Trailhunter, SR5, Limited, Access Cab
+Toyota|Tundra|Pickup|TRD Pro, Capstone, 1794 Edition, Platinum, SR5
+Toyota|Sequoia|SUV|TRD Pro, Capstone, Platinum
+Toyota|Camry|Sedan|XSE, TRD, SE, Hybrid XSE
+Toyota|Corolla|Sedan|AE86, AE92 GT-S, E100, GR, Hybrid, Cross
+Toyota|Crown|Sedan|Signia, Platinum, S130, Majesta
+Toyota|Prius|Hybrid|Gen 1, Gen 2, Gen 3, Gen 4, Prime, Gen 5 XLE
+Toyota|Chaser|Sports sedan|Tourer V JZX100, Tourer V JZX90
+Toyota|Soarer|Grand tourer|JZZ30, UZZ32 Lexus SC400
+Toyota|GR010|Hypercar|Hybrid
+Toyota|Sera|Coupe|
+Toyota|Century|Luxury sedan|
+Toyota|Alphard|Minivan|
+Toyota|Hilux|Pickup|Invincible, Rogue, GR Sport, Revo, Arctic Trucks AT35
+Toyota|Highlander|SUV|Platinum
+Toyota|RAV4|SUV|Prime, TRD Off-Road, Adventure, Hybrid
+Toyota|Sienna|Minivan|Platinum
+Nissan|Skyline GT-R|Sports car|R32, R32 Nismo, R33, R33 V-Spec, R33 LM Limited, R34, R34 V-Spec, R34 V-Spec II Nür, R34 M-Spec, R34 Z-Tune, KPGC10 Hakosuka, KPGC110 Kenmeri
+Nissan|GT-R (R35)|Supercar|Premium, Black Edition, Track Edition, Nismo, Nismo Special Edition, T-spec, Skyline, Club Track, GT-R50 by Italdesign, SpecV, Egoist
+Nissan|Z|Sports car|(RZ34) Sport, (RZ34) Performance, (RZ34) Nismo, 370Z, 370Z Nismo, 350Z, 350Z Nismo, 300ZX Z32 Twin Turbo, 300ZX Z31, 280ZX, 280Z, 260Z, 240Z, Fairlady Z432
+Nissan|Silvia|Sports coupe|S13, S14, S14 Kouki, S15 Spec-R, S15 Spec-S, 200SX, 180SX, 240SX, PS13
+Nissan|Skyline|Sports sedan|R31 GTS-R, R32 GTS-t, R33 GTS25t, R34 25GT-t, V35 350GT, V36 370GT, ER34 25GT Turbo, Hakosuka 2000GT-R
+Nissan|Patrol|SUV|Y60, Y61, Y62, Nismo, Warrior, Safari, GQ, 160
+Nissan|Stagea|Wagon|260RS Autech, 25t RS Four S
+Nissan|Pulsar|Hot hatch|GTI-R, SSS
+Nissan|Leaf|Electric hatchback|Gen 1, Gen 2, Plus, Nismo
+Nissan|Ariya|Electric SUV|Nismo, Evolve+
+Nissan|Frontier|Pickup|Pro-4X
+Nissan|Titan|Pickup|Pro-4X
+Nissan|Navara|Pickup|Warrior, Pro-4X
+Nissan|Sentra|Sedan|SE-R Spec V, Nismo
+Nissan|Altima|Sedan|SR VC-Turbo
+Nissan|Maxima|Sedan|SE, Platinum
+Nissan|Juke|Crossover|Nismo RS
+Nissan|Figaro|Retro coupe|
+Nissan|Cedric|Luxury sedan|
+Honda|NSX|Supercar|NA1, NA1 Type R, NA2, NA2 Type S-Zero, NC1, NC1 Type S, GT3
+Honda|Civic Type R|Hot hatch|EK9, EP3, FD2, FN2, FK2, FK8, FK8 Limited Edition, FL5, FL5 Ultimate Edition
+Honda|Civic|Hatchback|EG6 SiR, EK9, EK4 Si, EM1 Si, EP3 Si, FG2 Si, 8th Gen Si, 9th Gen Si, 10th Gen Si, 11th Gen Si, Si, Sport Touring, Acoustic
+Honda|Integra|Sports coupe|DC2 Type R, DC2 GS-R, DB8 Type R, DC5 Type R, DC5 RSX, 2023 Type S, 2023 A-Spec, 2023 A-Spec Tech
+Honda|S2000|Roadster|AP1, AP2, CR, Ultimate Edition, Type V
+Honda|Prelude|Sports coupe|SiR, Type SH, Si VTEC, BB6, Si 4WS
+Honda|Accord|Sedan|Euro R CL1, Euro R CL7, Type R CH1, Coupe V6, Sport 2.0T, Hybrid Touring
+Honda|CR-X|Sports coupe|Si, Del Sol, SiR
+Honda|Beat|Kei roadster|
+Honda|S800|Classic roadster|
+Honda|CR-V|SUV|Hybrid Sport, Touring
+Honda|Odyssey|Minivan|Elite, Touring, Absolute
+Honda|Ridgeline|Pickup|Black Edition, TrailSport
+Honda|Pilot|SUV|TrailSport, Elite
+Honda|HR-V|Crossover|Sport
+Honda|e|Electric hatchback|Advance
+Honda|Fit|Hatchback|RS, Sport, GK5
+Honda|Passport|SUV|TrailSport
+Mazda|RX-7|Sports car|FB, FC3S Turbo II, FC3S Convertible, FD3S, FD3S Spirit R Type A, FD3S Type RS, FD3S Type R Bathurst, Efini
+Mazda|MX-5 Miata|Roadster|NA, NA Eunos Roadster, NB, NB 10th Anniversary, NB Mazdaspeed, NC, NC PRHT, ND, ND RF, ND Club, ND Grand Touring, ND 30th Anniversary, ND2, ND Sport, Miata Mk1 BRG, Miata Mazdaspeed
+Mazda|RX-8|Sports coupe|Shinka, R3, Spirit R, Type RS
+Mazda|Mazda3|Hatchback|Mazdaspeed3, Turbo, 2.5 Turbo Premium Plus, MPS, SP20
+Mazda|Mazda6|Sedan|Mazdaspeed6, Signature, Turbo
+Mazda|CX-5|SUV|Turbo, Signature, Carbon Edition
+Mazda|CX-30|SUV|Turbo
+Mazda|CX-50|SUV|Turbo
+Mazda|CX-90|SUV|PHEV, Turbo S, S Premium Plus
+Mazda|Cosmo|Classic coupe|Series II, 20B
+Mazda|MX-30|Electric crossover|
+Mazda|RX-Vision|Concept|
+Mazda|Savanna RX-3|Classic coupe|
+Mazda|Familia|Hatchback|GT-R, GT-X
+Mazda|787B|Race car|
+Subaru|Impreza WRX STI|Rally car|GC8, GC8 22B, GC8 Type R, GDB Blobeye, GDB Hawkeye, GDB Peanut Eye, GRB, GRF, VA, S207, S208, R205
+Subaru|WRX|Sports sedan|VB, VB Premium, VB GT, VA, VA Limited, GR, 2.0 RS
+Subaru|BRZ|Sports coupe|ZC6, ZD8, tS, Limited, Premium, Premium Series Purple
+Subaru|Legacy|Wagon|GT, Spec B, RS, Outback XT, 2.5 GT, Touring
+Subaru|Forester|SUV|XT, Wilderness, Sport, Premium
+Subaru|Outback|Wagon|XT, Wilderness, Onyx
+Subaru|Crosstrek|Crossover|Wilderness
+Subaru|SVX|Grand tourer|LSi
+Subaru|Baja|Pickup|Turbo
+Subaru|Solterra|Electric SUV|Touring
+Subaru|360|Kei car|
+Mitsubishi|Lancer Evolution|Rally car|I, II, III, IV, V, VI, VI Tommi Mäkinen Edition, VII, VIII, VIII MR, IX, IX MR, X, X GSR, X Final Edition, X FQ-400
+Mitsubishi|3000GT VR-4|Grand tourer|, Spyder, Dodge Stealth R/T Turbo
+Mitsubishi|Eclipse|Sports coupe|GSX, GS-T, Cross, Spyder GT, 2G GSX
+Mitsubishi|Pajero|SUV|Evolution, Dakar, Mini, Exceed, Sport, Montero Limited
+Mitsubishi|GTO|Grand tourer|
+Mitsubishi|Starion|Sports coupe|ESI-R
+Mitsubishi|Galant VR-4|Sports sedan|
+Mitsubishi|L200|Pickup|
+Mitsubishi|Eclipse Cross|SUV|
+Mitsubishi|Outlander|SUV|PHEV, GT
+Mitsubishi|Mirage|Hatchback|
+Mitsubishi|Delica|Van|D:5, Space Gear, Star Wagon
+Mitsubishi|Shogun Sport|SUV|
+Ford|Mustang|Muscle car|(1965) Fastback, (1967) Shelby GT500, (1968) Bullitt GT, (1969) Boss 429, (1969) Mach 1, (1969) Boss 302, (1970) Boss 302, (1993) SVT Cobra, (1996) SVT Cobra, (2001) Bullitt, (2003) SVT Cobra Terminator, Fox Body 5.0 GT, (SN95) GT, (2005) GT, (S197) GT, (S197) Boss 302, (S197) Shelby GT500, (S550) GT, (S550) GT350, (S550) GT350R, (S550) Shelby GT500, (S550) Mach 1, (S550) Bullitt, (S550) EcoBoost, (S650) GT, (S650) Dark Horse, (S650) GT Premium, Dark Horse SC, GTD, RTR, Mach-E GT
+Ford|Mustang Shelby|Muscle car|GT350, GT350R, GT500, GT500 Super Snake, GT500KR, Cobra Jet, Super Snake, 1965 GT350, 1966 GT350H, 1969 GT500
+Ford|GT|Supercar|(2005), (2017), (2017) Heritage Edition, GT40 Mk I, GT40 Mk II, GT40 Mk IV, GT Mk IV, (2022) Liquid Carbon, GT '66 Heritage Edition
+Ford|F-150|Pickup|Raptor, Raptor R, Lightning, Lightning Platinum, Tremor, King Ranch, Platinum, Lariat, XLT, STX, Limited, SVT Lightning (1999), SVT Lightning (2004), Harley-Davidson Edition, Shelby Super Snake, Roush, 1996 XLT
+Ford|Bronco|SUV|Raptor, Badlands, Wildtrak, Outer Banks, Big Bend, Black Diamond, Everglades, Heritage Edition, Sasquatch, Early Bronco, 1966 Bronco Sport, Bronco Sport Badlands, Bronco Sport Heritage, Bronco DR, 1978 Bronco, 1996 Eddie Bauer
+Ford|Focus|Hot hatch|RS Mk1, RS Mk2, RS500, RS Mk3, ST Mk2, ST Mk3, ST Mk4
+Ford|Fiesta|Hot hatch|ST, ST150, ST200, XR2, RS Turbo, XR2i, Zetec S, Mk1, Mk7 ST, Mk8 ST, ST Edition, Rally2, RS WRC
+Ford|Escort|Hot hatch|RS Cosworth, RS2000, RS Turbo, Mexico, XR3i, Mk1 RS1600, Mk2 RS1800
+Ford|RS200|Rally car|Evolution
+Ford|Sierra RS Cosworth|Sports sedan|RS500, 4x4, Sapphire
+Ford|Capri|Coupe|2.8i, RS3100, 3.0 S, 280 Brooklands, Mk1, Mk3 2.8 Injection
+Ford|Ranger|Pickup|Raptor, Wildtrak, Tremor, Lariat, XLT, FX4, Splash, STX
+Ford|Maverick|Pickup|Tremor, XLT, Lariat
+Ford|Explorer|SUV|ST, Platinum, Timberline, XLT, King Ranch, Limited, Sport, Eddie Bauer
+Ford|Expedition|SUV|Timberline, Platinum, King Ranch, Limited
+Ford|Thunderbird|Classic car|1955, 1957, 1966, 1989 Super Coupe, 2002 Retro, 1964
+Ford|Model T|Classic car|Touring, Runabout, Roadster
+Ford|Model A|Classic car|Roadster, Coupe, Tudor Sedan
+Ford|Galaxie|Classic car|500, 500 XL, Fastback
+Ford|Fairlane|Classic car|500, 427, Skyliner, Thunderbolt
+Ford|Torino|Muscle car|Cobra, GT, Talladega, Starsky & Hutch
+Ford|Fusion|Sedan|Sport, Titanium, Energi
+Ford|Taurus|Sedan|SHO, Limited
+Ford|Transit|Van|Custom, Connect, Trail, Trend, Sport
+Ford|E-Series|Van|E-350, Econoline
+Ford|Mustang Mach-E|Electric SUV|GT, GT Performance Edition, Rally, Premium, Select, California Route 1
+Ford|Probe|Sports coupe|GT
+Ford|Cortina|Sedan|Lotus, 1600E, MK2, Mk3 GXL
+Ford|Anglia|Classic car|105E, 1.0, 1.2
+Ford|Thunderbolt|Drag car|
+Ford|Ranchero|Classic coupe utility|GT, 500, Squire
+Ford|Falcon|Muscle car|XR6 Turbo, XR8, GT-HO, XW GT, XY GT-HO, FPV GT-F, F6 Typhoon
+Chevrolet|Corvette|Sports car|C1 (1953), C1 (1962), C2 Sting Ray (1963), C2 Z06 (1963), C3 Stingray (1968), C3 L88 (1967), C3 ZR-1 (1970), C4 (1984), C4 Grand Sport (1996), C4 ZR-1 (1990), C4 Collector Edition (1996), C5 (1997), C5 Z06 (2001), C5 Z06 (2004), C6 (2005), C6 Grand Sport, C6 Z06, C6 ZR1 (2009), C6 Z06 Carbon Edition, C7 Stingray (2014), C7 Grand Sport, C7 Z06, C7 ZR1, C7 Z06 Carbon 65 Edition, C8 Stingray (2020), C8 Z51, C8 Z06 (2023), C8 E-Ray, C8 ZR1 (2025), C8 Z06 Z07 Package, C8 Stingray Convertible, C8 Z06 Convertible, C8 Grand Sport (2024)
+Chevrolet|Camaro|Muscle car|(1967) SS 396, (1969) Z/28, (1969) ZL1, (1969) COPO 427, (1969) Yenko, (1970) Z28, (1979) Z28, (1982) Z28, (1985) IROC-Z, (1990) Z28 25th, (1993) Z28 SS, (1998) SS, (2002) SS, (2010) SS, (2010) SS 1LE, (2012) ZL1, (2014) Z/28, (2016) SS, (2016) SS 1LE, (2016) ZL1, (2017) ZL1 1LE, (2018) ZL1 Collector's Edition, (2019) ZL1 1LE, 1LE, SS, ZL1, ZL1 1LE, LT1, RS, Z/28, Yenko, Collector's Edition Final Edition (2024)
+Chevrolet|Chevelle|Muscle car|SS 396, SS 454, SS 427 COPO, Malibu SS, Malibu Super Sport LS6, 1970 SS 454 LS6, 1966, 1968, 1969, 1970, 1971, 1972
+Chevrolet|Impala|Classic car|SS 1996, SS 427, SS 1958, SS 409, SS 1964, SS 1965, SS 1966, SS 1967, SS 1969, 1959, 1961, 1963, Lowrider
+Chevrolet|Bel Air|Classic car|1953, 1955, 1957, 1957 Nomad, 1956, 1957 Convertible, 1957 Hardtop, 1954
+Chevrolet|El Camino|Classic coupe utility|SS 396, SS 454, 1959, 1964, 1969, 1970, 1971, 1978
+Chevrolet|Nova|Muscle car|SS 396, SS 350, Yenko Nova, 1968, 1969, 1970, 1971, 1972
+Chevrolet|C10|Pickup|1957, 1967, 1972, 1969, 1970, 1971, 1973, Cheyenne, Apache, Custom, Restomod
+Chevrolet|Silverado|Pickup|ZR2, LT Trail Boss, High Country, RST, LTZ, LS, 1500 Z71, 2500HD, 3500HD, Custom, WT, EV, EV RST, Work Truck, Trail Boss, 454 SS
+Chevrolet|Tahoe|SUV|Z71, RST, LT, Premier, High Country, LS, Police, Midnight Edition
+Chevrolet|Suburban|SUV|Z71, RST, LT, Premier, High Country, LS, Midnight Edition
+Chevrolet|Blazer|SUV|K5, SS, RS, Premier, Z71, LT, EV, 1969, 1976
+Chevrolet|Colorado|Pickup|ZR2, ZR2 Bison, Trail Boss, Z71, Work Truck, LT, Extreme
+Chevrolet|Camaro Z28|Muscle car|1967, 1969, 1970, 1977, 1979, 1985, 1990, 2014
+Chevrolet|Monte Carlo|Coupe|SS, 1970, 1987 SS, 1995, 2006 SS
+Chevrolet|Bolt|Electric hatchback|EV, EUV, Premier
+Chevrolet|Equinox|SUV|Premier, EV, RS
+Chevrolet|Trax|Crossover|
+Chevrolet|Cobalt SS|Compact|Supercharged, Turbocharged, Coupe
+Chevrolet|SSR|Retro pickup|
+Chevrolet|HHR SS|Compact|
+Dodge|Charger|Muscle car|(1969) General Lee, (1969) R/T 440, (1969) Daytona, (1970) R/T 440 Six Pack, (1971) Super Bee, R/T, Scat Pack, Scat Pack Widebody, SRT Hellcat, SRT Hellcat Redeye, SRT Hellcat Jailbreak, SRT 392, SRT Super Stock, Super Bee, King Daytona, Last Call, Daytona R/T, Daytona Scat Pack, Daytona Sixpack, Daytona EV
+Dodge|Challenger|Muscle car|(1970) R/T, (1970) T/A, (1970) Hemi, (1970) 440 Six Pack, (1971) R/T, R/T, R/T Scat Pack, Scat Pack Widebody, SRT 392, SRT Hellcat, SRT Hellcat Redeye, SRT Super Stock, SRT Demon, SRT Demon 170, SRT Hellcat Jailbreak, T/A, T/A 392, Black Ghost, Swinger, Shakedown, GT AWD, SXT, Direct Connection, Last Call
+Dodge|Viper|Sports car|RT/10, GTS, ACR, SRT-10, SRT-10 ACR, GTS-R, ACR Voodoo II, ACR Extreme, GTS ACR (1999), RT/10 Gen 1, Gen 2, Gen 3, Gen 4, Gen 5, TA 2.0, VX I, VX II, Final Edition, Snake Skin, Mamba, Time Attack, Competition Coupe, Venom 800, Stryker, Time Attack Edition
+Dodge|Ram|Pickup|TRX, TRX Launch Edition, TRX Sandblast, 1500 Rebel, 1500 Big Horn, 1500 Laramie, 1500 Limited, 1500 Tungsten, 2500 Power Wagon, 2500 Laramie, 3500 Limited Longhorn, SRT-10, Warlock, Night Edition, Ramcharger, RHO, 1500 REV, Hellcat
+Dodge|Durango|SUV|SRT Hellcat, SRT 392, R/T, GT, Citadel, Pursuit, Hemi, Brotherhood
+Dodge|Demon|Drag car|170
+Dodge|Dart|Compact|GT, SRT4, Swinger, Demon, Aero, 1968 Hemi Dart, 340, 1972 Demon
+Dodge|Coronet|Muscle car|Super Bee, R/T, 440, Hemi
+Dodge|Super Bee|Muscle car|1969, 1970, 1971, Six Pack, 440, 2007
+Dodge|Daytona|Muscle car|Shelby Z, Turbo Z, 1969, Charger Daytona R/T, Daytona Shelby
+Dodge|Neon|Compact|SRT-4, R/T, ACR, Sport, 2003 SRT-4
+Dodge|Magnum|Wagon|SRT8, R/T, 2005
+Dodge|Stealth|Sports car|R/T Turbo, ES
+Dodge|Hornet|Crossover|R/T, GT, GT Plus
+Dodge|Caravan|Minivan|Grand, 1984, SXT, Sport, GT
+Dodge|Power Wagon|Pickup|1500, 2500, 1946, WM300, Crew Cab
+Dodge|Ramcharger|SUV|1974, 1980, 1990
+Dodge|Dakota|Pickup|R/T, Sport, SLT, Club Cab
+Dodge|Polara|Classic car|500, D500, Super Stock
+Jeep|Wrangler|SUV|Rubicon, Rubicon 392, Rubicon 4xe, Sahara, Sport, Sport S, Willys, Willys Sport, Unlimited, Moab, TJ, JK, JL, YJ, Mojave, Rubicon X, Sahara 4xe, High Altitude, 41 Edition, Islander, Wrangler 4xe Willys, Sport S 4xe, Overland, Freedom, Rubicon 20th Anniversary
+Jeep|Grand Cherokee|SUV|Trackhawk, SRT, SRT8, Summit, Summit Reserve, Overland, Limited, Laredo, L, 4xe, Altitude, Trailhawk, WK2, WJ, ZJ, ZJ Orvis, 1993 Limited, Grand Wagoneer
+Jeep|Cherokee|SUV|XJ, XJ Sport, XJ Classic, Trailhawk, Limited, Latitude, KL, Pioneer, SJ Chief, 1984, Laredo
+Jeep|Gladiator|Pickup|Rubicon, Mojave, Overland, Sport, Willys, High Altitude, Sport S, Mojave X, Freedom, Texas Trail, 80th Anniversary
+Jeep|Wagoneer|SUV|Grand Wagoneer, Series II, Series III, Carbide, Obsidian, L, Super Wagoneer, Original SJ, SJ Panel
+Jeep|CJ|Classic SUV|CJ-5, CJ-7, CJ-8 Scrambler, Renegade, Laredo, Golden Eagle, CJ-2A, CJ-3B, CJ-6
+Jeep|Willys MB|Military jeep|
+Jeep|Renegade|Crossover|Trailhawk
+Jeep|Compass|Crossover|Trailhawk
+Jeep|Commander|SUV|Overland
+Jeep|Patriot|SUV|
+Jeep|Liberty|SUV|Renegade
+Jeep|Comanche|Pickup|MJ
+Jeep|Avenger|Electric SUV|
+Jeep|Recon|Electric SUV|
+Jeep|Cherokee XJ|SUV|Pioneer, Country, Sport, Limited, Orvis
+Pontiac|Firebird|Muscle car|Trans Am, Trans Am Ram Air IV, Trans Am Ram Air III, Formula, Esprit, Trans Am WS6, Trans Am SD-455, Trans Am Turbo, Trans Am 20th Anniversary, Trans Am GTA, Trans Am Y84, Trans Am Bandit, Trans Am Pace Car, 1969, 1973, 1977, 1979, 1981, 1987, 1993, 2002 Collector Edition
+Pontiac|GTO|Muscle car|(1964), (1966), (1969) Judge, (1969) Ram Air IV, (1970) Judge, (2004), (2006), Judge Ram Air III, Ram Air IV, Tiger, Royal Bobcat, 1965, 1967, 1968, 1971, 1972, 2005
+Pontiac|Grand Prix|Coupe|SJ, GTP, 1969, 1977, 1987 2+2, Turbo, 1989 Turbo, GXP
+Pontiac|Solstice|Roadster|GXP, Coupe GXP
+Pontiac|G8|Sedan|GT, GXP
+Pontiac|Fiero|Sports car|GT, SE, Formula, Mera
+Pontiac|Bonneville|Classic car|1959, 1961, 1964, 1965, SSEi
+Pontiac|Grand Am|Sedan|GT, Ram Air, SE
+Pontiac|Trans Sport|Minivan|
+Pontiac|Aztek|Crossover|
+Plymouth|'Cuda|Muscle car|426 Hemi, 440 Six Pack, 340, AAR, 1970 Hemi, 1971 Hemi, 1970 440, 1971 440, 1972, 1973, 1974
+Plymouth|Barracuda|Muscle car|Formula S, 1964, 1965, 1966, 1967, 1968, 1969, Hemi, 1970
+Plymouth|Road Runner|Muscle car|426 Hemi, 440 Six Pack, 383, Superbird, 1968, 1969, 1970, 1971, 1972, 1973, 1974
+Plymouth|Superbird|Muscle car|426 Hemi, 440 Six Pack, 440
+Plymouth|GTX|Muscle car|426 Hemi, 440, 1967, 1968, 1969, 1970, 1971
+Plymouth|Duster|Muscle car|340, 1970, 1972, 1973, 1974
+Plymouth|Fury|Classic car|Christine, 1958, 1959, 1962, 1965, 1969, 1971, 1976
+Plymouth|Prowler|Retro roadster|
+Plymouth|Valiant|Classic car|Signet, 1960, 1964, 1967, 1970, Scamp
+Plymouth|Satellite|Muscle car|Sebring, 1967, 1969, 1970, 1971
+Plymouth|Belvedere|Classic car|
+Oldsmobile|442|Muscle car|W-30, W-31, 1968, 1969, 1970, 1971, 1972, 1985 Hurst/Olds
+Oldsmobile|Cutlass|Muscle car|Supreme, 442, Hurst/Olds, Calais, 1970, 1972, 1985
+Oldsmobile|Toronado|Luxury coupe|1966, 1971, 1976, 1986, Trofeo
+Buick|Grand National|Muscle car|GNX, T-Type, Turbo T, 1982 Regal, 1984, 1986, 1987, Gran Sport
+Buick|Regal|Sedan|GS, GNX, Turbo, 1987, 1971 GSX, 2018 GS, 2011 GS
+Buick|Riviera|Luxury coupe|1963, 1965 Gran Sport, 1971 Boattail, 1995, 1979
+Buick|Skylark|Classic car|GS, 1970 GS Stage 1, 1971, 1964, 1953
+Buick|GSX|Muscle car|Stage 1, 1970, 1971, 455
+Buick|Encore GX|Crossover|Avenir, Essence, Sport Touring
+Buick|Enclave|SUV|Avenir, Essence
+Buick|Envision|SUV|Avenir
+Buick|Roadmaster|Sedan|Estate Wagon, 1949, 1957, 1992
+Buick|LeSabre|Sedan|T-Type, Custom
+Buick|Wildcat|Classic car|
+Cadillac|CTS-V|Sports sedan|(2004), (2009), Coupe, Wagon, (2016)
+Cadillac|CT5-V Blackwing|Sports sedan|, V-Series, Manual
+Cadillac|CT4-V Blackwing|Sports sedan|, V-Series
+Cadillac|ATS-V|Sports sedan|Coupe, Sedan
+Cadillac|Escalade|SUV|V, ESV, Platinum, Sport, Premium Luxury, Escalade IQ, 2002, 2007 EXT, 2022, 2025
+Cadillac|Eldorado|Luxury car|1959, 1967, 1976 Fleetwood Convertible, 1971, 1993, 1959 Biarritz, Tiffany
+Cadillac|DeVille|Luxury car|1959, 1965, 1971, 1976, Coupe de Ville, Sedan de Ville, 1969, 1975
+Cadillac|Fleetwood|Luxury car|Brougham, Limousine, 1976
+Cadillac|Lyriq|Electric SUV|V, Luxury, Sport
+Cadillac|Celestiq|Electric luxury sedan|
+Cadillac|XLR|Roadster|V
+Cadillac|Allante|Roadster|
+Cadillac|SRX|SUV|
+Cadillac|XT5|SUV|Sport
+Lincoln|Continental|Luxury car|1961, 1965 Suicide Doors, 1969, 1976, 2017, Mark IV, Mark VIII, Mark III
+Lincoln|Navigator|SUV|Black Label, Reserve, L, Premier
+Lincoln|Town Car|Luxury car|Signature, Cartier
+Lincoln|Aviator|SUV|Grand Touring, Black Label
+Lincoln|LS|Sedan|V8
+Lincoln|Mark LT|Pickup|
+Lincoln|Nautilus|SUV|
+Chrysler|300|Sedan|C, SRT8, SRT-8, 300C Hemi, 300 Motown, 300 Touring, 1955 C300, 1970 Hurst, 300 S
+Chrysler|Pacifica|Minivan|Hybrid, Pinnacle, Limited
+Chrysler|PT Cruiser|Hatchback|GT, Turbo, Woodie, Dream Cruiser
+Chrysler|Crossfire|Sports coupe|SRT-6
+Chrysler|Voyager|Minivan|
+Chrysler|Imperial|Luxury car|1957, 1963, 1965
+Chrysler|Town & Country|Minivan|Woodgrain
+Chrysler|Airflow|Classic car|1934
+Chrysler|LeBaron|Convertible|
+Chrysler|Sebring|Convertible|
+DeLorean|DMC-12|Sports car|, Back to the Future
+AC|Cobra|Sports car|289, 427, 427 S/C, Dragonsnake, Daytona Coupe, 427 CSX, MKIV, Continuation
+Shelby|Cobra|Sports car|427, 289, 427 S/C, Daytona Coupe, Super Snake, CSX, Continuation, 427 Super Snake, Series 1, 1965 Cobra
+Shelby|Series 1|Roadster|
+Shelby|Super Snake|Muscle car|GT500, 1967 GT500 Super Snake, 2006 GT500 Super Snake, 2013 GT500 Super Snake
+Hennessey|Venom GT|Hypercar|, F5, Velociraptor, Mammoth, Exorcist, Goliath, Trailblazer, Venom F5 Roadster
+SSC|Tuatara|Hypercar|, Ultimate Aero, Ultimate Aero TT, Ultimate Aero XT, North America
+Saleen|S7|Supercar|Twin Turbo, LM, Competition, S281, S302, Mustang, S1
+Rezvani|Beast|Sports car|Tank, Hercules
+Panoz|Esperante|Sports car|GTLM, GTS, GT, Abruzzi, AIV Roadster
+Vector|W8|Supercar|WX-8, M12, Avtech
+Mosler|MT900|Supercar|S, GTR, Photon
+Fisker|Karma|Plug-in luxury sedan|Revero, Ocean, Ronin, Ocean One
+Rivian|R1T|Electric pickup|Adventure, Launch Edition, Quad-Motor, Dual-Motor, Max Pack, Quad, Explore, Tri-Motor, Gen 2
+Rivian|R1S|Electric SUV|Adventure, Quad-Motor, Launch Edition, Tri-Motor, Gen 2, Explore, Dual-Motor
+Rivian|R2|Electric SUV|
+Rivian|R3|Electric hatchback|R3X
+Lucid|Air|Electric sedan|Pure, Touring, Grand Touring, Grand Touring Performance, Sapphire, Dream Edition, Air Pure, Air Touring, Air Grand Touring
+Lucid|Gravity|Electric SUV|Touring, Grand Touring, Dream Edition
+Polestar|2|Electric sedan|Long Range Single Motor, Long Range Dual Motor, Performance, BST 270, Launch Edition
+Polestar|3|Electric SUV|Long Range Dual Motor, Performance
+Polestar|4|Electric SUV|
+Polestar|1|Plug-in hybrid coupe|
+Tesla|Model S|Electric sedan|Long Range, Plaid, Plaid+, Performance, P100D, P90D, 85D, 60, 85, P85, Signature, Raven, 70D, 75D, 100D, Founders
+Tesla|Model 3|Electric sedan|Long Range, Performance, Standard Range Plus, Highland, Highland Performance, Rear-Wheel Drive, Standard Range, Mid Range, Long Range AWD, Dual Motor
+Tesla|Model X|Electric SUV|Long Range, Plaid, Performance, P100D, Founders Series, 100D, 75D, 90D, Long Range Plus
+Tesla|Model Y|Electric SUV|Long Range, Performance, Standard Range, Juniper, Launch Series, Rear-Wheel Drive, Long Range RWD, Premium
+Tesla|Cybertruck|Electric pickup|AWD, Cyberbeast, Foundation Series, Rear-Wheel Drive, Long Range
+Tesla|Roadster|Electric sports car|(2008), (2020), Sport, Founders Series, 2.0, 2.5
+Tesla|Semi|Electric truck|
+Ferrari|F40|Supercar|LM, Competizione
+Ferrari|F50|Supercar|GT
+Ferrari|Enzo|Supercar|FXX, FXX-K Evo, Enzo Ferrari
+Ferrari|LaFerrari|Hypercar|Aperta, FXX K
+Ferrari|250|Classic grand tourer|GTO, GT California Spyder, GT SWB, Testa Rossa, GT Lusso, GT Berlinetta, LM
+Ferrari|275|Classic grand tourer|GTB/4, GTS/4 NART, GTB
+Ferrari|365|Classic grand tourer|GTB/4 Daytona, GTS/4, GT4 BB
+Ferrari|512|Supercar|BB, BBi, TR, M
+Ferrari|308|Sports car|GTB, GTS, GTBi, GTSi Quattrovalvole, GTB Vetroresina
+Ferrari|328|Sports car|GTB, GTS
+Ferrari|348|Sports car|tb, ts, GTB, Spider, Challenge, Serie Speciale
+Ferrari|355|Sports car|F1 Berlinetta, GTS, Spider, Challenge, Serie Fiorano
+Ferrari|360|Sports car|Modena, Spider, Challenge Stradale
+Ferrari|F430|Sports car|Spider, Scuderia, Scuderia 16M, Challenge, F1
+Ferrari|458|Sports car|Italia, Spider, Speciale, Speciale A, Challenge, GT3
+Ferrari|488|Sports car|GTB, Spider, Pista, Pista Spider, GT3, Challenge, Challenge Evo
+Ferrari|F8|Sports car|Tributo, Spider
+Ferrari|296|Sports car|GTB, GTS, GT3, Challenge, Speciale
+Ferrari|SF90|Hypercar|Stradale, Spider, XX Stradale, XX Spider, Assetto Fiorano
+Ferrari|Testarossa|Supercar|, F512 M, Monospecchio
+Ferrari|Mondial|Sports car|8, 3.2, t, Cabriolet
+Ferrari|Dino|Sports car|246 GT, 246 GTS, 206 GT, 308 GT4
+Ferrari|456|Grand tourer|GT, GTA, M GT, M GTA
+Ferrari|550 Maranello|Grand tourer|, Barchetta, GTZ
+Ferrari|575M Maranello|Grand tourer|Superamerica, HGTC
+Ferrari|599|Grand tourer|GTB Fiorano, GTO, SA Aperta, HGTE
+Ferrari|612 Scaglietti|Grand tourer|OneP
+Ferrari|F12|Grand tourer|Berlinetta, tdf
+Ferrari|812|Grand tourer|Superfast, GTS, Competizione, Competizione A
+Ferrari|California|Grand tourer|, T, 30
+Ferrari|Portofino|Grand tourer|, M
+Ferrari|Roma|Grand tourer|, Spider
+Ferrari|GTC4Lusso|Grand tourer|T
+Ferrari|FF|Grand tourer|
+Ferrari|Purosangue|SUV|
+Ferrari|12Cilindri|Grand tourer|, Spider
+Ferrari|Daytona SP3|Hypercar|
+Ferrari|F80|Hypercar|
+Ferrari|Monza SP1|Speedster|SP2
+Ferrari|Superamerica|Grand tourer|
+Ferrari|Amalfi|Grand tourer|
+Lamborghini|Miura|Supercar|P400, P400S, P400 SV, Jota, Roadster
+Lamborghini|Countach|Supercar|LP400, LP400 S, LP500 S, 5000 QV, 25th Anniversary, LPI 800-4, LP5000 S
+Lamborghini|Diablo|Supercar|, VT, SV, GT, GTR, 6.0 SE, VT Roadster, SE30, Jota
+Lamborghini|Murciélago|Supercar|LP640, LP640 Roadster, LP670-4 SuperVeloce, Reventón
+Lamborghini|Gallardo|Supercar|LP560-4, LP570-4 Superleggera, LP570-4 Performante, Spyder, LP550-2 Valentino Balboni, LP560-4 Bicolore, Squadra Corse, Superleggera, Super Trofeo Stradale
+Lamborghini|Aventador|Supercar|LP700-4, LP700-4 Roadster, S, SV, SVJ, SVJ Roadster, Ultimae, J, LP750-4 SuperVeloce, LP780-4 Ultimae, Miura Homage
+Lamborghini|Huracán|Supercar|LP610-4, LP580-2, Performante, Performante Spyder, EVO, EVO RWD, STO, Tecnica, Sterrato, EVO Spyder, Super Trofeo EVO2, Super Trofeo, GT3 EVO2
+Lamborghini|Urus|SUV|, S, Performante, SE
+Lamborghini|Revuelto|Hybrid supercar|, Opera Unica
+Lamborghini|Temerario|Hybrid supercar|
+Lamborghini|Veneno|Hypercar|Roadster
+Lamborghini|Sián|Hypercar|FKP 37, Roadster
+Lamborghini|Centenario|Hypercar|Roadster
+Lamborghini|Reventón|Hypercar|Roadster
+Lamborghini|Jalpa|Sports car|P350
+Lamborghini|LM002|SUV|
+Lamborghini|Espada|Grand tourer|Series I, Series II, Series III
+Lamborghini|Jarama|Grand tourer|
+Lamborghini|Silhouette|Sports car|
+McLaren|F1|Hypercar|GT, LM, GTR, Longtail
+McLaren|P1|Hypercar|GTR, LM
+McLaren|Senna|Hypercar|GTR, LM
+McLaren|Speedtail|Hypercar|
+McLaren|Elva|Roadster|
+McLaren|Artura|Hybrid supercar|Spider, Trophy
+McLaren|570S|Sports car|Spider, GT4, Coupe, 570GT
+McLaren|600LT|Sports car|Spider
+McLaren|620R|Sports car|
+McLaren|650S|Sports car|Spider, GT3, Can-Am
+McLaren|675LT|Sports car|Spider
+McLaren|720S|Sports car|Spider, GT3, GT3X, Le Mans
+McLaren|750S|Sports car|Spider
+McLaren|765LT|Sports car|Spider
+McLaren|GT|Grand tourer|
+McLaren|MP4-12C|Sports car|Spider, GT3
+McLaren|W1|Hypercar|
+McLaren|Solus GT|Track car|
+McLaren|GTS|Grand tourer|
+McLaren|Sabre|Hypercar|
+Aston Martin|DB5|Classic grand tourer|, Vantage, Convertible, Goldfinger, Skyfall, Continuation
+Aston Martin|DB4|Classic grand tourer|GT Zagato, GT, Series V
+Aston Martin|DB6|Classic grand tourer|Volante, Mk2
+Aston Martin|DB7|Grand tourer|Vantage, GT, Zagato, Volante
+Aston Martin|DB9|Grand tourer|Volante, GT, GT Bond Edition
+Aston Martin|DB11|Grand tourer|V8, V12, AMR, Volante
+Aston Martin|DB12|Grand tourer|Volante, S
+Aston Martin|DBS|Grand tourer|Superleggera, 770 Ultimate, Volante, V12
+Aston Martin|Vantage|Sports car|V8, V12, AMR, F1 Edition, GT8, GT12, Roadster, Zagato, Heritage, V600, V550, GT4, GT3, Le Mans, V8 Vantage S, N430, Sport, V12 S
+Aston Martin|Vanquish|Grand tourer|S, Zagato, Volante, Ultimate, 25th Anniversary
+Aston Martin|Valkyrie|Hypercar|Spider, AMR Pro
+Aston Martin|Valhalla|Hybrid supercar|
+Aston Martin|Rapide|Sedan|S, AMR, Luxe, Bertone Jet 2+2
+Aston Martin|One-77|Hypercar|
+Aston Martin|Victor|One-off hypercar|
+Aston Martin|Cygnet|City car|
+Aston Martin|Lagonda|Luxury sedan|Taraf, Vignale
+Aston Martin|DBX|SUV|707
+Aston Martin|Virage|Grand tourer|Volante, Shooting Brake
+Aston Martin|V8 Vantage|Classic supercar|Series I, Oscar India, Zagato, Le Mans
+Aston Martin|DBS|Grand tourer|Casino Royale, Skyfall, V12, 1967 DBS
+Bentley|Continental GT|Grand tourer|Speed, V8, Azure, Mulliner, W12, GTC, Supersports, GT3-R, Speed Convertible, GT Speed 2022, Number 9 Edition, Mulliner W12, GT Speed 12
+Bentley|Flying Spur|Luxury sedan|Speed, V8, Mulliner, Hybrid, W12 First Edition, Azure
+Bentley|Bentayga|SUV|Speed, EWB, Azure, V8, S, Hybrid, Mulliner, EWB Azure, Extended Wheelbase
+Bentley|Mulsanne|Luxury sedan|Speed, EWB, 6.75 Edition, Grand Limousine
+Bentley|Arnage|Luxury sedan|R, T, Red Label, Green Label, Final Series
+Bentley|Azure|Luxury convertible|
+Bentley|Batur|Grand tourer|
+Bentley|Bacalar|Roadster|
+Bentley|Speed 6|Race car|
+Bentley|Turbo R|Luxury sedan|
+Bentley|S1|Classic car|Continental
+Bentley|R-Type|Classic car|Continental
+Bentley|Blower|Race car|Number 1, Team Car
+Rolls-Royce|Phantom|Luxury sedan|VII, VIII, EWB, Drophead Coupé, Coupe, Series II, Oribe, Tempus, Scintilla, Black Badge, Extended, Extended Wheelbase
+Rolls-Royce|Ghost|Luxury sedan|Series II, Black Badge, Extended, EWB, Zenith, Series I
+Rolls-Royce|Cullinan|SUV|Black Badge, Series II, Mansory, Black Badge Series II
+Rolls-Royce|Wraith|Grand tourer|Black Badge, Luminary, Inspired by Music, Kryptos
+Rolls-Royce|Dawn|Convertible|Black Badge, Aero Cowling, Silver Bullet
+Rolls-Royce|Spectre|Electric coupe|Black Badge, Series II
+Rolls-Royce|Silver Shadow|Classic luxury sedan|II, I, Long Wheelbase
+Rolls-Royce|Silver Ghost|Classic luxury car|
+Rolls-Royce|Silver Cloud|Classic luxury sedan|I, II, III, Drophead
+Rolls-Royce|Corniche|Classic convertible|Series I, II, III, IV, V, Coupé
+Rolls-Royce|Camargue|Luxury coupe|
+Rolls-Royce|Silver Spur|Luxury sedan|II, III, IV
+Rolls-Royce|Boat Tail|Coachbuild|
+Rolls-Royce|Sweptail|Coachbuild|
+Rolls-Royce|Droptail|Coachbuild|La Rose Noire, Amethyst, Arcadia
+Bugatti|Veyron|Hypercar|16.4, Grand Sport, Grand Sport Vitesse, Super Sport, Pur Sang, L'Or Blanc, Legends, Centenaire, Vitesse, World Record Edition, Mansory, Rembrandt
+Bugatti|Chiron|Hypercar|Sport, Super Sport, Super Sport 300+, Pur Sport, Profilée, Noire, Divo, Centodieci, Chiron Super Sport, Pur Sport Grand Prix, Hermès Edition, Chiron 110 Ans, Chiron L'Ébé, Chiron Noire Sportive, Chiron Super Sport 57 One of One
+Bugatti|Mistral|Roadster|
+Bugatti|Tourbillon|Hybrid hypercar|
+Bugatti|Bolide|Track hypercar|
+Bugatti|EB110|Supercar|GT, Super Sport
+Bugatti|Divo|Hypercar|
+Bugatti|La Voiture Noire|One-off hypercar|
+Bugatti|Type 57|Classic car|SC Atlantic, Atalante, Aérolithe
+Bugatti|Type 35|Classic race car|
+Bugatti|Centodieci|Hypercar|
+Koenigsegg|Agera|Hypercar|R, S, RS, RS1, Final, One:1, Hundra, Thor
+Koenigsegg|Regera|Hypercar|
+Koenigsegg|Jesko|Hypercar|Attack, Absolut, Gemera, Absolut Jesko
+Koenigsegg|CC850|Hypercar|
+Koenigsegg|CCX|Hypercar|R, CCXR, CCXR Trevita
+Koenigsegg|CCR|Hypercar|
+Koenigsegg|CC8S|Hypercar|
+Koenigsegg|Gemera|Hybrid hypercar|
+Koenigsegg|One:1|Hypercar|
+Koenigsegg|Sadair's Spear|One-off hypercar|
+Pagani|Zonda|Hypercar|C12, S, F, Cinque, R, Tricolore, Revolucion, 760 RS, 760 LH, 760 RSR, 760, Aether, Roadster
+Pagani|Huayra|Hypercar|, Roadster, BC, R, Imola, Codalunga, Tricolore, Roadster BC, Dinastia
+Pagani|Utopia|Hypercar|Roadster, Coupe, Carbon
+Pagani|Imola|Hypercar|
+Pagani|Cinque|Hypercar|
+Lotus|Elise|Sports car|S1, S2, S3, Sport 190, Cup 250, Cup 260, Type 49, 111S, Series 1, 340R, Sport 220, Sprint, Final Edition
+Lotus|Exige|Sports car|S1, S2, S3, V6 Cup, Sport 350, Cup 430, Cup 380, 360 Cup, Sport 410, Series 2, V6 Cup R, S 240, 430
+Lotus|Evora|Sports car|S, GT430, 400, 410, GT410 Sport, Sport 410, GT430 Sport, Type 124
+Lotus|Emira|Sports car|V6 First Edition, i4, V6, V6 Sport, I4 First Edition, i4 Turbo, V6 Manual
+Lotus|Esprit|Sports car|Turbo, V8, S1, S2, S3, Sport 300, Series 1, S4, GT3, Sport 350, V8 SE, Turbo SE, Final Edition, Essex, John Player Special
+Lotus|Eletre|Electric SUV|S, R, Base
+Lotus|Emeya|Electric sedan|S, R, Base
+Lotus|Evija|Electric hypercar|X, Fittipaldi Edition
+Lotus|Seven|Sports car|S1, S2, S3, S4, Series 3, Super Seven, 160, 170, 270, 360, 420 Cup, Sport 240
+Lotus|Elan|Sports car|Sprint, S4, 1989 M100, +2, Series 1, +2 S130
+Lotus|Europa|Sports car|S, Twin Cam, Special, Series 1, Series 2
+Lotus|Carlton|Sports sedan|
+Lotus|Omega|Sports sedan|
+Lotus|340R|Track car|
+Lotus|3-Eleven|Track car|430
+Lotus|2-Eleven|Track car|
+Lotus|Elite|Sports car|Series 1, Series 2, Type 14
+Lotus|Cortina|Sports sedan|
+Alfa Romeo|4C|Sports car|Spider, Launch Edition, Coupe, Competizione
+Alfa Romeo|Giulia|Sports sedan|Quadrifoglio, GTA, GTAm, Veloce, Ti, Super, Sprint, GT Junior, Quadrifoglio Verde, 2000 GTV, 1600 Sprint, Super 1.6, Sprint GT, Veloce Ti, Ti Sport, Quadrifoglio 100th Anniversary, GTA 2021, Competizione
+Alfa Romeo|Stelvio|SUV|Quadrifoglio, Veloce, Ti, Sprint, Competizione, Lusso
+Alfa Romeo|8C|Sports car|Competizione, Spider, 2900B, 8C 2300
+Alfa Romeo|Montreal|Sports car|
+Alfa Romeo|Spider|Roadster|Duetto, 1600, Veloce, Series 2, Series 3, Series 4, Graduate, 1966
+Alfa Romeo|GTV|Sports coupe|V6, 916, Cup, 2000
+Alfa Romeo|156|Sedan|GTA, V6, Sportwagon
+Alfa Romeo|147|Hot hatch|GTA, Cup, TI, 2.0 Twin Spark
+Alfa Romeo|159|Sedan|Ti, JTS
+Alfa Romeo|Brera|Coupe|S, 3.2 JTS
+Alfa Romeo|Giulietta|Hatchback|Quadrifoglio Verde, Veloce, Sprint, Sprint Veloce, 1.75 TBi, Spider
+Alfa Romeo|33 Stradale|Supercar|, 1967, Alfa Romeo 33 Stradale (2024)
+Alfa Romeo|Tonale|Crossover|Veloce, Ti, Sprint
+Alfa Romeo|MiTo|Hatchback|Quadrifoglio Verde
+Alfa Romeo|155|Sports sedan|V6 TI, Q4, DTM, 2.0 Twin Spark
+Alfa Romeo|SZ|Sports coupe|ES30, RZ
+Maserati|MC20|Supercar|, Cielo, Cielo Folgore, Folgore, GT2
+Maserati|GranTurismo|Grand tourer|S, MC Stradale, Sport, Trofeo, Folgore, Modena, Zagato, MC Sportline, GT4, Convertible, MC GT4, Competizione
+Maserati|Quattroporte|Luxury sedan|GTS, S, Trofeo, Sport GT S, Diesel, V, IV, Edizione Cento, Royale, SQ4, Skyactiv, Evoluzione
+Maserati|Levante|SUV|Trofeo, GTS, S, Modena, Q4, GT Hybrid, Diesel, Folgore
+Maserati|Ghibli|Sedan|Trofeo, S, S Q4, Hybrid, GT, Modena, I Series, III, SS, Cup, Diesel, S Q4 Gransport
+Maserati|3200 GT|Grand tourer|Assetto Corsa, Spyder
+Maserati|Coupé|Grand tourer|Cambiocorsa, Spyder, GT
+Maserati|MC12|Hypercar|Versione Corse
+Maserati|Bora|Classic supercar|
+Maserati|Merak|Classic sports car|SS, 2000 GT
+Maserati|Khamsin|Classic grand tourer|
+Maserati|Biturbo|Sports sedan|Spyder, 222, 228, 430, Si, Zagato
+Maserati|Indy|Classic grand tourer|
+Maserati|Mistral|Classic grand tourer|Spyder
+Maserati|Grecale|SUV|Trofeo, Folgore, Modena, GT
+Maserati|Spyder|Roadster|GT, Cambiocorsa, 4200
+Maserati|Birdcage 75th|Concept|
+Maserati|MCXtrema|Track car|
+Jaguar|E-Type|Classic sports car|Series 1 3.8, Series 1 4.2, Series 1.5, Series 2, Series 3 V12, Lightweight, Low Drag Coupe, Roadster, Coupe, 2+2, Reborn, Zero, Series 1 Roadster, Lightweight Continuation
+Jaguar|XJ220|Supercar|, S, Sports
+Jaguar|F-Type|Sports car|R, SVR, P450, P300, V6 S, R-Dynamic, Project 7, 400 Sport, Heritage 60 Edition, Convertible, R75, Checkered Flag, 2.0, GT
+Jaguar|XK|Grand tourer|XKR, XKR-S, XKR-S GT, 120, XK8, XK140, XK150, 120M, XKR 75, 140, XK 8 Convertible
+Jaguar|XJ|Luxury sedan|XJR, XJR-S, XJ6, XJ12, XJ8, XJ-S, XJ220, XJ13, 2008, 1968, 1992 XJR-15, Ultimate, Supersport, Series 1, Series 3
+Jaguar|XF|Sedan|S, SV8, R-Sport, Sportbrake, Portfolio, 3.0
+Jaguar|XE|Sedan|SV Project 8, S, R-Dynamic, 300 Sport
+Jaguar|F-Pace|SUV|SVR, S, R-Sport, Portfolio, 400 Sport, P400
+Jaguar|E-Pace|SUV|P300, R-Dynamic, SE
+Jaguar|I-Pace|Electric SUV|EV400, HSE, First Edition, Black, S, SE
+Jaguar|S-Type|Sedan|R
+Jaguar|X-Type|Sedan|
+Jaguar|C-Type|Classic race car|
+Jaguar|D-Type|Classic race car|Longnose, Shortnose, XKSS
+Jaguar|XJS|Grand tourer|V12, TWR, Convertible, 4.0, HE, Celebration
+Jaguar|XJR-9|Race car|
+Jaguar|Mark 2|Classic sedan|3.8, 2.4, 240, 340
+Jaguar|SS100|Classic sports car|
+Jaguar|XK120|Classic sports car|OTS, FHC, Roadster, Fixed Head Coupe, M, Alloy
+Jaguar|XKSS|Classic sports car|Continuation
+Jaguar|Type 00|Concept|
+Land Rover|Defender|SUV|90, 110, 130, V8, Octa, X-Dynamic, Trophy, Works V8, Sport, 90 County, Tomb Raider, 2020, 2024, 110 SE, Expedition, Hard Top, Bond Edition, XS, Autobiography, Heritage, 110 Octa, 130 Outbound, 130 Sport, 110 V8 Carpathian Edition
+Land Rover|Range Rover|SUV|Sport, Sport SVR, Velar, Evoque, Autobiography, SV, Classic, P530 First Edition, Sport Autobiography, Sport P635 SV, Sport SV Edition One, Sport HSE, Velar SVAutobiography, Evoque Autobiography, Vogue, Classic 3-Door, Classic LSE, Long Wheelbase, P615, SVAutobiography, SV Black, P530, SV Ranthambore, Fifty, Sport First Edition, Electric, Sport Electric
+Land Rover|Discovery|SUV|Sport, Series 1, Series 2, Series 3, Series 4, 5, HSE, Metropolitan Edition, Landmark, Dynamic HSE, SE, Series 3 HSE, Sport HSE Dynamic, Sport Dynamic, Sport Landmark, Sport 2.0, Sport Dynamic SE, Sport Autobiography
+Land Rover|Series|Classic SUV|I, II, IIA, III, 88, 109, Series I 80, Series II Station Wagon
+Land Rover|Freelander|SUV|
+Hyundai|Ioniq 5 N|Electric hot hatch|
+Hyundai|Ioniq 5|Electric SUV|N, N Line, Limited, SEL, Long Range, Standard Range
+Hyundai|Ioniq 6|Electric sedan|N, Limited, SEL
+Hyundai|Elantra N|Sports sedan|
+Hyundai|Veloster N|Hot hatch|, Turbo, Turbo R-Spec, Turbo Ultimate
+Hyundai|i30 N|Hot hatch|Performance, Fastback, Drive-N
+Hyundai|i20 N|Hot hatch|
+Hyundai|Kona N|Crossover|
+Hyundai|Santa Fe|SUV|XRT, Calligraphy, Hybrid, Limited, Sport
+Hyundai|Tucson|SUV|N Line, XRT, Limited, Hybrid
+Hyundai|Palisade|SUV|Calligraphy, XRT, Limited, Hybrid
+Hyundai|Genesis Coupe|Sports coupe|3.8 R-Spec, 2.0T, 3.8 Track
+Hyundai|Santa Cruz|Pickup|
+Hyundai|Kona Electric|Electric crossover|
+Hyundai|Sonata N Line|Sedan|
+Hyundai|N Vision 74|Concept|
+Genesis|G70|Sports sedan|3.3T Sport, 2.0T, Shooting Brake, 3.3T Prestige
+Genesis|G80|Luxury sedan|Sport, Electrified, Signature, 3.5T
+Genesis|G90|Luxury sedan|Premium, Prestige, Long Wheelbase
+Genesis|GV60|Electric SUV|Magma, Performance
+Genesis|GV70|SUV|Sport Prestige, Electrified, 3.5T, 2.5T
+Genesis|GV80|SUV|Coupe, 3.5T Prestige, 2.5T, Sport
+Genesis|GV90|SUV|
+Genesis|X Gran Berlinetta|Concept|
+Kia|Stinger|Grand tourer|GT, GT2, GT1, GT-Line, GT Atlantic Edition, GT Scorpion, Premium, 3.3T
+Kia|EV6|Electric crossover|GT, GT-Line, Wind, Light, GT-Line AWD, Air
+Kia|EV9|Electric SUV|GT-Line, Land, Wind, Light, Air
+Kia|K5|Sedan|GT, GT-Line, EX
+Kia|Telluride|SUV|X-Pro, SX Prestige, EX, X-Line
+Kia|Sorento|SUV|X-Line, SX Prestige, Hybrid
+Kia|Sportage|SUV|X-Pro, X-Line, Hybrid
+Kia|Soul|Crossover|GT-Line, Turbo, Hamster
+Kia|Forte|Sedan|GT, GT-Line, Koup
+Kia|Optima|Sedan|SXL Turbo, GT, SX
+Kia|Niro|Crossover|EV, PHEV
+Kia|Carnival|Minivan|SX Prestige
+Kia|Rio|Hatchback|
+Kia|Seltos|Crossover|SX Turbo
+Kia|Cadenza|Sedan|
+Kia|EV3|Electric SUV|GT-Line, GT
+Kia|Soul EV|Electric crossover|
+Lexus|LFA|Supercar|Nürburgring Package, Nürburgring Edition, Spyder
+Lexus|LC 500|Grand tourer|Convertible, Inspiration Series, Touring, Bespoke Build, Black Line, Pinnacle
+Lexus|LC 500h|Grand tourer|
+Lexus|RC F|Sports coupe|Track Edition, Fuji Speedway Edition, 10th Anniversary, Performance Package, Final Edition
+Lexus|IS F|Sports sedan|, CCS-R
+Lexus|IS 500|Sports sedan|F Sport Performance, Launch Edition
+Lexus|IS 350|Sedan|F Sport
+Lexus|GS F|Sports sedan|
+Lexus|GS 300|Sedan|
+Lexus|LS 400|Luxury sedan|
+Lexus|LS 500|Luxury sedan|F Sport, AWD, Inspiration Series, LS 500h
+Lexus|LX|SUV|600, 570, 470, 600 Ultra Luxury, 600 F Sport, 700h Ultra Luxury, 600 Ultra, 570 Black Line, 450d
+Lexus|GX|SUV|550, 470, 460, 550 Overtrail, 460 Black Line, 550 Premium
+Lexus|RX|SUV|350, 500h, 450h, F Sport, 350h, 300
+Lexus|NX|SUV|350, F Sport, 450h+
+Lexus|UX|Crossover|250h, F Sport
+Lexus|ES|Sedan|350, 300h, F Sport
+Lexus|SC 400|Grand tourer|SC430, Soarer
+Lexus|RZ|Electric SUV|450e
+Lexus|LM|Minivan|350h
+Lexus|RC|Sports coupe|350, 300, F Sport
+Lexus|TX|SUV|
+Lexus|LFA Nürburgring|Supercar|
+Lexus|LFR|Concept|
+Lexus|ES 350|Sedan|
+Acura|NSX|Supercar|Type S, Type R, Acura NSX-T, GT3, 2017, 2022 Type S, 1991, 1997, 2005, NSX-R, Long Beach, Zanardi Edition, 30th Anniversary, 1990, Alex Zanardi Edition
+Acura|Integra|Sports coupe|Type R, GS-R, LS, GSR, A-Spec, Type S, RS, GS, 1994, 2002
+Acura|TLX|Sedan|Type S, A-Spec, Advance, PMC Edition
+Acura|RSX|Sports coupe|Type-S, Base, Type S, Premium
+Acura|MDX|SUV|Type S, A-Spec, Advance, Sport Hybrid, Technology
+Acura|RDX|SUV|A-Spec, Advance, PMC Edition, Type S
+Acura|TSX|Sedan|Sport Wagon, V6
+Acura|Legend|Luxury sedan|Coupe, GS, LS
+Acura|CL|Coupe|Type-S
+Acura|RL|Luxury sedan|SH-AWD
+Acura|ZDX|Electric SUV|Type S, A-Spec
+Acura|ILX|Sedan|A-Spec
+Acura|ARX-05|Race car|
+Mini|Cooper|Hatchback|S, JCW, SE, Works, Classic Mini 1275 GT, Mini Cooper S Mk1, Mini Cooper S Mk2, Mini Cooper S Mk3, John Cooper Works GP, Cooper S Paceman, Seven, Mayfair, Mini Cooper 1275 S, Mini 1000, Mk1 Mini Cooper, 3-door, 5-door, Convertible, Clubman, Cooper S R53, Cooper S R56, Cooper S F56, Cooper S F66, JCW Challenge, Cooper SE Electric
+Mini|Countryman|Crossover|JCW, S ALL4, SE ALL4, Cooper S
+Mini|Clubman|Wagon|JCW, S, Cooper S, 1275 GT
+Mini|John Cooper Works GP|Hot hatch|GP1, GP2, GP3
+Fiat|500|City car|Abarth, Abarth 595, Abarth 695, 500e, Giannini, 500 Nuova, 595 Competizione, Abarth 695 Tributo Ferrari, Abarth 500e, 500C, 500X, Pop, Lounge, Sport
+Fiat|124 Spider|Roadster|Abarth, Lusso, Classica, Spider 124 Sport
+Fiat|Panda|City car|4x4, 100HP, Cross, Sisley, Panda 4x4 Sisley
+Fiat|Punto|Hatchback|GT, Abarth, Evo Abarth, Gran Punto Abarth
+Fiat|Uno|Hatchback|Turbo i.e., Turbo
+Fiat|X1/9|Sports car|Bertone, 1500, Dallara
+Fiat|126|City car|Bis
+Fiat|Coupé|Sports coupe|20V Turbo, Plus
+Fiat|Dino|Sports car|Coupe, Spider
+Fiat|Multipla|Minivan|
+Abarth|595|Hot hatch|Competizione, Turismo, Pista, Esseesse, 695 Biposto, 695 Tributo 131 Rally, Scorpioneoro
+Abarth|695|Hot hatch|Biposto, Tributo Maserati
+Abarth|124 Spider|Roadster|
+Abarth|500|City car|Esseesse, Competizione
+Renault|Clio|Hot hatch|V6, RS 182, RS 172, RS 200, RS 220 Trophy, Williams, RS 197, RS Trophy, 16V, Renaultsport, R.S. 182 Trophy, E-Tech, V6 Phase 2, Cup, 3 RS, 4 RS, III RS 200 Cup
+Renault|Mégane RS|Hot hatch|R26.R, 250, 265, 275 Trophy, 275 Trophy-R, 280, 300 Trophy, 300 Trophy-R, Ultime, Trophy-R, F1 Team R26
+Renault|5 Turbo|Hot hatch|2, Turbo 2, Maxi Turbo
+Renault|Alpine A110|Sports car|S, R, GT, Legende, Pure, Première Edition, 1600 S, Berlinette, 1.8 Turbo
+Renault|Twingo|City car|RS, Gordini, 133
+Renault|Sport Spider|Sports car|
+Renault|Espace|Minivan|F1, Initiale Paris
+Renault|4|Classic hatchback|4L, 4L Sinpar, F4, E-Tech
+Renault|Twizy|Electric city car|F1, Sport Edition
+Renault|Mégane|Hatchback|E-Tech, Coupe-Cabriolet, GT, Cup, Mégane E-Tech Electric
+Renault|Laguna|Sedan|Coupe, Williams
+Renault|Fuego|Coupe|Turbo
+Alpine|A110|Sports car|S, R, GT, Pure, Legende, R Turini, E-ternité, A110 R 70, Tour de Corse, 1600S, Berlinette Tour de France
+Alpine|A290|Electric hot hatch|GTS
+Alpine|A290 Beta|Electric hot hatch|
+Alpine|A390|Electric crossover|
+Alpine|A310|Classic sports car|V6, 4-cyl
+Peugeot|205 GTI|Hot hatch|1.6, 1.9, Mi16, Gutmann, T16, Rallye, CTI, 1.9 GTI, 1.6 GTI, Turbo 16
+Peugeot|306 GTi-6|Hot hatch|Rallye, S16, GTi-6
+Peugeot|106|Hot hatch|Rallye, GTi, S16, XSi, 1.6 Rallye
+Peugeot|206|Hot hatch|GTI 180, S16, WRC, RC, CC, Gentry, XS, GT
+Peugeot|RCZ R|Sports coupe|, Magnus, Bronze Edition
+Peugeot|308 GTi|Hot hatch|270, 250, GTi by Peugeot Sport, SW
+Peugeot|208 GTi|Hot hatch|30th, by Peugeot Sport, GT Line
+Peugeot|508|Sedan|PSE, Sport Engineered, SW PSE
+Peugeot|405 Mi16|Sports sedan|T16
+Peugeot|504|Classic sedan|Coupe, Cabriolet, Pickup
+Peugeot|404|Classic sedan|Pickup, Coupe
+Peugeot|3008|Crossover|GT, Hybrid, PHEV
+Peugeot|Quasar|Concept|
+Peugeot|9X8|Hypercar|
+Citroën|2CV|Classic car|Charleston, Dolly, Sahara, 6, Spot, 007, Fourgonnette
+Citroën|DS|Classic luxury car|19, 21, 23, Pallas, Décapotable, DS 3, DS 4, DS 5, DS 7, DS 9, DS 3 Crossback, Ligne, Chic
+Citroën|SM|Classic grand tourer|Maserati, Opéra, Mylord
+Citroën|Xsara|Rally car|WRC, VTS, Kit Car, Picasso
+Citroën|C4|Hatchback|WRC, VTS, Picasso, Cactus, X, E-C4
+Citroën|C3|City car|WRC, Aircross, Pluriel, Picasso, Airdream
+Citroën|C1|City car|
+Citroën|Saxo|Hot hatch|VTS, Cup, Kit Car, VTR, VTS 16v
+Citroën|AX|Hot hatch|GT, GTi, Sport
+Citroën|BX|Hatchback|GTi, 4TC, 16v
+Citroën|Traction Avant|Classic sedan|11CV, 15 Six
+Citroën|H Van|Classic van|HY, Tube
+Citroën|Méhari|Classic utility|4x4
+Citroën|Ami|Electric quadricycle|
+Škoda|Octavia RS|Sports wagon|, vRS, 245, Combi, 230, 2.0 TSI, Hatch iV
+Škoda|Fabia|Hatchback|vRS, R5, Monte Carlo
+Škoda|Superb|Sedan|Sportline, L&K, Laurin & Klement
+Škoda|Kodiaq RS|SUV|, vRS
+Škoda|Enyaq|Electric SUV|RS, Coupe RS, iV
+Škoda|Octavia|Sedan|vRS, Scout, Combi
+Škoda|Karoq|SUV|Sportline
+Škoda|Kamiq|Crossover|Monte Carlo
+SEAT|Ibiza|Hatchback|Cupra, FR, Sport Coupe, Bocanegra, 1.8T
+SEAT|León|Hot hatch|Cupra R, Cupra 280, Cupra 300, FR, ST Cupra, SC, Cupra, Mk1 Cupra R
+SEAT|Cordoba|Sedan|WRC, Cupra
+SEAT|Arosa|City car|
+SEAT|Toledo|Sedan|Cupra
+SEAT|Altea|Minivan|Freetrack, Cupra
+SEAT|Exeo|Sedan|
+SEAT|Ateca|SUV|Cupra, FR
+SEAT|Tarraco|SUV|FR
+SEAT|600|Classic car|
+Cupra|Formentor|Crossover|VZ5, VZ, VZ2, VZ e-HYBRID
+Cupra|Born|Electric hatchback|VZ
+Cupra|León|Hatchback|VZ, VZ Estate, e-HYBRID
+Cupra|Ateca|SUV|
+Cupra|Tavascan|Electric SUV|VZ
+Cupra|Terramar|SUV|VZ
+Cupra|Raval|Electric hatchback|
+Cupra|DarkRebel|Concept|
+Opel|Manta|Classic coupe|A, B, GT/E, 400, Manta GSi, GT/J, 1900
+Opel|Astra|Hatchback|OPC, GSi, VXR, Gsi, 2.0 Turbo, GTC, Cabrio, Sports Tourer
+Opel|Corsa|Hatchback|OPC, GSi, GT, Sport, VXR
+Opel|Calibra|Sports coupe|Turbo 4x4, 16v
+Opel|Kadett|Classic car|GSi, GT/E, Rallye, GTE
+Opel|Omega|Sedan|Lotus, 3000 24V
+Opel|Vectra|Sedan|OPC, GSi, VXR
+Opel|Insignia|Sedan|OPC, GSi, VXR
+Opel|Speedster|Roadster|Turbo, VX220
+Opel|GT|Classic sports car|1900
+Vauxhall|VX220|Sports car|Turbo, Lotus
+Vauxhall|Monaro|Coupe|VXR, VXR500, VXR 427
+Vauxhall|Astra VXR|Hot hatch|, GTC VXR, Sports Tourer VXR
+Vauxhall|Corsa VXR|Hot hatch|, Nürburgring Edition
+Vauxhall|Lotus Carlton|Sports sedan|
+Vauxhall|Cavalier|Sedan|GSi 2000, SRi
+Vauxhall|Nova|Hatchback|GTE, SR
+Vauxhall|Chevette|Hatchback|HS, 2300 HS
+Vauxhall|Vectra VXR|Sedan|
+Saab|900|Classic car|Turbo, Aero, SPG, T16 S, Turbo 16S, Carlsson, Convertible, Viggen
+Saab|9-3|Sedan|Aero, Viggen, Turbo X, Sport, Convertible, Griffin
+Saab|9-5|Sedan|Aero, Wagon, Turbo, Griffin
+Saab|99|Classic car|Turbo, Turbo S
+Saab|9000|Classic car|Aero, CS Turbo, Carlsson
+Saab|Sonett|Classic sports car|III, V4
+Saab|92|Classic car|
+Saab|9-2X|Hatchback|Aero
+Saab|9-4X|SUV|
+Saab|Sonett III|Classic sports car|
+Volvo|240|Classic car|Turbo, GT, Wagon, DL, Estate, GL, Polar, Turbo Wagon, 242 Turbo, Polar Edition
+Volvo|850|Sedan|T-5R, R, T5, GLT, Estate, T-5 Wagon
+Volvo|S60|Sports sedan|R, Polestar, T6, Recharge, T8
+Volvo|V60|Wagon|Polestar, Polestar Engineered, T8, Cross Country, Recharge
+Volvo|V70|Wagon|R, XC70
+Volvo|S40|Sedan|T5
+Volvo|C30|Hatchback|T5 R-Design, Electric, Polestar
+Volvo|XC90|SUV|T8, Recharge, Excellence, B6, V8, T6, Inscription, Polestar, R-Design
+Volvo|XC60|SUV|T8, Recharge, Polestar Engineered, Inscription
+Volvo|XC40|SUV|Recharge, B4, P8, T5
+Volvo|P1800|Classic sports car|S, ES, Cyan
+Volvo|Amazon|Classic car|122S, 123GT
+Volvo|140|Classic car|
+Volvo|740|Classic car|Turbo, Wagon
+Volvo|940|Classic car|Turbo, Wagon
+Volvo|C70|Convertible|T5, Convertible
+Volvo|EX30|Electric SUV|Twin Motor Performance
+Volvo|EX90|Electric SUV|Twin Motor
+Volvo|Polestar|Race car|
+Volvo|S90|Sedan|Recharge, Inscription
+Volvo|PV444|Classic car|
+Volvo|PV544|Classic car|
+Volvo|Cross Country|Wagon|V90, V70
+Rover|Mini|Classic car|Cooper
+Rover|75|Sedan|V8
+Rover|SD1|Classic car|Vitesse, 3500
+Rover|P5|Classic sedan|
+Rover|P6|Classic sedan|3500, 3500 V8
+Rover|MGF|Roadster|
+Rover|200|Hatchback|Vitesse
+MG|MGB|Classic roadster|GT, GT V8, Roadster, Mk1, Mk2
+MG|Midget|Classic roadster|Mk1, 1500, Mk3
+MG|MGF|Roadster|TF, Trophy
+MG|TF|Roadster|
+MG|ZR|Hot hatch|160
+MG|ZS|Crossover|EV
+MG|Cyberster|Electric roadster|
+MG|4|Electric hatchback|XPower
+MG|HS|SUV|PHEV
+MG|Magnette|Classic sedan|ZA
+MG|TC|Classic roadster|
+MG|Maestro|Hatchback|Turbo
+MG|Metro|Hatchback|6R4, Turbo
+Triumph|TR6|Classic roadster|
+Triumph|TR7|Classic sports car|
+Triumph|Spitfire|Classic roadster|1500, Mk3
+Triumph|Stag|Classic grand tourer|
+Triumph|GT6|Classic coupe|
+Triumph|TR4|Classic roadster|
+Triumph|TR3|Classic roadster|
+Triumph|Dolomite|Classic sedan|Sprint
+Austin|Mini|Classic car|Cooper S
+Austin|Healey|Classic roadster|3000, Sprite, 100, 100-Six, Frogeye, 3000 Mk III, BN7, BJ8
+Jensen|Interceptor|Classic grand tourer|Mk III, FF
+Jensen|Healey|Classic roadster|
+Morgan|Plus Four|Roadster|, Plus 8, Plus Six, 4/4, Aero 8, Three-Wheeler
+TVR|Griffith|Sports car|200, 500
+TVR|Cerbera|Sports car|Speed 12, 4.5
+TVR|Tuscan|Sports car|Speed Six
+TVR|Chimaera|Sports car|
+TVR|Sagaris|Sports car|
+TVR|Tamora|Sports car|
+Caterham|Seven|Sports car|160, 270, 310, 360, 420, 485, 620 R, 620 S, CSR, R300, Roadsport, Superlight, 170
+Ariel|Atom|Track car|4, 3, 500, 3.5R
+Ariel|Nomad|Off-road car|R, Tactical
+BAC|Mono|Track car|R
+Noble|M600|Supercar|
+Noble|M12|Sports car|
+Gordon Murray|T.50|Hypercar|, T.50s Niki Lauda
+Gordon Murray|T.33|Hypercar|
+Morgan|Three-Wheeler|Roadster|
+Radical|SR3|Track car|SL, SR8, RXC
+Ultima|GTR|Supercar|
+Lister|Storm|Supercar|
+Spyker|C8|Supercar|Aileron, Laviolette
+Donkervoort|D8|Sports car|GT
+Rimac|Nevera|Electric hypercar|R
+Rimac|Concept One|Electric hypercar|
+Zenvo|TS1|Hypercar|GT
+Zenvo|ST1|Hypercar|
+Zenvo|Aurora|Hypercar|
+Czinger|21C|Hypercar|V Max
+Dallara|Stradale|Track car|EXP
+Devon|GTX|Supercar|
+Apollo|Intensa Emozione|Hypercar|
+Automobili Estrema|Fulminea|Electric hypercar|
+Praga|Bohema|Track car|
+De Tomaso|Pantera|Classic supercar|GT5, GT5-S, GTS, Group 4
+De Tomaso|Mangusta|Classic supercar|
+De Tomaso|Guarà|Supercar|
+De Tomaso|P72|Hypercar|
+Iso|Grifo|Classic grand tourer|
+Iso|Rivolta|Classic grand tourer|
+Bizzarrini|5300 GT|Classic grand tourer|Strada
+Lancia|Delta Integrale|Rally car|HF Integrale Evo, Evo II, 16V, 8V, Martini 6, HF 4WD, S4, Futurista, Evoluzione, Final Edition
+Lancia|Stratos|Rally car|HF Stradale, HF, New Stratos
+Lancia|037|Rally car|Stradale, Evo 2
+Lancia|Fulvia|Classic coupe|HF, 1.6 HF Fanalone, Coupe
+Lancia|Aurelia|Classic grand tourer|B20 GT, B24 Spider
+Lancia|Beta|Classic car|Coupe, Montecarlo, HPE
+Lancia|Thema|Sedan|8.32, Ferrari 8.32
+Lancia|Flaminia|Classic grand tourer|
+Lancia|Ypsilon|City car|
+Lancia|Rally 037|Rally car|
+Lancia|Gamma|Classic car|Coupe
+Holden|Commodore|Sedan|VL Group A, SS, HSV GTS, HSV Maloo, VE SS, VF SS Redline
+Holden|Monaro|Coupe|CV8, CV8-Z, HSV GTO
+Holden|Torana|Classic car|A9X, LC GTR XU-1, LJ XU-1
+Suzuki|Jimny|SUV|Sierra, JB74, JB64, SJ410, Samurai
+Suzuki|Swift Sport|Hot hatch|ZC31S, ZC32S, ZC33S
+Suzuki|Cappuccino|Kei roadster|
+BYD|Seal|Electric sedan|Performance, Seal U
+Xiaomi|SU7|Electric sedan|Max, Ultra
+Zeekr|001|Electric shooting brake|FR`,
+motorcycles:`Ducati|Panigale V4|Sportbike|S, R, SP, SP2, Speciale, Superleggera, Lamborghini Edition, Tricolore
+Ducati|Panigale V2|Sportbike|S, Bayliss Edition
+Ducati|Panigale|Sportbike|1199, 1199 S, 1199 R, 1199 Superleggera, 1299, 1299 S, 1299 R Final Edition, 959, 899
+Ducati|Superbike|Sportbike|748, 851, 888 SP4, 916, 916 SPS, 996, 998, 998 R, 999, 999 R, 1098, 1098 R, 1198, 848, 848 EVO, 749
+Ducati|Monster|Naked bike|S4R, 696, 796, 821, 937, 937 SP, 1100 EVO, 1200, 1200 S, 1200 R, 900, 600, S2R, 916, 30° Anniversario
+Ducati|Streetfighter|Naked bike|V4, V4 S, V4 SP, V4 SP2, V2, 848, 1098
+Ducati|Multistrada|Adventure bike|V4 S, V4 Pikes Peak, V4 Rally, V4 RS, 1260 Enduro, 1260 S, 1200 Enduro, 950, 950 S, 1200 S, V2 S, 1000 DS
+Ducati|Diavel|Cruiser|V4, 1260 S, Carbon, Dark, 1200
+Ducati|XDiavel|Cruiser|S, Dark, Nera
+Ducati|Scrambler|Retro bike|Icon, Icon Dark, Full Throttle, Nightshift, 1100 Pro, 1100 Sport Pro, 1100 Tribute Pro, Urban Enduro, Café Racer, Desert Sled, Classic, Mach 2.0, Flat Track Pro, Sixty2, 800
+Ducati|Hypermotard|Supermoto|950, 950 SP, 950 RVE, 698 Mono, 698 Mono RVE, 821, 939, 1100, 1100 EVO, 796
+Ducati|SuperSport|Sport tourer|950, 950 S, 937, 939
+Ducati|DesertX|Adventure bike|Rally, Discovery
+Ducati|Desmosedici RR|Track bike|
+Ducati|Sport Classic|Retro bike|1000, Paul Smart 1000 LE, GT1000
+Ducati|MH900e|Retro bike|
+Ducati|750 SuperSport|Classic sportbike|
+Ducati|900 SS|Classic sportbike|
+Yamaha|YZF-R1M|Superbike|2015, 2020
+Yamaha|YZF-R1|Superbike|M, 1998, 2002, 2004, 2007, 2009 Crossplane, 2015, 2020, 25th Anniversary
+Yamaha|YZF-R6|Supersport|1999, 2003, 2006, 2008, 2017, Race
+Yamaha|YZF-R7|Sportbike|
+Yamaha|YZF-R3|Sportbike|
+Yamaha|YZF-R125|Sportbike|
+Yamaha|MT-09|Naked bike|SP, Y-AMT
+Yamaha|MT-07|Naked bike|
+Yamaha|MT-10|Naked bike|SP
+Yamaha|MT-03|Naked bike|
+Yamaha|XSR900|Retro bike|GP
+Yamaha|XSR700|Retro bike|XTribute
+Yamaha|Ténéré 700|Adventure bike|World Raid, Extreme
+Yamaha|Tracer 9|Sport tourer|GT, GT+
+Yamaha|V-Max|Muscle bike|1200, Carbon
+Yamaha|FZR1000|Sportbike|Exup
+Yamaha|TMAX|Scooter|560, Tech Max, 530
+Yamaha|SR400|Retro bike|
+Yamaha|RD350|Classic sportbike|LC
+Yamaha|TZR250|Classic sportbike|
+Yamaha|WR450F|Dirt bike|
+Yamaha|YZ450F|Dirt bike|
+Yamaha|YZ250|Dirt bike|
+Yamaha|YZ125|Dirt bike|
+Yamaha|TW200|Dual sport|
+Yamaha|Niken|Leaning three-wheeler|GT
+Kawasaki|Ninja H2|Hypersport|R, SX, SX SE, Carbon
+Kawasaki|Ninja ZX-10R|Superbike|RR, SE, Winter Test Edition, 40th Anniversary, KRT Edition
+Kawasaki|Ninja ZX-6R|Supersport|636, 636 KRT
+Kawasaki|Ninja ZX-4RR|Supersport|ZX-4R, SE
+Kawasaki|Ninja ZX-14R|Hypersport|ABS, SE
+Kawasaki|Ninja ZX-12R|Hypersport|
+Kawasaki|Ninja ZX-9R|Sportbike|
+Kawasaki|Ninja ZX-7R|Sportbike|
+Kawasaki|Ninja 400|Sportbike|ABS, KRT Edition
+Kawasaki|Ninja 650|Sportbike|KRT
+Kawasaki|Ninja 300|Sportbike|
+Kawasaki|Ninja 250R|Sportbike|
+Kawasaki|Ninja 1000SX|Sport tourer|
+Kawasaki|Z900|Naked bike|RS, RS Cafe, SE, 50th Anniversary
+Kawasaki|Z H2|Naked bike|SE
+Kawasaki|Z650|Naked bike|RS
+Kawasaki|Z400|Naked bike|
+Kawasaki|Z1000|Naked bike|SX, R Edition
+Kawasaki|Z1|Classic bike|900, Z1-R, Z1000 MkII
+Kawasaki|H1 Mach III|Classic two-stroke|500
+Kawasaki|KLR650|Dual sport|Adventure, Traveler
+Kawasaki|Versys|Adventure bike|1000 SE, 650, X-300
+Kawasaki|Vulcan|Cruiser|S, 900, 1700, 2000
+Kawasaki|KX450|Dirt bike|X
+Kawasaki|KX250|Dirt bike|
+Kawasaki|W800|Retro bike|Street
+Honda|CBR1000RR-R Fireblade|Superbike|SP, SP 30th Anniversary
+Honda|CBR1000RR|Superbike|Fireblade, SP, SP2
+Honda|CBR600RR|Supersport|
+Honda|CBR900RR|Sportbike|Fireblade, 893, 919, 929, 954
+Honda|CBR600F|Sportbike|F2, F3, F4, F4i
+Honda|CBR500R|Sportbike|
+Honda|CBR650R|Sportbike|E-Clutch
+Honda|CBR300R|Sportbike|
+Honda|CB750|Classic bike|Four K0, F
+Honda|CB1000R|Naked bike|Black Edition
+Honda|CB650R|Naked bike|E-Clutch
+Honda|CB500F|Naked bike|
+Honda|CB300R|Naked bike|
+Honda|CB1100|Retro bike|EX, RS
+Honda|CBX|Classic bike|1000
+Honda|Gold Wing|Touring bike|Tour, DCT, F6B, GL1800, GL1500, 50th Anniversary
+Honda|Africa Twin|Adventure bike|Adventure Sports, CRF1100L, CRF1000L, DCT
+Honda|Rebel|Cruiser|300, 500, 1100, 1100 DCT
+Honda|CRF450R|Dirt bike|RWE
+Honda|CRF250R|Dirt bike|
+Honda|CRF300L|Dual sport|Rally
+Honda|CRF450L|Dual sport|
+Honda|XR650L|Dual sport|
+Honda|Monkey|Mini bike|125
+Honda|Super Cub|Moped|C125, 110, C100
+Honda|Grom|Mini bike|125
+Honda|NC750X|Adventure bike|DCT
+Honda|XL750 Transalp|Adventure bike|
+Honda|RC213V-S|Track bike|
+Honda|RC30|Classic superbike|VFR750R
+Honda|RC45|Classic superbike|RVF750
+Honda|VFR800|Sport tourer|
+Honda|NSR250R|Classic two-stroke|
+Honda|NSR500|Race bike|
+Suzuki|GSX-R1000|Superbike|R, K1, K5, K7, K9, L7, L9, Anniversary
+Suzuki|GSX-R750|Supersport|1985, 1992
+Suzuki|GSX-R600|Supersport|
+Suzuki|Hayabusa|Hypersport|GSX1300R Gen 1, Gen 2, Gen 3, 25th Anniversary
+Suzuki|GSX-S1000|Naked bike|GT, GX
+Suzuki|GSX-8S|Naked bike|
+Suzuki|Katana|Sport bike|1100, 600, 1000
+Suzuki|V-Strom|Adventure bike|1050, 1050 XT, 650, 650 XT, 250, 800 DE
+Suzuki|SV650|Naked bike|X
+Suzuki|DR-Z400|Dual sport|SM, S
+Suzuki|DR650|Dual sport|
+Suzuki|RM-Z450|Dirt bike|
+Suzuki|Bandit|Naked bike|1200, 650
+Suzuki|Boulevard|Cruiser|M109R, C50, M50
+Suzuki|Burgman|Scooter|400, 650
+Suzuki|TL1000S|Sportbike|
+Suzuki|RG500|Classic two-stroke|Gamma
+BMW Motorrad|S 1000 RR|Superbike|M, M Competition, HP4, HP4 Race
+BMW Motorrad|M 1000 RR|Superbike|Competition, 50 Years M
+BMW Motorrad|S 1000 R|Naked bike|M, Sport
+BMW Motorrad|M 1000 R|Naked bike|
+BMW Motorrad|S 1000 XR|Sport tourer|
+BMW Motorrad|R 1250 GS|Adventure bike|Adventure, HP, Rallye, Exclusive, Trophy
+BMW Motorrad|R 1300 GS|Adventure bike|Adventure, Trophy, Option 719
+BMW Motorrad|R 1200 GS|Adventure bike|Adventure, LC, Rallye, Exclusive
+BMW Motorrad|F 850 GS|Adventure bike|Adventure
+BMW Motorrad|F 750 GS|Adventure bike|
+BMW Motorrad|G 310 GS|Adventure bike|
+BMW Motorrad|G 310 R|Naked bike|
+BMW Motorrad|R nineT|Retro bike|Scrambler, Racer, Urban G/S, Pure
+BMW Motorrad|R 12 nineT|Retro bike|
+BMW Motorrad|R 18|Cruiser|B, Classic, Transcontinental, Roctane
+BMW Motorrad|K 1600|Touring bike|GT, GTL, B, Grand America
+BMW Motorrad|K 1300 S|Sport tourer|
+BMW Motorrad|F 900 R|Naked bike|
+BMW Motorrad|F 900 XR|Sport tourer|
+BMW Motorrad|R 1250 RT|Touring bike|
+BMW Motorrad|CE 04|Electric scooter|
+BMW Motorrad|R 80 G/S|Classic adventure bike|
+BMW Motorrad|R 100 RS|Classic bike|
+BMW Motorrad|R 90 S|Classic bike|
+BMW Motorrad|HP2 Megamoto|Sport bike|
+Triumph|Speed Triple|Naked bike|1200 RS, 1200 RR, 1050, 1050 R, 955i
+Triumph|Street Triple|Naked bike|765 RS, 765 R, 765 S, 675, 675 R
+Triumph|Daytona|Sportbike|675, 675 R, 765 Moto2 Edition, 600
+Triumph|Bonneville|Retro bike|T120, T100, Bobber, Speedmaster, T120 Black
+Triumph|Thruxton|Retro bike|RS, R, 1200
+Triumph|Scrambler|Retro bike|1200 XE, 1200 XC, 900, 400 X
+Triumph|Tiger|Adventure bike|900 Rally Pro, 900 GT Pro, 1200 GT, 1200 Rally Pro, 1200 Explorer, 800 XC, 800 XRX, Sport 660
+Triumph|Rocket 3|Muscle bike|R, GT, 2500
+Triumph|Trident|Naked bike|660, T150
+Triumph|Speed 400|Naked bike|
+Triumph|Speed 900|Retro bike|
+Triumph|Trophy|Touring bike|
+Triumph|Sprint ST|Sport tourer|
+Triumph|T595|Classic sportbike|
+Harley-Davidson|Sportster|Cruiser|S, 883 Iron, 883, 1200, Forty-Eight, XR1200, Nightster, 1200 Custom, Roadster, Superlow, Seventy-Two
+Harley-Davidson|Softail|Cruiser|Fat Boy, Fat Bob, Heritage Classic, Breakout, Low Rider S, Low Rider ST, Street Bob, Slim, Deluxe, Standard, Springer, Blackline, Night Train, Cross Bones
+Harley-Davidson|Street Glide|Touring bike|Special, ST, CVO
+Harley-Davidson|Road Glide|Touring bike|Special, ST, CVO
+Harley-Davidson|Road King|Touring bike|Special, Classic
+Harley-Davidson|Electra Glide|Touring bike|Ultra Limited, Standard, Ultra Classic
+Harley-Davidson|Pan America|Adventure bike|1250, 1250 Special
+Harley-Davidson|LiveWire|Electric bike|One, S2 Del Mar, S2 Mulholland
+Harley-Davidson|Nightster|Cruiser|Special, 975
+Harley-Davidson|Dyna|Cruiser|Wide Glide, Street Bob, Low Rider, Super Glide, Fat Bob, Switchback
+Harley-Davidson|V-Rod|Cruiser|Muscle, Night Rod, Night Rod Special, VRSC
+Harley-Davidson|Knucklehead|Classic cruiser|EL, 1936
+Harley-Davidson|Panhead|Classic cruiser|
+Harley-Davidson|Shovelhead|Classic cruiser|
+Harley-Davidson|Street|Cruiser|750, 500, Street Rod
+Harley-Davidson|XR750|Race bike|
+Indian|Scout|Cruiser|Bobber, Sixty, Rogue, 101, Classic, Super Scout
+Indian|Chief|Cruiser|Dark Horse, Bobber, Classic, Vintage, Super Chief
+Indian|Challenger|Touring bike|Dark Horse, Limited, Elite
+Indian|FTR|Roadster|R Carbon, 1200, S, Rally, Sport
+Indian|Roadmaster|Touring bike|Dark Horse, Limited, Elite
+Indian|Chieftain|Touring bike|Dark Horse, Limited, Elite
+Indian|Springfield|Touring bike|Dark Horse
+Indian|Pursuit|Touring bike|Dark Horse, Limited
+KTM|1290 Super Duke R|Naked bike|EVO, GT, RR
+KTM|1390 Super Duke R|Naked bike|EVO
+KTM|990 Duke|Naked bike|
+KTM|890 Duke|Naked bike|R, GP
+KTM|790 Duke|Naked bike|
+KTM|390 Duke|Naked bike|
+KTM|125 Duke|Naked bike|
+KTM|RC 390|Sportbike|
+KTM|RC 8C|Track bike|
+KTM|1290 Super Adventure|Adventure bike|S, R
+KTM|1390 Super Adventure|Adventure bike|S
+KTM|790 Adventure|Adventure bike|R
+KTM|890 Adventure|Adventure bike|R, Rally
+KTM|390 Adventure|Adventure bike|
+KTM|450 SX-F|Dirt bike|Factory Edition
+KTM|350 SX-F|Dirt bike|
+KTM|250 SX-F|Dirt bike|
+KTM|125 SX|Dirt bike|
+KTM|450 EXC-F|Dirt bike|
+KTM|300 XC-W|Dirt bike|
+KTM|500 EXC-F|Dirt bike|
+KTM|300 EXC|Dirt bike|TPI
+KTM|690 SMC R|Supermoto|
+KTM|690 Enduro R|Dual sport|
+Aprilia|RSV4|Superbike|1100 Factory, 1100, RR, RF, Factory, X
+Aprilia|RS 660|Sportbike|Extrema
+Aprilia|RS 457|Sportbike|
+Aprilia|RS 125|Sportbike|
+Aprilia|RS 250|Classic two-stroke|
+Aprilia|Tuono V4|Naked bike|1100 Factory, 1100 RR, Factory
+Aprilia|Tuono 660|Naked bike|Factory
+Aprilia|Tuareg 660|Adventure bike|
+Aprilia|Shiver|Naked bike|900, 750
+Aprilia|Dorsoduro|Supermoto|900, 750
+Aprilia|Caponord|Adventure bike|1200
+MV Agusta|F4|Superbike|RR, 1000, 750 Oro, Tamburini, Claudio, 312 R, Senna
+MV Agusta|Brutale|Naked bike|1000 RR, 800 RR, 1090, 920, 800, 1000 Serie Oro
+MV Agusta|Superveloce|Sportbike|800, S, Serie Oro, Alpine, Ago
+MV Agusta|Dragster|Naked bike|800 RR, 800 RR Pirelli
+MV Agusta|Turismo Veloce|Sport tourer|800, 800 Lusso SCS
+MV Agusta|F3|Sportbike|800, 675, 800 Ago, 800 RC
+MV Agusta|Lucky Explorer|Adventure bike|9.5, 5.5
+Royal Enfield|Classic 350|Retro bike|Signals, Halcyon, Redditch, Dark, Chrome
+Royal Enfield|Bullet 350|Retro bike|Military, Standard, Battalion Black
+Royal Enfield|Himalayan|Adventure bike|450, Scram 411, 411
+Royal Enfield|Interceptor 650|Retro bike|Bear 650
+Royal Enfield|Continental GT 650|Cafe racer|
+Royal Enfield|Meteor 350|Cruiser|Supernova, Fireball, Stellar, Aurora
+Royal Enfield|Hunter 350|Retro bike|Metro, Retro, Factory
+Royal Enfield|Super Meteor 650|Cruiser|Astral, Interstellar, Celestial
+Royal Enfield|Shotgun 650|Cruiser|
+Royal Enfield|Guerrilla 450|Naked bike|
+Royal Enfield|Classic 500|Retro bike|
+Royal Enfield|Thunderbird|Cruiser|350X, 500
+Vespa|Primavera|Scooter|50, 125, 150, Sprint, Sean Wotherspoon, Racing Sixties
+Vespa|GTS|Scooter|300, 300 Super, 300 Super Tech, 125, 150
+Vespa|Sprint|Scooter|125, 150
+Vespa|PX|Scooter|125, 150, 200
+Vespa|Elettrica|Electric scooter|
+Vespa|946|Scooter|
+Vespa|GS|Classic scooter|160, 150
+Lambretta|LI|Classic scooter|Series 1, Series 2, Series 3, 125, 150
+Lambretta|G350|Scooter|Special
+Lambretta|X300|Scooter|
+Zero|SR/F|Electric bike|Premium
+Zero|SR/S|Electric bike|Premium
+Zero|DSR/X|Electric adventure bike|
+Zero|FXE|Electric bike|
+Energica|Ego|Electric superbike|Corsa
+Energica|Eva|Electric naked bike|Ribelle, EsseEsse9
+Husqvarna|Svartpilen|Naked bike|401, 701, 801
+Husqvarna|Vitpilen|Naked bike|401, 701
+Husqvarna|701|Supermoto|Enduro, Supermoto
+Husqvarna|Norden 901|Adventure bike|Expedition
+Husqvarna|FE 350|Dirt bike|
+Husqvarna|TE 300|Dirt bike|
+Husqvarna|FC 450|Dirt bike|
+Husqvarna|TC 125|Dirt bike|
+Moto Guzzi|V7|Retro bike|Stone, Special, Racer, III, 850
+Moto Guzzi|V85 TT|Adventure bike|Travel, Guardia d'Onore, Evocative
+Moto Guzzi|V100 Mandello|Sport tourer|S
+Moto Guzzi|V9|Cruiser|Bobber, Roamer
+Moto Guzzi|California|Cruiser|1400, Touring, Eldorado, Audace, Custom, Jackal, Vintage, 1100 EV
+Moto Guzzi|Le Mans|Classic sportbike|1000, 850
+Moto Guzzi|Griso|Naked bike|8V SE, 1100
+Moto Guzzi|Stelvio|Adventure bike|NTX
+Buell|1125R|Sportbike|1125CR
+Buell|XB12|Sportbike|R, S, Scg
+Buell|Lightning|Naked bike|XB9S, XB12S
+Buell|Firebolt|Sportbike|XB9R, XB12R
+Buell|Ulysses|Adventure bike|XB12X
+Norton|Commando|Retro bike|961, 961 Sport, 961 Café Racer, 850, 750
+Norton|V4SV|Superbike|V4 RR, Superlight
+Norton|Dominator|Classic bike|961, 99, 88
+Norton|Manx|Race bike|
+Brough Superior|SS100|Classic bike|SS80
+Brough Superior|Lawrence|Electric bike|
+Vincent|Black Shadow|Classic bike|Series C, Series B
+Vincent|Rapide|Classic bike|Series C
+Vincent|Black Lightning|Classic race bike|
+Can-Am|Ryker|Three-wheeler|Rally, Sport, 900 ACE, 600
+Can-Am|Spyder|Three-wheeler|RT, F3, RT Limited, F3-S
+Super73|S2|Electric bike|
+Super73|RX|Electric bike|
+Super73|Z1|Electric bike|
+Super73|ZX|Electric bike|
+Sur-Ron|Light Bee|Electric dirt bike|X, L1e
+Sur-Ron|Ultra Bee|Electric dirt bike|
+Talaria|Sting|Electric dirt bike|R, MX3, MX4
+Stark|Varg|Electric dirt bike|EX
+Ural|Gear Up|Sidecar|Patrol, Sahara, Cruiser
+Ural|Patrol|Sidecar|
+Ural|M72|Classic sidecar|`,
+aircraft:`Boeing|737|Airliner|-100, -200, -300, -400, -500, -600, -700, -800, -900ER, MAX 7, MAX 8, MAX 9, MAX 10, BBJ
+Boeing|747|Airliner|-100, -200, -300, -400, -400ER, -8 Intercontinental, -8F, SP, -400F, Dreamlifter, E-4B Nightwatch, VC-25 Air Force One
+Boeing|757|Airliner|-200, -300, -200PF
+Boeing|767|Airliner|-200ER, -300ER, -400ER, -300F, KC-46 Pegasus
+Boeing|777|Airliner|-200, -200ER, -200LR, -300, -300ER, -8, -9, 777F, 777X
+Boeing|787 Dreamliner|Airliner|-8, -9, -10
+Boeing|707|Airliner|-120, -320B, -320C
+Boeing|727|Airliner|-100, -200
+Boeing|717|Airliner|
+Boeing|314 Clipper|Flying boat|
+Boeing|Stratocruiser|Airliner|377
+Airbus|A220|Airliner|-100, -300
+Airbus|A318|Airliner|
+Airbus|A319|Airliner|neo, CJ
+Airbus|A320|Airliner|ceo, neo
+Airbus|A321|Airliner|ceo, neo, XLR, LR
+Airbus|A300|Airliner|B4, -600, -600ST Beluga
+Airbus|A310|Airliner|-300
+Airbus|A330|Airliner|-200, -300, -800neo, -900neo, MRTT, -200F
+Airbus|A340|Airliner|-200, -300, -500, -600
+Airbus|A350|Airliner|-900, -1000, -900ULR
+Airbus|A380|Airliner|-800, -900
+Airbus|A400M|Military transport|Atlas
+Airbus|Beluga XL|Cargo plane|
+Concorde|Concorde|Supersonic airliner|G-BOAC, Air France F-BTSD, Alpha Delta, 
+Tupolev|Tu-144|Supersonic airliner|
+Tupolev|Tu-95|Bomber|Bear, 
+Tupolev|Tu-160|Bomber|Blackjack, 
+Tupolev|Tu-154|Airliner|
+Ilyushin|Il-96|Airliner|
+Ilyushin|Il-76|Cargo plane|
+Ilyushin|Il-2|WWII attack aircraft|Sturmovik
+Antonov|An-225 Mriya|Cargo plane|
+Antonov|An-124 Ruslan|Cargo plane|
+Antonov|An-2|Biplane|
+Embraer|E175|Regional jet|
+Embraer|E190|Regional jet|E2, 
+Embraer|E195|Regional jet|E2, 
+Embraer|Phenom|Business jet|100, 300, 300E
+Embraer|Praetor|Business jet|500, 600
+Embraer|Legacy|Business jet|450, 500, 600, 650
+Bombardier|CRJ|Regional jet|200, 700, 900, 1000
+Bombardier|Global|Business jet|5500, 6500, 7500, 8000, Express
+Bombardier|Challenger|Business jet|300, 350, 604, 605, 650
+Bombardier|Learjet|Business jet|45, 60, 75, 75 Liberty, 23, 35
+Bombardier|Dash 8|Turboprop|Q100, Q300, Q400
+ATR|72|Turboprop|-600, -500, -200
+ATR|42|Turboprop|-600
+McDonnell Douglas|DC-3|Classic airliner|
+McDonnell Douglas|DC-8|Airliner|
+McDonnell Douglas|DC-9|Airliner|
+McDonnell Douglas|DC-10|Airliner|
+McDonnell Douglas|MD-11|Airliner|
+McDonnell Douglas|MD-80|Airliner|MD-82, MD-83, MD-88
+McDonnell Douglas|MD-90|Airliner|
+Douglas|DC-3|Classic airliner|C-47 Skytrain, Dakota
+Douglas|DC-6|Classic airliner|
+Douglas|DC-7|Classic airliner|
+Lockheed|L-1011 TriStar|Airliner|
+Lockheed|Constellation|Classic airliner|L-749, L-1049 Super Constellation
+Lockheed|Electra|Turboprop|
+Lockheed|C-130|Military transport|Hercules, H, J, J-30, AC-130J Ghostrider, E, 
+Lockheed|C-5|Military transport|Galaxy, M Super Galaxy
+Lockheed|C-141|Military transport|Starlifter
+Lockheed Martin|F-35|Fighter|A, B, C, Lightning II
+Lockheed Martin|F-22|Fighter|Raptor
+Lockheed Martin|F-16|Fighter|A, C, D, Block 50, Block 70 Viper, Fighting Falcon, Viper
+Lockheed Martin|F-117|Stealth attack aircraft|Nighthawk
+Lockheed Martin|U-2|Spy plane|Dragon Lady
+Lockheed Martin|SR-71|Spy plane|Blackbird
+Lockheed Martin|A-12|Spy plane|Oxcart
+Lockheed Martin|P-3 Orion|Maritime patrol|
+Lockheed Martin|P-38 Lightning|WWII fighter|
+Lockheed Martin|F-104|Fighter|Starfighter
+Lockheed Martin|F-111|Fighter-bomber|Aardvark
+Lockheed Martin|AC-130|Gunship|Spooky, Spectre
+Lockheed Martin|X-35|Prototype|
+Lockheed Martin|X-59|Experimental aircraft|QueSST
+Lockheed Martin|Vega|Classic aircraft|
+Boeing|B-52|Bomber|Stratofortress, H
+Boeing|B-17|WWII bomber|Flying Fortress, G, 
+Boeing|B-29|WWII bomber|Superfortress, Enola Gay
+Boeing|B-1|Bomber|B Lancer
+Boeing|B-2|Stealth bomber|Spirit
+Boeing|B-21|Stealth bomber|Raider
+Boeing|B-24|WWII bomber|Liberator
+Boeing|KC-135|Tanker|Stratotanker
+Boeing|E-3|AWACS|Sentry
+Boeing|P-8|Maritime patrol|Poseidon
+Boeing|F-15|Fighter|Eagle, C, E Strike Eagle, EX Eagle II
+Boeing|F/A-18|Fighter|Hornet, Super Hornet E/F, EA-18G Growler, A/B, C/D
+Boeing|F-4|Fighter|Phantom II
+Boeing|F-14|Fighter|Tomcat, A, B, D
+Boeing|AV-8B|Attack aircraft|Harrier II
+Boeing|A-10|Attack aircraft|Thunderbolt II, Warthog, C
+Boeing|AH-64|Helicopter|Apache, D Longbow, E Guardian
+Boeing|CH-47|Helicopter|Chinook, F
+Boeing|V-22|Tiltrotor|Osprey, 
+Boeing|F-15EX|Fighter|
+Boeing|Stearman|Biplane|Model 75, PT-17
+Boeing|P-26|Classic fighter|Peashooter
+Boeing|X-32|Prototype|
+Northrop Grumman|B-2|Stealth bomber|Spirit
+Northrop Grumman|F-5|Fighter|Tiger II, 
+Northrop Grumman|F-20|Fighter|Tigershark
+Northrop Grumman|P-61|Night fighter|Black Widow
+Northrop Grumman|A-6|Attack aircraft|Intruder
+Northrop Grumman|E-2|AEW aircraft|Hawkeye
+Northrop Grumman|RQ-4|Drone|Global Hawk
+Grumman|F6F|WWII fighter|Hellcat
+Grumman|F4F|WWII fighter|Wildcat
+Grumman|TBF|WWII bomber|Avenger
+Grumman|F8F|Fighter|Bearcat
+Grumman|G-21|Amphibian|Goose
+Grumman|Mallard|Amphibian|
+North American|P-51|WWII fighter|Mustang, D, H
+North American|F-86|Fighter|Sabre, 
+North American|T-6|Trainer|Texan
+North American|B-25|WWII bomber|Mitchell
+North American|X-15|Rocket plane|
+North American|XB-70|Experimental bomber|Valkyrie
+North American|F-100|Fighter|Super Sabre
+Republic|P-47|WWII fighter|Thunderbolt
+Republic|F-105|Fighter-bomber|Thunderchief
+Vought|F4U|WWII fighter|Corsair
+Vought|F-8|Fighter|Crusader
+Curtiss|P-40|WWII fighter|Warhawk
+Curtiss|JN-4|Biplane|Jenny
+Curtiss|SB2C|WWII bomber|Helldiver
+Bell|P-39|WWII fighter|Airacobra
+Bell|X-1|Rocket plane|
+Bell|UH-1|Helicopter|Huey, 
+Bell|AH-1|Helicopter|Cobra, Z Viper, 
+Bell|206|Helicopter|JetRanger, L LongRanger
+Bell|407|Helicopter|GXi
+Bell|429|Helicopter|
+Bell|47|Helicopter|
+Bell|525|Helicopter|Relentless
+Sikorsky|UH-60|Helicopter|Black Hawk, M, L
+Sikorsky|CH-53|Helicopter|Sea Stallion, King Stallion, 
+Sikorsky|S-92|Helicopter|
+Sikorsky|SH-60|Helicopter|Seahawk
+Sikorsky|S-76|Helicopter|
+Sikorsky|S-64|Helicopter|Skycrane
+Sikorsky|S-97|Helicopter|Raider
+Robinson|R22|Helicopter|
+Robinson|R44|Helicopter|Raven II
+Robinson|R66|Helicopter|
+Airbus Helicopters|H125|Helicopter|
+Airbus Helicopters|H145|Helicopter|
+Airbus Helicopters|H160|Helicopter|
+Airbus Helicopters|H135|Helicopter|
+Airbus Helicopters|Tiger|Helicopter|
+Airbus Helicopters|Super Puma|Helicopter|H225
+Eurocopter|AS350|Helicopter|Écureuil, B3
+Eurocopter|EC135|Helicopter|
+Eurocopter|Dauphin|Helicopter|
+Leonardo|AW139|Helicopter|
+Leonardo|AW101|Helicopter|Merlin
+Leonardo|AW609|Tiltrotor|
+Leonardo|M-346|Trainer|Master
+Leonardo|AW109|Helicopter|
+Mil|Mi-24|Helicopter|Hind
+Mil|Mi-8|Helicopter|Hip
+Mil|Mi-26|Helicopter|Halo
+Mil|Mi-17|Helicopter|
+Kamov|Ka-52|Helicopter|Alligator
+Kamov|Ka-50|Helicopter|Black Shark
+Kamov|Ka-27|Helicopter|Helix
+Cessna|172|Light aircraft|Skyhawk, S, SP, R, 
+Cessna|182|Light aircraft|Skylane, T, 
+Cessna|152|Light aircraft|
+Cessna|150|Light aircraft|
+Cessna|206|Light aircraft|Stationair
+Cessna|208|Turboprop|Caravan, Grand Caravan EX
+Cessna|210|Light aircraft|Centurion
+Cessna|310|Twin piston|
+Cessna|421|Twin piston|Golden Eagle
+Cessna|Citation|Business jet|X, X+, Longitude, Latitude, Sovereign, Mustang, CJ4, M2, Excel, XLS, Ultra, Bravo, Encore, II, Hemisphere, Ascend, Citation Jet
+Cessna|SkyCourier|Turboprop|
+Cessna|A-37|Attack aircraft|Dragonfly
+Cessna|O-2|Observation aircraft|Skymaster
+Piper|J-3 Cub|Classic aircraft|
+Piper|PA-28|Light aircraft|Cherokee, Warrior, Archer, Arrow, Cadet
+Piper|PA-18|Light aircraft|Super Cub
+Piper|PA-46|Light aircraft|Malibu, Mirage, M600
+Piper|Seneca|Twin piston|
+Piper|Cheyenne|Turboprop|
+Piper|Navajo|Twin piston|
+Piper|Aztec|Twin piston|
+Beechcraft|Bonanza|Light aircraft|A36, G36, V-tail, 35, F33A, Debonair
+Beechcraft|King Air|Turboprop|350, 360, 250, 200, C90, B200, F90, 90, 
+Beechcraft|Baron|Twin piston|58, G58, 55, 
+Beechcraft|T-6|Trainer|Texan II
+Beechcraft|Staggerwing|Classic aircraft|D17S
+Beechcraft|Duchess|Twin piston|
+Beechcraft|Super King Air|Turboprop|
+Beechcraft|Model 18|Twin piston|
+Beechcraft|Starship|Turboprop|
+Cirrus|SR22|Light aircraft|T, G6, G7, GTS
+Cirrus|SR20|Light aircraft|
+Cirrus|Vision Jet|Personal jet|SF50, G2+
+Diamond|DA40|Light aircraft|NG, 
+Diamond|DA42|Twin piston|Twin Star
+Diamond|DA62|Twin piston|
+Diamond|DA20|Light aircraft|Katana
+Mooney|M20|Light aircraft|J, Ovation, Acclaim, TLS, Bravo, 
+Pilatus|PC-12|Turboprop|NGX, 
+Pilatus|PC-24|Business jet|
+Pilatus|PC-7|Trainer|Mk II
+Pilatus|PC-21|Trainer|
+Pilatus|Porter|STOL aircraft|PC-6
+Quest|Kodiak|Turboprop|100, 900, 
+Daher|TBM|Turboprop|940, 960, 900, 850, 
+Daher|Kodiak|Turboprop|
+Honda|HondaJet|Business jet|Elite, Elite II, 2600
+Gulfstream|G650|Business jet|ER, 
+Gulfstream|G700|Business jet|
+Gulfstream|G800|Business jet|
+Gulfstream|G600|Business jet|
+Gulfstream|G550|Business jet|
+Gulfstream|G500|Business jet|
+Gulfstream|G450|Business jet|
+Gulfstream|G280|Business jet|
+Gulfstream|G200|Business jet|
+Gulfstream|G100|Business jet|
+Gulfstream|G-IV|Business jet|SP, 
+Gulfstream|G-V|Business jet|
+Gulfstream|G-I|Turboprop|
+Dassault|Falcon|Business jet|7X, 8X, 900, 2000, 6X, 10X, 50, 20
+Dassault|Rafale|Fighter|C, B, M, F4
+Dassault|Mirage|Fighter|2000, III, F1, 5, IV, 2000C, 2000-5, 
+Dassault|Mirage III|Fighter|
+Dassault|Super Étendard|Fighter|
+Dassault|Ouragan|Fighter|
+Dassault|Mystère|Fighter|
+Dassault|nEUROn|Drone|
+Dassault|Falcon 2000|Business jet|S, LXS
+Dassault|Falcon 900|Business jet|LX
+Dassault|Falcon 8X|Business jet|
+Eurofighter|Typhoon|Fighter|T1, FGR4, T3, Tranche 3, Tranche 4, EK, 
+Panavia|Tornado|Fighter-bomber|GR4, ADV, ECR, IDS, 
+BAE Systems|Hawk|Trainer|T1, 128, 
+BAE Systems|Harrier|Attack aircraft|GR9, GR7, AV-8B, 
+BAE Systems|Nimrod|Maritime patrol|MR2, MRA4, 
+BAE Systems|Sea Harrier|Fighter|FA2, FRS1, 
+BAE Systems|Taranis|Drone|
+BAE Systems|Tempest|Concept|
+BAE Systems|Jetstream|Turboprop|
+BAE Systems|146|Airliner|
+Hawker|Hunter|Fighter|F6, 
+Hawker|Hurricane|WWII fighter|Mk I, Mk II, Sea Hurricane, 
+Hawker|Typhoon|WWII fighter|
+Hawker|Tempest|WWII fighter|
+Hawker|Siddeley|Business jet|
+Supermarine|Spitfire|WWII fighter|Mk I, Mk II, Mk V, Mk IX, Mk XIV, Mk XVI, Seafire, Mk 24, Mk 21, Mk XIX, 
+Supermarine|S.6B|Racing seaplane|
+Avro|Lancaster|WWII bomber|B.I, B.III, 
+Avro|Vulcan|Bomber|B.2, 
+Avro|Shackleton|Maritime patrol|
+Avro|Anson|Trainer|
+Avro|Avian|Classic aircraft|
+Handley Page|Halifax|WWII bomber|
+Handley Page|Victor|Bomber|
+Handley Page|Hampden|WWII bomber|
+de Havilland|Mosquito|WWII bomber|FB VI, B.IV, 
+de Havilland|Vampire|Fighter|
+de Havilland|Comet|Airliner|1, 4, 
+de Havilland|Tiger Moth|Biplane|
+de Havilland|Beaver|Bush plane|DHC-2, 
+de Havilland|Otter|Bush plane|DHC-3, 
+de Havilland|Twin Otter|Bush plane|DHC-6, 
+de Havilland|Dash 7|Turboprop|
+de Havilland|Chipmunk|Trainer|
+de Havilland|Dragon Rapide|Classic aircraft|
+de Havilland|Venom|Fighter|
+de Havilland|Sea Vixen|Fighter|
+de Havilland|DH.88 Comet|Racing aircraft|
+de Havilland|Hornet|Fighter|
+Gloster|Meteor|Fighter|F.8, 
+Gloster|Gladiator|Biplane fighter|
+English Electric|Lightning|Fighter|F.6, 
+English Electric|Canberra|Bomber|B.2, 
+Short|Sunderland|Flying boat|
+Short|Stirling|WWII bomber|
+Fairey|Swordfish|WWII torpedo bomber|
+Westland|Lynx|Helicopter|
+Westland|Wessex|Helicopter|
+Westland|Sea King|Helicopter|
+Westland|Whirlwind|Helicopter|
+Messerschmitt|Bf 109|WWII fighter|E, F, G-6, K-4, 
+Messerschmitt|Me 262|WWII jet fighter|Schwalbe, 
+Messerschmitt|Me 163|Rocket fighter|Komet, 
+Messerschmitt|Bf 110|WWII fighter|
+Messerschmitt|Me 410|WWII fighter|
+Focke-Wulf|Fw 190|WWII fighter|A-8, D-9, F-8, 
+Focke-Wulf|Ta 152|WWII fighter|
+Focke-Wulf|Fw 200|Condor|
+Junkers|Ju 87|WWII dive bomber|Stuka, 
+Junkers|Ju 52|Transport|
+Junkers|Ju 88|WWII bomber|
+Junkers|Ju 390|Transport|
+Heinkel|He 111|WWII bomber|
+Heinkel|He 162|WWII jet fighter|Volksjäger, 
+Heinkel|He 177|WWII bomber|
+Dornier|Do 17|WWII bomber|
+Dornier|Do 335|WWII fighter|Pfeil, 
+Dornier|Do X|Flying boat|
+Arado|Ar 234|WWII bomber|Blitz, 
+Horten|Ho 229|Flying wing|
+Fieseler|Storch|Classic aircraft|Fi 156, 
+Zeppelin|LZ 129|Hindenburg|
+Zeppelin|NT|Airship|
+Mitsubishi|A6M Zero|WWII fighter|A6M2, A6M3, A6M5, 
+Mitsubishi|Ki-46|Reconnaissance aircraft|Dinah, 
+Mitsubishi|G4M|WWII bomber|Betty, 
+Mitsubishi|SpaceJet|Regional jet|
+Mitsubishi|F-2|Fighter|
+Kawasaki|Ki-61|WWII fighter|Hien, 
+Kawasaki|P-1|Maritime patrol|
+Nakajima|Ki-43|WWII fighter|Hayabusa, Oscar, 
+Nakajima|Ki-84|WWII fighter|Hayate, Frank, 
+Aichi|D3A|WWII dive bomber|Val, 
+Yokosuka|D4Y|WWII dive bomber|Suisei, 
+Kawanishi|N1K|WWII fighter|Shiden, 
+Kawanishi|H8K|Flying boat|Emily, 
+Sukhoi|Su-27|Fighter|Flanker, P, SK, 
+Sukhoi|Su-30|Fighter|SM, MKI, MKK, SME, 
+Sukhoi|Su-35|Fighter|S, 
+Sukhoi|Su-57|Stealth fighter|Felon, 
+Sukhoi|Su-34|Fighter-bomber|Fullback, 
+Sukhoi|Su-25|Attack aircraft|Frogfoot, 
+Sukhoi|Su-24|Fighter-bomber|Fencer, 
+Sukhoi|Su-17|Fighter-bomber|Fitter, 
+Sukhoi|Su-47|Experimental fighter|Berkut, 
+Sukhoi|Superjet 100|Regional jet|
+Sukhoi|T-50|Prototype|
+Sukhoi|Su-75|Stealth fighter|Checkmate, 
+Sukhoi|Su-33|Fighter|Flanker-D, 
+Sukhoi|Su-7|Fighter|Fitter, 
+Mikoyan|MiG-29|Fighter|Fulcrum, A, SMT, K, M2, 
+Mikoyan|MiG-21|Fighter|Fishbed, MF, bis, 
+Mikoyan|MiG-15|Fighter|Fagot, 
+Mikoyan|MiG-17|Fighter|Fresco, 
+Mikoyan|MiG-19|Fighter|Farmer, 
+Mikoyan|MiG-23|Fighter|Flogger, 
+Mikoyan|MiG-25|Interceptor|Foxbat, 
+Mikoyan|MiG-31|Interceptor|Foxhound, 
+Mikoyan|MiG-35|Fighter|Fulcrum-F, 
+Mikoyan|MiG-1.44|Prototype|
+Yakovlev|Yak-3|WWII fighter|
+Yakovlev|Yak-9|WWII fighter|
+Yakovlev|Yak-130|Trainer|
+Yakovlev|Yak-52|Trainer|
+Yakovlev|Yak-38|VTOL fighter|Forger, 
+Lavochkin|La-7|WWII fighter|
+Polikarpov|Po-2|Biplane|
+Polikarpov|I-16|Fighter|
+Petlyakov|Pe-2|WWII bomber|
+Chengdu|J-20|Stealth fighter|Mighty Dragon, 
+Chengdu|J-10|Fighter|Vigorous Dragon, C, 
+Chengdu|JF-17|Fighter|Thunder, Block III, 
+Shenyang|J-35|Stealth fighter|
+Shenyang|J-31|Stealth fighter|
+Shenyang|J-16|Fighter|
+Shenyang|J-11|Fighter|
+Shenyang|J-15|Fighter|Flying Shark, 
+Xi'an|H-6|Bomber|
+Xi'an|H-20|Stealth bomber|
+Xi'an|Y-20|Transport|Kunpeng, 
+COMAC|C919|Airliner|
+COMAC|C909|Regional jet|ARJ21, 
+COMAC|C929|Airliner|
+HAL|Tejas|Fighter|Mk1A, Mk2, 
+HAL|Dhruv|Helicopter|
+HAL|Light Combat Helicopter|Helicopter|Prachand, 
+HAL|HF-24|Fighter|Marut, 
+HAL|HTT-40|Trainer|
+Saab|Gripen|Fighter|C, D, E, F, 
+Saab|JAS 39 Gripen|Fighter|C, D, E, 
+Saab|Draken|Fighter|J 35, 
+Saab|Viggen|Fighter|JA 37, 
+Saab|Lansen|Fighter|
+Saab|340|Turboprop|
+Saab|2000|Turboprop|
+Saab|Erieye|AEW aircraft|
+KAI|KF-21|Fighter|Boramae, 
+KAI|T-50|Trainer|Golden Eagle, 
+KAI|FA-50|Light fighter|
+IAI|Kfir|Fighter|
+IAI|Lavi|Fighter|
+IAI|Heron|Drone|
+IAI|Arava|Transport|
+IAI|Westwind|Business jet|
+IAI|Astra|Business jet|
+Turkish Aerospace|KAAN|Stealth fighter|
+Turkish Aerospace|Hürjet|Trainer|
+Turkish Aerospace|Anka|Drone|
+Baykar|Bayraktar TB2|Drone|
+Baykar|Bayraktar Akıncı|Drone|
+Baykar|Kızılelma|Drone|
+General Atomics|MQ-9|Drone|Reaper, 
+General Atomics|MQ-1|Drone|Predator, 
+General Atomics|Avenger|Drone|
+General Atomics|Gray Eagle|Drone|
+Boom|Overture|Supersonic airliner|
+Boom|XB-1|Experimental aircraft|
+Wright|Flyer|Historic aircraft|1903, 1905, Model A, 
+Ryan|Spirit of St. Louis|Historic aircraft|
+Ryan|NYP|Historic aircraft|
+Lockheed|Vega|Classic aircraft|5B, 
+Lockheed|Model 10 Electra|Classic aircraft|
+Lockheed|Hudson|WWII bomber|
+Waco|YMF|Biplane|5, 
+Waco|UPF-7|Biplane|
+Stearman|PT-17|Biplane|Kaydet, 
+Pitts|S-2|Aerobatic biplane|S-2C, S-1S, 
+Extra|EA-300|Aerobatic aircraft|L, 330SC, 330LX, 
+Extra|NG|Aerobatic aircraft|
+Sukhoi|Su-26|Aerobatic aircraft|
+Sukhoi|Su-29|Aerobatic aircraft|
+Zivko|Edge 540|Aerobatic aircraft|V3, 
+Zlin|Z-50|Aerobatic aircraft|
+Van's|RV-7|Homebuilt|RV-8, RV-10, RV-12, RV-14, RV-4, RV-6, RV-3, 
+Lancair|Evolution|Homebuilt|IV, Legacy, 
+Glasair|Sportsman|Homebuilt|
+Rutan|Voyager|Experimental aircraft|
+Rutan|VariEze|Homebuilt|Long-EZ, 
+Rutan|SpaceShipOne|Spaceplane|
+Rutan|SpaceShipTwo|Spaceplane|VSS Unity, 
+Scaled Composites|Stratolaunch|Carrier aircraft|Roc, 
+Scaled Composites|White Knight|Carrier aircraft|
+Boeing|X-37|Spaceplane|B, 
+Boeing|X-20|Spaceplane|Dyna-Soar, 
+Boeing|X-45|Drone|
+Boeing|X-47B|Drone|
+Boeing|X-51|Hypersonic|Waverider, 
+Boeing|X-43|Hypersonic|`,
+weapons:`Kalashnikov|AK-47|Assault rifle|Type 1, Type 2, Type 3, Type 56
+Kalashnikov|AKM|Assault rifle|AKMS
+Kalashnikov|AK-74|Assault rifle|AK-74M, AKS-74U
+Kalashnikov|AK-12|Assault rifle|AK-15
+Kalashnikov|PKM|Machine gun|
+Kalashnikov|SVD Dragunov|Sniper rifle|
+Colt|M16|Assault rifle|M16A1, M16A2, M16A4
+Colt|AR-15|Rifle|SP1, Match Target
+Colt|M4|Carbine|M4A1, Commando, Mk18
+Colt|M1911|Pistol|M1911A1, Government, Commander, Gold Cup, Series 70, Delta Elite
+Colt|Python|Revolver|4 inch, 6 inch, 2020
+Colt|Anaconda|Revolver|
+Colt|Single Action Army|Revolver|Peacemaker
+Colt|Walker|Revolver|
+Colt|Navy 1851|Revolver|
+Colt|Detective Special|Revolver|
+Smith & Wesson|Model 29|Revolver|.44 Magnum
+Smith & Wesson|Model 686|Revolver|Plus
+Smith & Wesson|Model 500|Revolver|
+Smith & Wesson|Model 10|Revolver|
+Smith & Wesson|Model 19|Revolver|Combat Magnum
+Smith & Wesson|Model 66|Revolver|
+Smith & Wesson|Model 60|Revolver|
+Smith & Wesson|M&P|Pistol|9, 9 Shield, 15 Sport II, 2.0, 45, M2.0 Compact
+Glock|17|Pistol|Gen 3, Gen 4, Gen 5
+Glock|19|Pistol|Gen 3, Gen 4, Gen 5, X, MOS
+Glock|26|Pistol|Gen 5
+Glock|34|Pistol|Gen 5
+Glock|43|Pistol|X, X MOS
+Glock|45|Pistol|
+Glock|48|Pistol|MOS
+Glock|20|Pistol|10mm
+Glock|21|Pistol|
+Glock|22|Pistol|
+Glock|18|Pistol|
+SIG Sauer|P226|Pistol|Legion, Elite, X-Five, Navy, Mk25
+SIG Sauer|P229|Pistol|Legion
+SIG Sauer|P220|Pistol|Elite, Legion
+SIG Sauer|P320|Pistol|M17, M18, X-Five, Carry, Compact, RXP
+SIG Sauer|P365|Pistol|XL, X, XMacro
+SIG Sauer|P210|Pistol|
+SIG Sauer|MCX|Rifle|Spear, Rattler, Virtus
+SIG Sauer|MPX|Submachine gun|
+SIG Sauer|Cross|Rifle|
+Heckler & Koch|MP5|Submachine gun|A3, SD, K, PDW
+Heckler & Koch|G3|Battle rifle|A3, A4
+Heckler & Koch|HK416|Assault rifle|A5, D145RS
+Heckler & Koch|HK417|Battle rifle|
+Heckler & Koch|G36|Assault rifle|C, K
+Heckler & Koch|UMP|Submachine gun|9, 40, 45
+Heckler & Koch|USP|Pistol|Tactical, Compact, Match, Expert
+Heckler & Koch|VP9|Pistol|
+Heckler & Koch|P30|Pistol|L, SK
+Heckler & Koch|P7|Pistol|M8, M13
+Heckler & Koch|HK45|Pistol|Tactical, Compact
+Heckler & Koch|Mark 23|Pistol|
+Heckler & Koch|MP7|Submachine gun|A1, A2
+Heckler & Koch|MSG90|Sniper rifle|
+Heckler & Koch|PSG1|Sniper rifle|
+FN Herstal|SCAR|Battle rifle|SCAR-H, SCAR-L, SCAR 17S, SCAR 16S, Mk 17, Mk 16
+FN Herstal|FAL|Battle rifle|L1A1
+FN Herstal|P90|Personal defense weapon|
+FN Herstal|Five-seveN|Pistol|MK3
+FN Herstal|509|Pistol|Tactical, Midsize
+FN Herstal|M249|Light machine gun|SAW
+FN Herstal|M240|Machine gun|MAG 58
+FN Herstal|Browning Hi-Power|Pistol|
+Beretta|92FS|Pistol|M9, M9A3, 92X, 92A1
+Beretta|APX|Pistol|A1, Carry
+Beretta|1301|Shotgun|Tactical, Competition
+Beretta|A400|Shotgun|Xcel, Xplor
+Beretta|686|Shotgun|Silver Pigeon, Onyx
+Beretta|ARX160|Assault rifle|
+Beretta|93R|Pistol|
+Beretta|Model 12|Submachine gun|
+Browning|M2HB|Machine gun|Ma Deuce
+Browning|Hi-Power|Pistol|Mk III
+Browning|BAR|Rifle|M1918
+Browning|M1919|Machine gun|
+Browning|Auto-5|Shotgun|
+Browning|Citori|Shotgun|
+Browning|X-Bolt|Rifle|
+Browning|Buck Mark|Pistol|
+Winchester|Model 70|Rifle|Featherweight, Pre-64, Classic, Super Grade
+Winchester|Model 1873|Rifle|
+Winchester|Model 1894|Rifle|30-30, Trapper
+Winchester|Model 1892|Rifle|
+Winchester|Model 1886|Rifle|
+Winchester|Model 1897|Shotgun|Trench Gun
+Winchester|Model 12|Shotgun|
+Winchester|Model 1866|Rifle|Yellow Boy
+Winchester|SXP|Shotgun|Defender, Black Shadow
+Remington|700|Rifle|SPS, BDL, ADL, 5R, XCR, Police, CDL
+Remington|870|Shotgun|Express, Wingmaster, Police Magnum, Tactical, Marine Magnum
+Remington|1100|Shotgun|
+Remington|11-87|Shotgun|
+Remington|Nylon 66|Rifle|
+Remington|M24|Sniper rifle|SWS
+Remington|1858|Revolver|New Model Army
+Mossberg|500|Shotgun|Persuader, Tactical, Cruiser, 590A1, Maverick 88, Flex
+Mossberg|590|Shotgun|Shockwave, 590A1, Mariner
+Mossberg|930|Shotgun|SPX, Tactical, 
+Mossberg|Shockwave|Firearm|
+Benelli|M4|Shotgun|Super 90, Tactical, H2O, Entry
+Benelli|M2|Shotgun|Field, Tactical, 3-Gun
+Benelli|Super Black Eagle|Shotgun|II, 3, 
+Benelli|Nova|Shotgun|
+Ruger|10/22|Rifle|Takedown, Target, Carbine, Charger, Tactical
+Ruger|Mark IV|Pistol|Target, 22/45, Hunter, Lite
+Ruger|GP100|Revolver|Match Champion, 
+Ruger|Redhawk|Revolver|
+Ruger|Super Redhawk|Revolver|Alaskan, 
+Ruger|Blackhawk|Revolver|
+Ruger|LCP|Pistol|II, Max
+Ruger|Precision Rifle|Rifle|
+Ruger|Mini-14|Rifle|Ranch, Tactical, 
+Ruger|PC Carbine|Rifle|
+Ruger|SP101|Revolver|
+Springfield Armory|M1A|Rifle|Scout Squad, SOCOM 16, Loaded, 
+Springfield Armory|Hellcat|Pistol|OSP, Pro, 
+Springfield Armory|XD|Pistol|XD-M, XD-S, XD Mod.2, XD-M Elite
+Springfield Armory|1911|Pistol|Operator, Loaded, Mil-Spec, TRP, Range Officer
+Springfield Armory|M1903|Rifle|
+Taurus|G3|Pistol|G3c, G3X, G3 Tactical
+Taurus|Judge|Revolver|
+Taurus|Raging Bull|Revolver|
+Taurus|856|Revolver|
+Taurus|TX22|Pistol|
+Taurus|PT92|Pistol|
+Walther|PPK|Pistol|PPK/S, 
+Walther|P38|Pistol|P1, 
+Walther|PPQ|Pistol|M2, 
+Walther|P99|Pistol|
+Walther|PDP|Pistol|Compact, Full-Size, F-Series, 
+Walther|WA 2000|Rifle|
+Walther|Q5 Match|Pistol|Steel Frame, 
+CZ|75|Pistol|SP-01, Shadow 2, B, Compact, P-01, Kadet, 
+CZ|Scorpion EVO 3|Submachine gun|S1, 
+CZ|Shadow 2|Pistol|Orange, SP-01 Shadow, 
+CZ|P-10|Pistol|C, F, S, 
+CZ|BREN 2|Rifle|
+Desert Eagle|Mark XIX|Pistol|.357 Magnum, .44 Magnum, .50 AE, L5, 
+Barrett|M82|Anti-materiel rifle|M82A1, M107A1, M82A2, 
+Barrett|M99|Anti-materiel rifle|
+Barrett|MRAD|Sniper rifle|
+Accuracy International|AWM|Sniper rifle|L115A3, 
+Accuracy International|AX50|Sniper rifle|
+Tikka|T3x|Rifle|Lite, Hunter, Tac A1, Super Varmint, CTR, 
+Savage|110|Rifle|Hunter, Storm, Tactical, Elite Precision, 
+Savage|Axis|Rifle|II, XP, 
+Marlin|Model 1895|Rifle|45-70, Guide Gun, SBL, 
+Marlin|Model 336|Rifle|
+Marlin|Model 1894|Rifle|
+Henry|Big Boy|Rifle|Steel, Brass, X Model, Classic, All-Weather, Color Case Hardened, 
+Henry|Golden Boy|Rifle|
+Steyr|AUG|Bullpup rifle|A1, A2, A3, A3 M1, 
+Steyr|Scout|Rifle|`
+};
 const NATIVE = {};
 Object.assign(NATIVE, {
 artists:`BTS|방탄소년단 · K-pop
@@ -4656,6 +6489,8 @@ Mumbai|मुंबई
 Busan|부산`
 });
 const CATALOG = {};
+const BASEOF = {};   /* a trim's model, for finding a picture when the trim has none of its own */
+const VEH_CATS = new Set(['cars','motorcycles','aircraft','weapons']);
 function buildCatalog(){
   const parse=t=>t.trim().split('\n').map(l=>{const [n,s]=l.split('|');return {n:n.trim(),s:(s||'').trim()};});
   for (const id in RAW){ const seen=new Set(), out=[];
@@ -4665,6 +6500,16 @@ function buildCatalog(){
       if(old){ if(isNat(it.s) && !isNat(old.s)) old.s = segs(it.s).length>1 ? it.s : [it.s,old.s].filter(Boolean).join(' · '); continue; }   /* later list adds the native name to an existing entry */
       byName.set(k,it); out.push(it); }
     CATALOG[id]=out; }
+  for(const id in MODEL_SRC){
+    const list=CATALOG[id]||(CATALOG[id]=[]), have=new Set(list.map(i=>i.n.toLowerCase()));
+    for(const line of MODEL_SRC[id].split('\n')){
+      const [make,model,cls,trims]=line.split('|'); if(!make||!model) continue;
+      const base=model.toLowerCase().startsWith(make.toLowerCase())||model.toLowerCase()===make.toLowerCase()||(id==='weapons'&&have.has(model.toLowerCase()))?model:make+' '+model;
+      const add=(n,sub,b)=>{ const k=n.toLowerCase(); if(have.has(k)) return; have.add(k); list.push({n,s:sub}); if(b&&b!==n) BASEOF[id+'|'+n]=b; };
+      add(base,make+' · '+cls);
+      for(const t of String(trims||'').split(',').map(x=>x.trim()).filter(Boolean)) add(/^[-+]/.test(t)||(id==='aircraft'&&/^[A-Z]$/.test(t))?base+t:base+' '+t, model+' · '+cls, base);
+    }
+  }
 }
 buildCatalog();
 const STATIC = new Set(); for(const c in CATALOG) for(const it of CATALOG[c]) STATIC.add(c+'|'+it.n.toLowerCase());   /* what ships with the app */
@@ -4742,6 +6587,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 function snapAt(years,y){ const ys=Object.keys(years||{}).map(Number).filter(v=>v<=y).sort((a,b)=>b-a); if(!ys.length) return null; const s=years[ys[0]]; return (!s||s.removed||!s.top||!s.top.length)?null:s; }
 function ago(t){ const m=Math.max(1,Math.round((Date.now()-new Date(t))/60000)); if(m<60) return m+'m'; const h=Math.round(m/60); if(h<24) return h+'h'; return Math.round(h/24)+'d'; }
 async function loadFriends(){
+  await loadCustomCats();
   const fr=await sb.from('friendships').select('friend_id,close').eq('user_id',me.id); if(fr.error) throw fr.error;
   const rows=fr.data||[], ids=rows.map(r=>r.friend_id);
   FRIENDS=[]; UPDATES=[]; shared={};
@@ -5048,6 +6894,7 @@ async function makeMatchStory(st,font){
 }
 /* ---------- Coming from a friend's shared shelf: rank the same topic right away, then see the match ---------- */
 function startVs(vs){
+  PASS.add(vs.cat);
   if(eff(vs.cat,CURRENT)){ ui.tab='friends'; ui.profile=vs.id; ui.compare=null; render(); openVsResult(vs.id,vs.cat); return; }
   ui.tab='me'; render(); openEditor(vs.cat,false); ed.vs=vs; renderEditor(); toast(`You and ${vs.name} are now friends`);
 }
@@ -5063,6 +6910,102 @@ function openVsResult(fid,c){
   <div class="cols vs-cols"><div><h3>You</h3>${mini(mine.snap.top,c,set)}</div><div><h3>${esc(first(f))}</h3>${mini(theirs.top,c,set)}</div></div>
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="vs-profile" data-f="${f.id}">See ${esc(first(f))}'s profile</button><button class="pill" data-act="share-match" data-f="${f.id}" data-cat="${c}">Share our match</button></div></div>`,'vs');
 }
+/* ---------- Unlocks: 8 starter categories for everyone, the rest in packs that open by coming back, inviting and filling shelves ---------- */
+const STARTER = ['artists','albums','songs','movies','tv','games','anime','fastfood'];
+const PACKS = [
+  {id:'eats',   name:'Eats & drinks',    blurb:'Restaurants, cafés, desserts, cocktails and more',  kind:'invites', n:1,  of:c=>c.group==='Food & drink'},
+  {id:'screen', name:'Screen & stars',   blurb:'Actors, characters, K-dramas, celebrities and more', kind:'days',    n:3,  of:c=>c.group==='People'||c.group==='Film & TV'},
+  {id:'places', name:'Places & nature',  blurb:'Countries, cities, landmarks, animals and more',      kind:'shelves', n:3,  of:c=>c.group==='Places'||c.group==='Nature'},
+  {id:'style',  name:'Style & wheels',   blurb:'Sneakers, cars, fragrances, tech and more',           kind:'invites', n:3,  of:c=>c.group==='Style & stuff'||c.group==='Vehicles'},
+  {id:'culture',name:'Culture & sport',  blurb:'Books, podcasts, sports, board games and more',       kind:'days',    n:7,  of:c=>c.group==='Reading & listening'||c.group==='Sport'||c.group==='Games'||c.group==='Music'},
+  {id:'deep',   name:'Deep cuts',        blurb:'History, ideas, languages, hobbies and more',         kind:'days',    n:14, of:c=>c.group==='History & ideas'||c.group==='Life'}
+];
+const CUSTOM_PACK = {id:'custom', name:'Make your own', blurb:'Your own shelf for your friends, like "Who is the smartest in the group?"', kind:'invites', n:5};
+const packOf = c => { const x=CAT[c]; if(!x||STARTER.includes(c)) return null; return PACKS.find(p=>p.of(x)) || null; };
+const UNL = {loaded:false, gate:false, supporter:false, invites:0, days:0, shelves:0, unlocked:new Set(), rules:{}};   /* gate stays off until the server says on, so nothing locks before unlocks.sql is run */
+const PASS = new Set();                                                                                               /* a link from a friend opens that one topic */
+const need = p => (UNL.rules[p.id]||p);
+const gotOf = k => UNL[k]|0;
+const packDone = p => !UNL.gate || UNL.supporter || UNL.unlocked.has(p.id);
+function isOpen(c){
+  if(!CAT[c]) return false; if(CAT[c].custom||!UNL.gate||UNL.supporter||STARTER.includes(c)||PASS.has(c)||state.shelves[c]) return true;
+  const p=packOf(c); return !p || UNL.unlocked.has(p.id);
+}
+const customOpen = () => !UNL.gate || UNL.supporter || UNL.unlocked.has('custom');
+function packText(p){ const r=need(p); return r.kind==='invites' ? (r.n===1?'1 friend joins':r.n+' friends join')+' through your link and makes a shelf'.replace('makes',r.n===1?'makes':'make') : r.kind==='days' ? `Open Palate on ${r.n} different days` : `Make ${r.n} shelves`; }
+function packLeft(p){ const r=need(p), got=gotOf(r.kind), left=Math.max(0,r.n-got); return {got:Math.min(got,r.n), n:r.n, left}; }
+function packCount(p){ return CATS.filter(c=>packOf(c.id)===p).length; }
+function nextPack(){ return PACKS.filter(p=>!packDone(p)).sort((a,b)=>packLeft(a).left/packLeft(a).n-packLeft(b).left/packLeft(b).n)[0]||null; }
+let unlT=0; document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadUnlocks(); });
+async function loadUnlocks(force){
+  if(!sb||!me||(!force&&Date.now()-unlT<60000)) return; unlT=Date.now();
+  try{
+    const {data,error}=await sb.rpc('unlock_state'); if(error||!data) return;
+    UNL.loaded=true; UNL.gate=!!data.gate; UNL.supporter=!!data.supporter; UNL.invites=data.invites|0; UNL.days=data.days|0; UNL.shelves=data.shelves|0;
+    UNL.unlocked=new Set(data.unlocked||[]); UNL.rules=Object.fromEntries((data.rules||[]).map(r=>[r.id,r]));
+    const seen=(()=>{ try{ return JSON.parse(localStorage.getItem('palate-unl-seen')||'[]'); }catch(e){ return []; } })();
+    const fresh=(data.fresh||[]).filter(id=>!seen.includes(id)&&(PACKS.find(p=>p.id===id)||id==='custom'));
+    if(fresh.length){ try{ localStorage.setItem('palate-unl-seen',JSON.stringify([...seen,...fresh])); }catch(e){} }
+    if(document.body.classList.contains('in')){ if(ui.tab==='me' && !ed) render(); if(fresh.length && !ed) celebrateUnlock(fresh); }
+  }catch(e){ if(window.PALATE_DEBUG) console.warn('unlock state failed',e); }
+}
+function celebrateUnlock(ids){
+  const items=ids.map(id=>id==='custom'?CUSTOM_PACK:PACKS.find(p=>p.id===id)).filter(Boolean); if(!items.length) return;
+  sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK.replace('<svg','<svg class="open"')}</div><h2>${items.length>1?'New shelves unlocked':'Unlocked: '+esc(items[0].name)}</h2>
+    <p class="muted">${items.map(p=>p.id==='custom'?'You can now make your own shelves.':`${packCount(p)} new categories are open: ${esc(p.blurb.toLowerCase())}.`).join(' ')}</p>
+    ${items.some(p=>p.id!=='custom')?`<button class="pill" style="width:100%;margin-top:14px" data-act="add-shelf">Pick a new shelf</button>`:`<button class="pill" style="width:100%;margin-top:14px" data-act="make-own">Make one</button>`}
+    <button class="swap" data-act="close">Later</button></div>`,'unlock');
+}
+function unlRow(p,custom){
+  const done=custom?customOpen():packDone(p), pr=packLeft(p), pct=Math.round(100*pr.got/pr.n);
+  const act = done?'' : need(p).kind==='invites' ? `<button class="pill sm" data-act="unl-invite">Copy invite link</button>` : need(p).kind==='shelves' ? `<button class="pill sm" data-act="add-shelf">Add a shelf</button>` : `<span class="muted unl-tip">Counts when you open the app</span>`;
+  return `<li class="unl-row${done?' done':''}"><div class="unl-ic">${done?'✓':LOCK}</div><div class="unl-main"><b>${esc(p.name)}${custom?'':` <em>${packCount(p)}</em>`}</b><span>${esc(p.blurb)}</span>
+    ${done?`<span class="unl-ok">Unlocked</span>`:`<span class="unl-need">${esc(packText(p))}</span><div class="unl-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${pr.n}" aria-valuenow="${pr.got}"><i style="width:${pct}%"></i></div><span class="unl-prog">${pr.got} of ${pr.n}</span>${act}`}</div></li>`;
+}
+function openUnlock(c){
+  const p=packOf(c), r=p&&packLeft(p); if(!p){ openUnlocks(); return; }
+  sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK}</div><h2>${esc(CAT[c].name)} is locked</h2>
+    <p class="muted">It opens with the ${esc(p.name)} pack (${packCount(p)} categories). ${esc(packText(p))}.</p>
+    <div class="unl-bar big"><i style="width:${Math.round(100*r.got/r.n)}%"></i></div><p class="unl-prog" style="text-align:center">${r.got} of ${r.n}</p>
+    ${need(p).kind==='invites'?`<button class="pill" style="width:100%;margin-top:6px" data-act="unl-invite">Copy invite link</button>`:need(p).kind==='shelves'?`<button class="pill" style="width:100%;margin-top:6px" data-act="close">Make a shelf first</button>`:`<p class="muted" style="text-align:center;margin-top:6px">Come back tomorrow, it adds up.</p>`}
+    <button class="swap" data-act="unlocks">See every pack</button></div>`,'unlock');
+}
+function openUnlocks(){
+  const starter=STARTER.map(id=>CAT[id].name).join(', ');
+  sheet(`<div class="sheet-head"><div><h2>Unlock shelves</h2><p>${UNL.supporter?'You have everything open':'Come back, invite friends, fill shelves'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <p class="muted" style="margin:0 0 12px">Always open: ${esc(starter)}.</p>
+  <ul class="unl-list">${PACKS.map(p=>unlRow(p,false)).join('')}${unlRow(CUSTOM_PACK,true)}
+    <li class="unl-row soon"><div class="unl-ic">★</div><div class="unl-main"><b>Supporter</b><span>Opens every pack at once, and gives you the Supporter badge.</span><span class="unl-need">Coming in the beta</span></div></li></ul>
+  <div style="height:18px"></div>`,'unlocks');
+}
+function unlockedCard(){
+  if(!UNL.gate||UNL.supporter||!UNL.loaded) return '';
+  const np=nextPack(); if(!np&&customOpen()) return '';
+  const pr=np?packLeft(np):null, pct=np?Math.round(100*pr.got/pr.n):100;
+  return `<button class="unl-card" data-act="unlocks"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>${np?`Next unlock: ${esc(np.name)}`:'Make your own shelves'}</b><span>${np?esc(packText(np))+` · ${pr.got} of ${pr.n}`:'Open the last pack'}</span>${np?`<span class="unl-bar"><i style="width:${pct}%"></i></span>`:''}</span><span class="unl-go">${PACKS.filter(packDone).length} of ${PACKS.length}</span></button>`;
+}
+/* Make-your-own shelves: the name lives in a small shared table so friends can rank the same thing. */
+function registerCustom(r){ if(!r||!r.id||!String(r.id).startsWith('my:')) return; CAT[r.id]={id:r.id,name:r.name,group:'Made by friends',shape:'square',popular:false,photo:false,custom:true,owner:r.owner||null}; CATALOG[r.id] ||= []; }
+async function loadCustomCats(){
+  if(!sb) return; try{ const {data,error}=await sb.from('custom_cats').select('id,name,owner').range(0,999); if(!error) for(const r of data||[]) registerCustom(r); }catch(e){}
+}
+function peopleItems(){ return [{n:me.name,s:'You'},...FRIENDS.map(f=>({n:f.name,s:'Friend'}))]; }
+function openMakeOwn(){
+  if(!customOpen()){ openUnlocks(); toast('Make-your-own is still locked'); return; }
+  sheet(`<div class="sheet-head"><div><h2>Make your own shelf</h2><p>Friends can rank it too</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="search"><input id="own-name" maxlength="40" autocomplete="off" aria-label="Shelf name" placeholder="Who is the smartest in the group?"></div>
+  <div class="own-ex">${['Best cook in the group','Most likely to be late','Who would survive a zombie apocalypse','Worst driver'].map(t=>`<button class="pk" data-act="own-ex" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+  <button class="pill" id="own-go" style="width:100%;margin-top:14px" data-act="make-own-go">Create shelf</button>
+  <p class="muted" style="font-size:13px;margin-top:10px">Your friends and you show up as suggestions, and you can add anything you type.</p>`,'own');
+  setTimeout(()=>$('#own-name')?.focus(),40);
+}
+async function makeOwn(){
+  const name=($('#own-name')?.value||'').trim(); if(name.length<2){ toast('Give it a name first'); return; }
+  const b=$('#own-go'); if(b) b.disabled=true;
+  try{ const {data,error}=await sb.rpc('make_custom_cat',{p_name:name}); if(error) throw error; registerCustom({id:data.id,name:data.name,owner:me.id}); closeSheet(); track('custom_cat','my'); openEditor(data.id,false); }
+  catch(e){ if(b) b.disabled=false; toast(/locked/i.test(e.message||'')?'Still locked':(e.message||"Couldn't make it. Try again.").slice(0,80)); }
+}
+
 function openAccount(){
   const dv=prefs().defVis||'friends';
   sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
@@ -5227,6 +7170,7 @@ async function enter(user){
   try{
     me={id:user.id,email:user.email||''};
     const jinfo=joinInfo(), code=jinfo?jinfo.code:null; let joined=null;
+    await loadCustomCats();
     const friendsP = code ? null : loadFriends(); if(friendsP) friendsP.catch(()=>{});     /* friends load alongside everything else, unless we are about to add one */
     const soft = q => q.then(r=>r,()=>({error:true}));
     const [pr,sh,ph,us,im,ci]=await Promise.all([
@@ -5247,7 +7191,7 @@ async function enter(user){
     synced.shelves={}; for(const c of state.order){ const r=shelfRow(c); synced.shelves[c]=JSON.stringify([r.years,r.vis,r.pos]); }
     synced.photos={}; for(const k in state.photos) synced.photos[k]=JSON.stringify(state.photos[k]);
     synced.custom=JSON.stringify(state.custom);
-    buildCatalog(); applyCustom(); applySharedCatalog(ci);
+    buildCatalog(); for(const k in CAT) if(CAT[k].custom) CATALOG[k] ||= []; applyCustom(); applySharedCatalog(ci);
     AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34,by:r.src||''};
     if(code){
       clearJoin(); let pv=JOINPREV;
@@ -5262,7 +7206,7 @@ async function enter(user){
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500);
+    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500); setTimeout(()=>loadUnlocks(true),900);
     if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     const vs = joined&&!joined.err&&joined.id&&joined.cat&&CAT[joined.cat] ? {id:joined.id,name:joined.name,cat:joined.cat} : null;
     if(vs) startVs(vs);
@@ -5739,8 +7683,9 @@ async function sampleTint(url){
   }
   return null;
 }
-async function resolveOne(c,n,subHint){
-  const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
+/* The one place that decides which picture belongs to a thing. Used both when something is added and while you search. */
+async function findImage(c,n,subHint){
+  if(CAT[c]&&CAT[c].custom) return {url:null,src:'',failed:true};
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
   const order=[['music',musicImage],['logo',logoImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
   for(const [name,fn] of order){
@@ -5749,8 +7694,14 @@ async function resolveOne(c,n,subHint){
     if(url && LOGO_CATS.has(c) && /^wikipedia/.test(name) && !LOGO_NAME.test(decodeURIComponent(url).split('/').pop())) url=null;   /* logos only, no storefront photos */
     if(url){ src=name; break; }
   }
-  if(!url){ if(!failed) rememberNone(k); return; }
-  await adoptImage(c,n,url,src);
+  if(!url && BASEOF[c+'|'+n]) return findImage(c,BASEOF[c+'|'+n],subHint);   /* a trim without its own picture borrows its model's */
+  return {url,src,failed};
+}
+async function resolveOne(c,n,subHint){
+  const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
+  const r=await findImage(c,n,subHint);
+  if(!r.url){ if(!r.failed) rememberNone(k); return; }
+  await adoptImage(c,n,r.url,r.src);
 }
 async function adoptImage(c,n,url,src){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
@@ -5845,6 +7796,7 @@ function viewMe(){
   return `<section class="profile">
     <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
     ${badgeRow(me&&me.id)}
+    ${unlockedCard()}
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
       ${minYear()<CURRENT?`<div class="years"><label for="year" class="vh">Year</label><input type="range" id="year" min="${minYear()}" max="${CURRENT}" step="1" value="${y}" aria-valuetext="${y}"><output id="year-out" for="year">${y}</output></div>`:''}
@@ -6104,12 +8056,14 @@ function openStory(kind,c,mcat){
 function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null; if(box) box.remove(); if(!$('#sheet-root').firstChild) document.body.style.overflow=''; }
 function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:sty.kind==='match'?'match':'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
 /* The short note that goes with anything shared: iMessage, Instagram, WhatsApp, and so on. The link inside it opens straight into ranking the same topic. */
+/* A category's name inside a sentence: "Fast food" -> "fast food", but keep "NBA, NFL & MLB teams", "Pokémon", "K-dramas". */
+const catPhrase = id => CAT[id].name.split(' ').map(w=>(/[A-Z].*[A-Z]/.test(w)||/^(Pok|K-|Café)/.test(w)&&/^(Pokémon|K-dramas)$/.test(w))?w:w.toLowerCase()).join(' ');
 function shareMsg(){
   if(!sty) return '';
-  if(sty.kind==='shelf'){ const e=eff(sty.cat,ui.year===undefined?CURRENT:ui.year), n=e?e.snap.top.length:5, nm=CAT[sty.cat].name.toLowerCase();
+  if(sty.kind==='shelf'){ const e=eff(sty.cat,ui.year===undefined?CURRENT:ui.year), n=e?e.snap.top.length:5, nm=catPhrase(sty.cat);
     return `This is my ${n>=2?'top '+n+' ':''}${nm} on Palate. Rank yours and see how well we match.`; }
   if(sty.kind==='match'){ const f=FRIENDS.find(x=>x.id===sty.cat); if(f){ const pc=compat(f), per=sty.mcat?pc.per.find(p=>p.c===sty.mcat):null, pct=sty.mcat?(per?Math.round(100*per.score):0):pc.pct;
-      return `We are a ${pct}% taste match${sty.mcat?' in '+CAT[sty.mcat].name.toLowerCase():''} on Palate. Rank yours and see how we compare.`; } }
+      return `We are a ${pct}% taste match${sty.mcat?' in '+catPhrase(sty.mcat):''} on Palate. Rank yours and see how we compare.`; } }
   return 'These are my favorites on Palate. Rank yours and see how well we match.';
 }
 const shareLink = () => sty ? inviteLink(sty.kind==='shelf'?sty.cat:(sty.mcat||'')) : inviteLink();
@@ -6146,6 +8100,7 @@ function openDetail(c, fid){
 
 /* Editor */
 function openEditor(c, flow){
+  if(!isOpen(c)){ openUnlock(c); return; }
   const e=eff(c,CURRENT), s=e?e.snap:{top:[],hm:[]};
   const slots=Array(7).fill(null);
   s.top.forEach((it,i)=>slots[i]={...it}); s.hm.forEach((it,i)=>slots[5+i]={...it});
@@ -6153,11 +8108,15 @@ function openEditor(c, flow){
   renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),30);
 }
 function hl(n,q){ const i=n.toLowerCase().indexOf(q); if(i<0) return esc(n); return esc(n.slice(0,i))+'<mark>'+esc(n.slice(i,i+q.length))+'</mark>'+esc(n.slice(i+q.length)); }
+const REFINED = new Map();   /* search-result pictures after the proper lookup: cat|name|sub -> url or '' */
+const rfKey=(c,it)=>c+'|'+normT(it.n)+'|'+normT(it.s||'');
 function resArt(it){
+  const k0=photo(ed.cat,it.n); const rf=REFINED.get(rfKey(ed.cat,it));
+  const best=(k0&&k0.src)||rf; if(best) it={...it,img:best};
   if(it.img){ const shape=CAT[ed.cat]?.shape||'square'; return `<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,it.img))}')" role="img" aria-label="${esc(it.n)}"></span>`; }
   return art(it.n,ed.cat,'sm',true);
 }
-function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}">${resArt(it)}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
+function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}" data-rf="${esc(rfKey(ed.cat,it))}">${resArt(it)}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
 
 /* ---------- Live title search (type-ahead) ----------
    Typing searches the category's own database for titles AND pictures at the same time, so tapping a result already has its photo. */
@@ -6322,7 +8281,8 @@ async function fillDetails(c,n){
   return r;
 }
 function addCustom(c,n){
-  const it={n,s:''}; (state.custom[c] ||= []).push(it); CATALOG[c].push(it); save(); addItem(it);
+  const it={n,s:''}; if(!CAT[c].custom) (state.custom[c] ||= []).push(it); (CATALOG[c] ||= []).push(it); save(); addItem(it);
+  if(CAT[c].custom) return;                        /* your own shelf: nothing to look up */
   noteMiss(c,n);                                   /* it was not in the catalog: tell us so we can add it properly */
   toast('Looking up the details…');
   fillDetails(c,n).then(r=>{ if(r&&r.s) toast('Found: '+r.s); }).catch(()=>{});
@@ -6458,7 +8418,7 @@ async function findNative(c,n,sub){
 }
 let liveT=null;
 function queueLive(){
-  clearTimeout(liveT); const q=ed.query.trim(), c=ed.cat; if(q.length<2 && !isNat(q)){ ed.live=[]; ed.liveQ=''; return; }
+  clearTimeout(liveT); if(CAT[ed.cat]&&CAT[ed.cat].custom){ ed.live=[]; ed.liveQ=''; return; } const q=ed.query.trim(), c=ed.cat; if(q.length<2 && !isNat(q)){ ed.live=[]; ed.liveQ=''; return; }
   const key=c+'|'+q.toLowerCase(); if(LIVE.has(key)){ ed.live=LIVE.get(key); ed.liveQ=q; return; }
   liveT=setTimeout(async()=>{
     let list=[]; try{ list=await liveSearch(c,q); }catch(e){ if(window.PALATE_DEBUG) console.warn('live search failed',e); }
@@ -6466,10 +8426,21 @@ function queueLive(){
     if(ed && ed.cat===c && ed.query.trim()===q){ ed.live=list; ed.liveQ=q; const ul=$('#ed-results'); if(ul) ul.innerHTML=results(); }
   },350);
 }
+let rfRunning=0; const rfQ=[];
+function refineResults(){
+  if(!ed) return; const c=ed.cat;
+  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); rfQ.push([c,it,k]); }
+  rfPump();
+}
+function rfPump(){
+  while(rfRunning<3 && rfQ.length){ const [c,it,k]=rfQ.shift(); rfRunning++;
+    findImage(c,it.n,it.s).then(r=>{ if(r&&r.url){ REFINED.set(k,r.url); if(ed&&ed.cat===c){ document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a&&a.classList.contains('photo')) a.style.backgroundImage=`url('${cssUrl(dispSrc(c,r.url))}')`; else if(a){ const shape=CAT[c]?.shape||'square'; a.outerHTML=`<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(dispSrc(c,r.url))}')" role="img" aria-label="${esc(it.n)}"></span>`; } } }); } } })
+      .catch(()=>{}).finally(()=>{ rfRunning--; rfPump(); }); }
+}
 function results(){
   const raw=ed.query.trim(), q=raw.toLowerCase();
   const have=new Set(ed.slots.filter(Boolean).map(s=>s.n.toLowerCase()));
-  const all=CATALOG[ed.cat]||[];
+  const all=CAT[ed.cat]&&CAT[ed.cat].custom ? peopleItems().concat(CATALOG[ed.cat]||[]) : (CATALOG[ed.cat]||[]);
   if(!q){
     /* Suggestions for when you're blanking: friends' picks first, then what's popular */
     const fr={};
@@ -6478,6 +8449,7 @@ function results(){
     const flNames=new Set(fl.map(x=>x.it.n));
     const pop=all.filter(it=>!have.has(it.n.toLowerCase()) && !flNames.has(it.n)).slice(0, fl.length?6:9);
     ed.res=[...fl.map(x=>x.it), ...pop];
+    setTimeout(refineResults,0);
     let k=0, html='';
     if(fl.length) html+=`<li class="sec">On your friends' shelves</li>`+fl.map(x=>resBtn(x.it,k++,'',`<span class="stack">${x.fs.map(f=>av(f)).join('')}</span>`)).join('');
     if(pop.length) html+=`<li class="sec">Popular</li>`+pop.map(it=>resBtn(it,k++,'')).join('');
@@ -6485,15 +8457,21 @@ function results(){
   }
   const live=(ed.liveQ===raw?ed.live:[]);
   const liveBy=new Map(live.map(x=>[normT(x.n),x]));
-  const m=all.filter(it=>!have.has(it.n.toLowerCase()) && (it.n.toLowerCase().includes(q)||it.s.toLowerCase().includes(q)));
-  m.sort((a,b)=>(b.n.toLowerCase().startsWith(q))-(a.n.toLowerCase().startsWith(q)));
-  const local=m.slice(0,live.length?5:7).map(it=>{ const t=liveBy.get(normT(it.n)); return t?{...it,img:t.img,full:t.full,src:t.src}:it; });
+  const tk=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
+  const toks=tk(q).split(' ').filter(Boolean);
+  const hay=it=>tk(it.n+' '+it.s), nm=it=>tk(it.n);
+  const m=all.filter(it=>!have.has(it.n.toLowerCase()) && (it.n.toLowerCase().includes(q)||it.s.toLowerCase().includes(q)||(toks.length>1&&toks.every(t=>hay(it).includes(t)))));
+  const rank=it=>{ const n=nm(it), nl=it.n.toLowerCase(); return nl===q?0 : nl.startsWith(q)?1 : toks.every(t=>n.split(' ').some(w=>w.startsWith(t)))?2 : 3; };
+  const veh=VEH_CATS.has(ed.cat), idx=new Map(all.map((it,i)=>[it,i]));
+  m.sort((a,b)=>rank(a)-rank(b) || (veh?a.n.length-b.n.length:0) || idx.get(a)-idx.get(b));
+  const local=m.slice(0,veh?(live.length?8:12):(live.length?5:7)).map(it=>{ const t=liveBy.get(normT(it.n)); return t?{...it,img:t.img,full:t.full,src:t.src}:it; });
   const lset=new Set(local.map(it=>normT(it.n)));
   const extra=live.filter(x=>!lset.has(normT(x.n)) && !have.has(x.n.toLowerCase())).slice(0,6);
   ed.res=[...local,...extra];
+  setTimeout(refineResults,0);
   const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
   return ed.res.map((it,k)=>resBtn(it,k,q)).join('')
-    + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>Not listed yet · we will look up the details</span></div><span class="add">Add</span></button></li>`);
+    + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>${CAT[ed.cat]&&CAT[ed.cat].custom?'Add it as you wrote it':'Not listed yet · we will look up the details'}</span></div><span class="add">Add</span></button></li>`);
 }
 function slotRow(i){
   const it=ed.slots[i], label=i<5?String(i+1):'·';
@@ -6503,7 +8481,7 @@ function slotRow(i){
     <div class="ctl"><button type="button" class="ib" data-act="rm" data-i="${i}" aria-label="Remove ${esc(it.n)}">✕</button>${grip(it.n)}</div>
     ${i<5?`<textarea class="why-in" id="why-${i}" data-i="${i}" rows="1" aria-label="Why ${esc(it.n)}" placeholder="Why this one? (optional)">${esc(it.why||'')}</textarea>`:''}${ed.alt&&ed.alt.n===it.n?altPanel():''}</li>`;
 }
-function nextCat(){ const free=c=>!eff(c.id,CURRENT) && c.id!==ed?.cat; return (CATS.find(c=>c.popular&&free(c))||CATS.find(free))?.id; }
+function nextCat(){ const free=c=>isOpen(c.id) && !eff(c.id,CURRENT) && c.id!==ed?.cat; return (CATS.find(c=>c.popular&&free(c))||CATS.find(free))?.id; }
 function renderEditor(){
   const c=CAT[ed.cat];
   const left = ed.isNew ? '<span></span>' : ed.confirm
@@ -6542,8 +8520,9 @@ function addItem(it){
   }
   if(!photo(ed.cat,it.n)){                                                                     /* the photo loads now, because you picked it */
     const cat=ed.cat;
-    if(cat==='books'||cat==='albums'||cat==='songs'){ resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); }); }
-    else if(it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{});
+    const rf=REFINED.get(rfKey(cat,it));
+    if(rf) adoptImage(cat,it.n,rf,'search').catch(()=>{});                                       /* the picture you saw in the list is the one you get */
+    else resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); });
   }
   renderEditor();
   setTimeout(()=>$('#ed-q')?.focus(),20);
@@ -6555,7 +8534,7 @@ function saveEditor(next){
   const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c); (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
-  save(); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
+  save(); setTimeout(()=>loadUnlocks(true),2600); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
   if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(vs&&vs.cat===c){ toast('Saved'); setTimeout(()=>openVsResult(vs.id,c),250); } else if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
 function removeShelf(){
@@ -6608,19 +8587,24 @@ $('#photo-input').addEventListener('change', async e=>{
 });
 
 /* Category picker */
+function unlockPickerCard(){
+  if(!UNL.gate||UNL.supporter) return ''; const np=nextPack(); const locked=CATS.filter(c=>!isOpen(c.id)).length; if(!locked) return '';
+  return `<button class="unl-card" data-act="unlocks"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>${locked} categories locked</b><span>${np?esc(np.name)+': '+esc(packText(np)):'Tap to see what opens them'}</span></span><span class="unl-go">See how</span></button>`;
+}
 function pickerList(){
   const q=(pk.q||'').trim().toLowerCase();
-  const btn=c=>`<button class="pk" data-act="pick-cat" data-cat="${c.id}" ${eff(c.id,CURRENT)?'disabled':''}>${esc(c.name)}</button>`;
+  const btn=c=>isOpen(c.id) ? `<button class="pk" data-act="pick-cat" data-cat="${c.id}" ${eff(c.id,CURRENT)?'disabled':''}>${esc(c.name)}</button>` : `<button class="pk locked" data-act="pk-locked" data-cat="${c.id}" aria-label="${esc(c.name)}, locked"><i class="pk-lock">${LOCK}</i>${esc(c.name)}</button>`;
   if(q){ const m=CATS.filter(c=>c.name.toLowerCase().includes(q)||c.group.toLowerCase().includes(q)); return m.length?`<div class="pk-group"><div class="pk-grid">${m.map(btn).join('')}</div></div>`:`<p class="muted" style="margin-top:16px">No match for “${esc(pk.q.trim())}”.</p>`; }
-  const left=CATS.filter(c=>c.popular && !eff(c.id,CURRENT)).length;
-  return (left?`<div class="quick"><div><b>Quick start</b><span>Go through the ${left} most popular shelves one after another, with suggestions.</span></div><button class="pill" data-act="quick">Start</button></div>`:'')
+  const left=CATS.filter(c=>c.popular && isOpen(c.id) && !eff(c.id,CURRENT)).length;
+  return unlockPickerCard()+`<button class="own-btn" data-act="make-own"><span class="plus">+</span><span><b>Make your own</b><small>${customOpen()?'A shelf just for your friends':'Locked · invite friends to open it'}</small></span>${customOpen()?'':`<i class="pk-lock">${LOCK}</i>`}</button>`
+    + (left?`<div class="quick"><div><b>Quick start</b><span>Go through the ${left} most popular shelves one after another, with suggestions.</span></div><button class="pill" data-act="quick">Start</button></div>`:'')
     + `<div class="pk-group"><h3>Popular</h3><div class="pk-grid">${CATS.filter(c=>c.popular).map(btn).join('')}</div></div>`
     + `<div class="pk-group"><h3>Browse by topic</h3>${[...new Set(CATS.map(c=>c.group))].map(g=>{ const list=CATS.filter(c=>c.group===g); const open=pk.open&&pk.open.has(g);
         return `<details class="pk-acc" data-g="${esc(g)}"${open?' open':''}><summary><span>${esc(g)}</span><em>${list.length}</em></summary><div class="pk-grid">${list.map(btn).join('')}</div></details>`; }).join('')}</div>`;
 }
 function openPicker(){
   pk={q:''};
-  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${CATS.length} categories</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${CATS.filter(c=>isOpen(c.id)).length} open · ${CATS.length} in all</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="search"><input id="pk-q" type="search" autocomplete="off" aria-label="Search categories" placeholder="Search categories"></div>
   <div id="pk-list">${pickerList()}</div><div style="height:22px"></div>`, 'picker');
   setTimeout(()=>$('#pk-q')?.focus(),30);
@@ -6702,7 +8686,7 @@ function warmPopular(){
   const PER=12, urls=[], missing=[];
   const take=(cats,find)=>{ for(const c of cats) for(const it of (CATALOG[c.id]||[]).slice(0,PER)){ const p=photo(c.id,it.n); if(p) urls.push(dispSrc(c.id,p.src)); else if(find) missing.push([c.id,it.n]); } };
   take(CATS.filter(c=>c.popular),true);             /* the categories everyone sees first */
-  if(!slow) take(CATS.filter(c=>!c.popular),false); /* the rest, only on Wi-Fi */
+  if(!slow) take(CATS.filter(c=>!c.popular&&isOpen(c.id)),false); /* the rest, only on Wi-Fi */
   const idle=f=>('requestIdleCallback' in window)?requestIdleCallback(f,{timeout:3000}):setTimeout(f,500);
   const uniq=[...new Set(urls)]; let i=0;
   const step=()=>idle(()=>{
@@ -6750,6 +8734,12 @@ document.addEventListener('click',e=>{
     case 'open': openDetail(el.dataset.cat); break;
     case 'open-friend': openDetail(el.dataset.cat, el.dataset.f); break;
     case 'edit': openEditor(el.dataset.cat); break;
+    case 'unlocks': openUnlocks(); break;
+    case 'pk-locked': openUnlock(el.dataset.cat); break;
+    case 'make-own': openMakeOwn(); break;
+    case 'make-own-go': makeOwn(); break;
+    case 'own-ex': { const i=$('#own-name'); if(i){ i.value=el.dataset.t; i.focus(); } break; }
+    case 'unl-invite': { track('invite_copy'); copyText(inviteLink(),'Invite link copied. Send it to a friend.'); break; }
     case 'add-shelf': ui.view='me'; if(ui.tab==='me' && ui.year!==CURRENT) ui.year=CURRENT; if(ui.tab==='me') render(); openPicker(); break;
     case 'share': e.stopPropagation(); openStory('shelf',el.dataset.cat); break;
     case 'share-profile': openStory('profile'); break;
@@ -6759,7 +8749,7 @@ document.addEventListener('click',e=>{
     case 'story-copy-img': storyCopyImg(); break;
     case 'story-copy-link': track('invite_copy'); copyText(shareMsg()+'\n'+shareLink(),'Message and link copied'); break;
     case 'story-sms': storySms(); break;
-    case 'quick': { const c=CATS.find(x=>x.popular&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
+    case 'quick': { const c=CATS.find(x=>x.popular&&isOpen(x.id)&&!eff(x.id,CURRENT)); if(c) openEditor(c.id,true); break; }
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
     case 'close': closeSheet(); break;
