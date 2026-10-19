@@ -378,6 +378,39 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .invite .swap{background:none;border:0;padding:10px 0 0;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline}
 .cmp-actions{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 14px}
 .empty-note{padding:18px 4px;color:var(--muted);font-size:15px}
+.av.xl{width:104px;height:104px;font-size:36px}
+.bdg{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;line-height:1;flex:none;text-shadow:0 1px 2px rgb(0 0 0 / .2)}
+.bdg.xl{width:96px;height:96px;font-size:46px;box-shadow:0 10px 30px -10px rgb(0 0 0 / .45)}
+.bdg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.who .bdg-row{margin-top:6px}
+.bdg-chip{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--raise);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px 3px 3px;cursor:pointer}
+.bdg-chip .bdg{width:20px;height:20px;font-size:11px}
+.bdg-detail{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:10px 6px 4px}
+.bdg-detail p{margin:0;font-size:15.5px;color:var(--text);max-width:34ch}
+.bdg-rare{font-size:13px;font-weight:700;color:var(--accent);background:var(--raise);border-radius:999px;padding:6px 12px}
+.bdg-detail small{color:var(--muted);font-size:13px}
+.pf-top{padding-block:6px 4px}
+.pf-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 18px}
+.pf-hero h1{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:12px 0 0;line-height:1.1}
+.pf-rel{margin:4px 0 0;color:var(--muted);font-size:14.5px}
+.pf-hero .bdg-row{justify-content:center}
+.pf-match{display:flex;align-items:center;gap:16px;padding:16px 18px}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--accent) calc(var(--p) * 1%),var(--raise) 0)}
+.ring b{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:var(--card);font-size:22px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pm-txt h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
+.pm-txt p{margin:3px 0 0;color:var(--muted);font-size:14.5px}
+.panel .pm-txt h2{margin:0}
+.pf-btns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px}
+.pf-rel-btns{margin:0 0 6px}
+.pf-h{font-size:14px;font-weight:600;color:var(--muted);margin:20px 2px 10px}
+.pf-shelf{border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;width:100%}
+.pf-art{display:flex;gap:6px;margin:8px 0 6px;overflow:hidden;padding:2px}
+.pf-art span{display:inline-flex;border-radius:12px;flex:none}
+.pf-art .hit{outline:2px solid var(--accent);outline-offset:1px}
+.pf-no1{margin:4px 0 8px;font-size:14.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-no1 b{color:var(--text)}
+.pf-sheet{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:6px 0 4px}
+.person-open{display:flex;align-items:center;gap:12px;flex:1;min-width:0;background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .credit{margin:0 0 28px;font-size:12px;color:var(--faint)}
 </style>
 
@@ -4619,10 +4652,10 @@ if('serviceWorker' in navigator) addEventListener('load',()=>{ navigator.service
 const prefs = () => (state.custom && state.custom._prefs) || {};
 function setPref(k,v){ state.custom._prefs={...prefs(),[k]:v}; save(); }
 function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.custom[c])) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
-const ui = {tab:'me', year:CURRENT, compare:null, view:'me'};
+const ui = {tab:'me', year:CURRENT, compare:null, profile:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
 if(location.hash==='#friends') ui.tab='friends';
-addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me){ ui.tab='friends'; ui.compare=null; render(); window.scrollTo(0,0); } });
+addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me){ ui.tab='friends'; ui.compare=null; ui.profile=null; render(); window.scrollTo(0,0); } });
 
 /* Saving: any change calls save(); a moment later only what changed is sent to Supabase. */
 const synced = {shelves:{}, photos:{}, custom:'{}'};
@@ -4663,13 +4696,13 @@ async function loadFriends(){
   if(!ids.length) return;
   const [pr,sh,ph]=await Promise.all([
     sb.from('profiles').select('id,name,avatar').in('id',ids).then(r=>r.error?sb.from('profiles').select('id,name').in('id',ids):r),   /* works before the avatar column exists */
-    sb.from('shelves').select('user_id,cat,years,updated_at').in('user_id',ids),
+    sb.from('shelves').select('user_id,cat,years,updated_at,pos').in('user_id',ids),
     sb.from('item_photos').select('user_id,cat,name,url,h,s').in('user_id',ids)]);
   if(pr.error) throw pr.error; if(sh.error) throw sh.error; if(ph.error) throw ph.error;
   const closeOf=Object.fromEntries(rows.map(r=>[r.friend_id,r.close]));
-  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,avatar:p.avatar||0,hue:hue(p.name),close:!!closeOf[p.id],shelves:{}}));
+  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,avatar:p.avatar||0,hue:hue(p.name),close:!!closeOf[p.id],shelves:{},pos:{}}));
   const by=Object.fromEntries(FRIENDS.map(f=>[f.id,f])); const ups=[];
-  for(const r of (sh.data||[])){ const f=by[r.user_id]; if(!f||!CAT[r.cat]) continue; const sn=snapAt(r.years,CURRENT); if(!sn) continue; f.shelves[r.cat]=sn; ups.push([f.id,r.cat,r.updated_at]); }
+  for(const r of (sh.data||[])){ const f=by[r.user_id]; if(!f||!CAT[r.cat]) continue; const sn=snapAt(r.years,CURRENT); if(!sn) continue; f.shelves[r.cat]=sn; f.pos[r.cat]=r.pos|0; ups.push([f.id,r.cat,r.updated_at]); }
   FRIENDS.sort((a,b)=>a.name.localeCompare(b.name));
   ups.sort((a,b)=>new Date(b[2])-new Date(a[2]));
   UPDATES=ups.slice(0,8).map(([id,c,t])=>({id,c,t}));
@@ -4696,7 +4729,7 @@ function maybeShowMatch(){
   const rows=FRIENDS.map(f=>({f,...compat(f)})).filter(r=>r.pct>0).sort((a,b)=>b.pct-a.pct).slice(0,4); if(!rows.length) return false;
   try{ localStorage.setItem(matchKey,'1'); }catch(e){}
   sheet(`<div class="sheet-head"><div><h2>Your taste match</h2><p>Based on the shelves you both filled in.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  ${rows.map(r=>`<button class="match-row" data-act="compare" data-f="${r.f.id}">${av(r.f)}<b>${esc(r.f.name)}</b><span class="pct">${r.pct}%</span></button>`).join('')}
+  ${rows.map(r=>`<button class="match-row" data-act="profile" data-f="${r.f.id}">${av(r.f)}<b>${esc(r.f.name)}</b><span class="pct">${r.pct}%</span></button>`).join('')}
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Keep going</button></div></div>`,'match');
   return true;
 }
@@ -4777,7 +4810,7 @@ let DIRECTORY=[];
 async function loadPeople(){
   try{ const r=await sb.rpc('alpha_people'); DIRECTORY=(r&&!r.error&&Array.isArray(r.data))?r.data:[]; }catch(e){ DIRECTORY=[]; }
 }
-function personRow(p){ return `<div class="person">${av({id:p.id,name:p.name,avatar:p.avatar})}<b>${esc(p.name)}</b><button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button></div>`; }
+function personRow(p){ return `<div class="person"><button class="person-open" data-act="person" data-id="${p.id}">${av({id:p.id,name:p.name,avatar:p.avatar})}<b>${esc(p.name)}</b></button><button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button></div>`; }
 function peoplePanel(){
   if(!DIRECTORY.length) return '';
   return `<div class="panel people"><h2>People on Palate <span class="alpha-note">alpha</span></h2><p class="muted" style="margin:2px 0 8px;font-size:14px">Everyone who has signed up so far. Tap to add them as a friend.</p>${DIRECTORY.map(personRow).join('')}<div style="padding:10px 0"><button class="pill sm" data-act="add-all">Add everyone</button></div></div>`;
@@ -4788,13 +4821,15 @@ function openPeople(){
   <div class="sheet-foot"><span></span><div class="foot-right">${DIRECTORY.length?'<button class="pill soft" data-act="add-all">Add everyone</button>':''}<button class="pill" data-act="close">Done</button></div></div>`,'people');
 }
 async function afterFriendsChanged(msg){
-  try{ await loadFriends(); }catch(e){} await loadPeople();
+  try{ await loadFriends(); }catch(e){} await Promise.all([loadPeople(),loadBadges()]);
   if(sheetKind==='people'){ const l=$('#people-list'); if(l) l.innerHTML=DIRECTORY.length?DIRECTORY.map(personRow).join(''):'<p class="muted">You are connected with everyone. New people show up here as they join.</p>'; }
   render(); if(msg) toast(msg);
 }
 async function addPerson(id){
   const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(r.error){ toast(r.error.message||'Could not add that person'); return; }
+  const fromSheet=sheetKind==='person';
   track('friend_added'); await afterFriendsChanged('You and '+r.data+' are now friends');
+  if(fromSheet){ closeSheet(); ui.tab='friends'; ui.compare=null; ui.profile=id; render(); window.scrollTo(0,0); }
 }
 async function addAll(){
   const ids=DIRECTORY.map(p=>p.id); let n=0; for(const id of ids){ const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(!r.error) n++; }
@@ -4815,6 +4850,98 @@ async function pickAvatar(v){
   document.querySelectorAll('[data-act="avatar-pick"]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===v))); render();
   try{ const r=await sb.rpc('set_avatar',{p_i:v}); if(r&&r.error) throw r.error; track('avatar_pick'); }
   catch(e){ console.warn(e); me.avatar=prev; document.querySelectorAll('[data-act="avatar-pick"]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.v===prev))); render(); toast("Could not save that. Try again in a minute."); }
+}
+/* ---------- Badges ---------- */
+/* What each badge looks like and says. Who has which one comes from the database (supabase/badges.sql). */
+const BADGES={
+  creator:{name:'Creator',glyph:'✦',c:['#B992E3','#E5799B'],blurb:'Built Palate from scratch. There is only one.'},
+  supporter:{name:'Supporter',glyph:'♥',c:['#E5799B','#EE9A6E'],blurb:'Helped keep Palate running without ads.'},
+  alpha:{name:'Alpha',glyph:'α',c:['#EDBB6A','#EE9A6E'],blurb:'Was here during the alpha, before Palate opened up. It is only handed out during the alpha, so no one can get it later.'}
+};
+const BADGE_ORDER=['creator','supporter','alpha'];   /* rarest first */
+let BADGE_OF={}, BSTAT={};
+async function loadBadges(){
+  try{
+    const [a,b]=await Promise.all([sb.rpc('badge_board'),sb.rpc('badge_stats')]);
+    const of={}; if(a&&!a.error) for(const r of a.data||[]) (of[r.user_id] ||= []).push({id:r.badge,at:r.awarded_at});
+    BADGE_OF=of; BSTAT=(b&&!b.error)?Object.fromEntries((b.data||[]).map(r=>[r.badge,{holders:+r.holders,total:+r.total}])):{};
+  }catch(e){ BADGE_OF={}; BSTAT={}; }
+}
+const badgesOf = uid => (BADGE_OF[uid]||[]).filter(b=>BADGES[b.id]).sort((a,b)=>BADGE_ORDER.indexOf(a.id)-BADGE_ORDER.indexOf(b.id));
+const bdgIcon = (id,cls='') => { const b=BADGES[id]; return `<span class="bdg ${cls}" style="background:linear-gradient(140deg,${b.c[0]},${b.c[1]})" aria-hidden="true">${b.glyph}</span>`; };
+function rarityLine(id){
+  const s=BSTAT[id]; if(!s||!s.total) return '';
+  if(s.holders<=1 && s.total>1) return 'Only 1 person has this badge';
+  const p=100*s.holders/s.total, t=p<1?'less than 1':p<10?(Math.round(p*10)/10):Math.round(p);
+  return p<50 ? `Only ${t}% of people have this badge` : `${t}% of people have this badge so far`;
+}
+function badgeRow(uid){
+  const list=badgesOf(uid); if(!list.length) return '';
+  return `<div class="bdg-row">${list.map(b=>`<button class="bdg-chip" data-act="badge" data-b="${b.id}" data-u="${uid}" aria-label="${esc(BADGES[b.id].name)} badge">${bdgIcon(b.id)}<span>${esc(BADGES[b.id].name)}</span></button>`).join('')}</div>`;
+}
+function openBadge(id,uid){
+  const b=BADGES[id]; if(!b) return; const mine=(BADGE_OF[uid]||[]).find(x=>x.id===id), line=rarityLine(id);
+  const who = uid===(me&&me.id) ? 'You' : (((FRIENDS.find(f=>f.id===uid)||DIRECTORY.find(p=>p.id===uid)||{}).name||'They').split(' ')[0]);
+  const since = mine&&mine.at ? new Date(mine.at).toLocaleDateString(undefined,{month:'long',year:'numeric'}) : '';
+  sheet(`<div class="sheet-head"><div><h2>${esc(b.name)} badge</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="bdg-detail">${bdgIcon(id,'xl')}<p>${esc(b.blurb)}</p>${line?`<span class="bdg-rare">${esc(line)}</span>`:''}${since?`<small>${esc(who)} earned this in ${esc(since)}</small>`:''}</div>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Close</button></div></div>`,'badge');
+}
+
+/* ---------- Profiles ---------- */
+const matchLabel = (pct,n) => !n ? 'Nothing to compare yet' : pct>=70?'Taste twins':pct>=50?'Great match':pct>=30?'Good overlap':pct>=10?'Some overlap':'Opposites attract';
+function viewProfile(f){
+  const {pct,per}=compat(f), nShared=per.reduce((n,p)=>n+p.shared.length,0);
+  const cats=Object.keys(f.shelves).sort((a,b)=>(f.pos[a]??99)-(f.pos[b]??99));
+  const cards=cats.map(c=>{
+    const top=f.shelves[c].top.slice(0,5), e=eff(c,CURRENT), mine=new Set(e?e.snap.top.map(i=>i.n):[]), both=top.filter(i=>mine.has(i.n)).length;
+    return `<button class="card pf-shelf" style="${tint(c,top[0].n)}" data-act="open-friend" data-f="${f.id}" data-cat="${c}">
+      <div class="card-head"><h2>${esc(CAT[c].name)}</h2>${both?`<span class="meta">${both} in common</span>`:''}</div>
+      <div class="pf-art">${top.map(i=>`<span class="${mine.has(i.n)?'hit':''}">${art(i.n,c,'row')}</span>`).join('')}</div>
+      <p class="pf-no1"><b>#1</b> ${esc(top[0].n)}</p></button>`; }).join('');
+  return `<div class="pf-top"><button class="pill soft" data-act="back-friends" aria-label="Back to friends">←</button></div>
+  <section class="pf-hero">${av(f,'xl')}<h1>${esc(f.name)}</h1>
+    <p class="pf-rel">${f.close?'Close friend':'Friend'} · ${cats.length} shelf${cats.length===1?'':'ves'} you can see</p>${badgeRow(f.id)}</section>
+  <div class="panel pf-match"><div class="ring" style="--p:${pct}"><b>${pct}%</b></div>
+    <div class="pm-txt"><h2>${esc(matchLabel(pct,per.length))}</h2><p>${per.length?`${nShared} shared pick${nShared===1?'':'s'} across ${per.length} shelf${per.length===1?'':'ves'} you both have`:`Rank the same topics as ${esc(first(f))} to see how you match.`}</p></div></div>
+  <div class="pf-btns"><button class="pill" data-act="share-match" data-f="${f.id}">Share our match</button><button class="pill soft" data-act="compare" data-f="${f.id}">Side by side</button></div>
+  <div class="cmp-actions pf-rel-btns"><button class="pill soft sm" data-act="toggle-close" data-f="${f.id}">${f.close?'Close friend ✓':'Add to close friends'}</button><button class="pill ghost sm" data-act="remove-friend" data-f="${f.id}">Unfriend</button></div>
+  <h2 class="pf-h">${esc(first(f))}'s shelves</h2>
+  ${cards?`<div class="shelves pf-shelves">${cards}</div>`:`<p class="empty-note">${esc(first(f))} has not shared any shelves with you yet.</p>`}`;
+}
+function openPerson(id){
+  const p=DIRECTORY.find(x=>x.id===id); if(!p) return;
+  sheet(`<div class="sheet-head"><div><h2>${esc(p.name)}</h2><p>On Palate</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="pf-sheet">${av({id:p.id,name:p.name,avatar:p.avatar},'xl')}${badgeRow(p.id)}<p class="muted">Add ${esc(p.name.split(' ')[0])} as a friend to see their shelves and your taste match.</p></div>
+  <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="close">Not now</button><button class="pill" data-act="add-person" data-id="${p.id}">Add friend</button></div></div>`,'person');
+}
+
+/* The shareable match picture, same size as the story pictures */
+async function makeMatchStory(st,font){
+  const f=FRIENDS.find(x=>x.id===st.cat); if(!f) return null;
+  const {pct,per}=compat(f), nShared=per.reduce((n,p)=>n+p.shared.length,0), rows=[];
+  for(const p of [...per].sort((a,b)=>b.score-a.score)) for(const n of p.shared) if(rows.length<3) rows.push({n,s:CAT[p.c].name,why:'',c:p.c,shape:CAT[p.c].shape,rank:0,p:photo(p.c,n),im:null});
+  await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); }));
+  const mySeed=(me&&me.id)||state.name, gm=gradParts(mySeed,me&&me.avatar), gf=gradParts(f.id,f.avatar);
+  const hx=c=>{ const v=parseInt(c.slice(1),16); return Math.round(rgbToHsl(v>>16&255,v>>8&255,v&255)[0]); };
+  const cv=document.createElement('canvas'); cv.width=SW; cv.height=SH; const x=cv.getContext('2d');
+  drawStoryBg(x,hx(gm.cols[0]),hx(gf.cols[0])); drawHeader(x,CURRENT,font);
+  const R=128, cy=520, disc=(cx,g,txt)=>{
+    x.save(); x.beginPath(); x.arc(cx,cy,R+8,0,Math.PI*2); x.fillStyle='#0b0b0e'; x.fill(); x.restore();
+    const rad=g.angle*Math.PI/180, dx=Math.sin(rad)*R, dy=-Math.cos(rad)*R, lg=x.createLinearGradient(cx-dx,cy-dy,cx+dx,cy+dy); lg.addColorStop(0,g.cols[0]); lg.addColorStop(1,g.cols[1]);
+    x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.fillStyle=lg; x.fill();
+    x.fillStyle='#fff'; x.font=`700 92px ${font}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(txt,cx,cy+5); x.textBaseline='alphabetic'; x.textAlign='left'; };
+  disc(SW/2+92,gf,f.name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase());
+  disc(SW/2-92,gm,(state.name.split(' ').map(p=>p[0]).join('').slice(0,2)||'?').toUpperCase());
+  x.textAlign='center'; x.fillStyle='#fff'; x.font=`700 64px ${font}`; x.fillText(fitText(x,'You & '+first(f),SW-180),SW/2,742);
+  x.font=`800 290px ${font}`; x.fillText(pct+'%',SW/2,1000);
+  x.fillStyle='rgba(255,255,255,.86)'; x.font=`700 68px ${font}`; x.fillText(matchLabel(pct,per.length),SW/2,1090);
+  x.fillStyle='rgba(255,255,255,.55)'; x.font=`500 38px ${font}`;
+  x.fillText(per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shelf${per.length===1?'':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
+  x.textAlign='left';
+  if(rows.length){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`700 34px ${font}`; x.letterSpacing='4px'; x.fillText('YOU BOTH PICKED',90,1250); x.letterSpacing='0px'; drawRows(x,rows,font,false,1272,rows.length*120); }
+  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Find your match · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
+  return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
 }
 function openAccount(){
   const dv=prefs().defVis||'friends';
@@ -4985,7 +5112,7 @@ async function enter(user){
     if(code){ try{ sessionStorage.removeItem('palate-join'); }catch(e){} const r=await sb.rpc('add_friend_by_code',{code}); if(r.error) joined={err:r.error.message}; else joined={name:r.data}; await loadFriends(); }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
-    await loadPeople();
+    await Promise.all([loadPeople(),loadBadges()]);
     await preloadForBoot();
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
@@ -5012,16 +5139,19 @@ function art(name, cat, size, noh){
   return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
-/* Every person gets their own soft gradient of 2 or 3 colours taken from the logo, always the same one for the same person.
-   v (0, 1 or 2) is the option they picked on their profile. */
+/* Every person gets their own soft gradient from the logo colours, always the same for the same person.
+   They pick one of 3 options on their profile (v = 0, 1 or 2). The 3 options never share a colour: together they use all six.
+   Pairs are always neighbours or near neighbours on the colour wheel, so every option looks soft and never muddy. */
 const SOFT=['#EDBB6A','#EE9A6E','#E5799B','#B992E3','#9483E6','#6BB9E0'];   /* gold, tangerine, rose, lilac, violet, sky: the logo, a little muted */
-function grad(seed,v=0){
+const SPLITS=[[[0,1],[2,3],[4,5]],[[0,2],[1,3],[4,5]],[[0,1],[2,4],[3,5]]];   /* three ways to cut the six colours into three pairs */
+const ORDERS=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+function gradParts(seed,v=0){
   const mix=n=>{ n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; n=Math.imul(n,0x45d9f3b); n^=n>>>16; return n>>>0; };
-  const k=String(seed)+'#'+(v|0), h=mix(hash(k)), g=mix(hash('g'+k)), three=(h>>>7)%10<4;
-  const step=three?1+(g%2):1+(g%3), span=step*(three?2:1), start=(h>>>3)%(SOFT.length-span);
-  const cols=[...Array(three?3:2)].map((_,i)=>SOFT[start+i*step]); if((g>>>4)%2) cols.reverse();
-  return `linear-gradient(${120+(g>>>9)%80}deg,${cols.join(',')})`;
+  const h=mix(hash('m'+seed)), o=ORDERS[(h>>>4)%6], split=SPLITS[h%3], i=((v|0)%3+3)%3, pair=split[o[i]];
+  const g=mix(hash('g'+seed+'#'+i)), cols=pair.map(k=>SOFT[k]); if(g&1) cols.reverse();
+  return {cols, angle:120+((g>>>3)%80)};
 }
+function grad(seed,v=0){ const {cols,angle}=gradParts(seed,v); return `linear-gradient(${angle}deg,${cols.join(',')})`; }
 function av(f, cls=''){ return `<span class="av ${cls}" style="background:${grad(f.id||f.name,f.avatar)}" title="${esc(f.name)}" aria-hidden="true">${esc(f.name.split(' ').map(p=>p[0]).join(''))}</span>`; }
 const meAv = (tap) => tap ? `<button class="me-av tap-av" data-act="avatar" style="background:${grad((me&&me.id)||state.name,me&&me.avatar)}" aria-label="Change your picture" title="Change your picture">${esc(state.name[0]||'?')}</button>` : `<span class="me-av" style="background:${grad((me&&me.id)||state.name,me&&me.avatar)}" aria-hidden="true">${esc(state.name[0]||'?')}</span>`;
 const first = f => f.name.split(' ')[0];
@@ -5566,7 +5696,7 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p>${badgeRow(me&&me.id)}</div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
       ${minYear()<CURRENT?`<div class="years"><label for="year" class="vh">Year</label><input type="range" id="year" min="${minYear()}" max="${CURRENT}" step="1" value="${y}" aria-valuetext="${y}"><output id="year-out" for="year">${y}</output></div>`:''}
@@ -5596,9 +5726,10 @@ function invitePanel(){
 }
 function viewFriends(){
   if(ui.compare){ const f=FRIENDS.find(x=>x.id===ui.compare); if(f) return viewCompare(f); }
+  if(ui.profile){ const f=FRIENDS.find(x=>x.id===ui.profile); if(f) return viewProfile(f); ui.profile=null; }
   const rows=FRIENDS.map(f=>({f,...compat(f)})).sort((a,b)=>b.pct-a.pct);
   const list = rows.length
-    ? `<div class="panel">${rows.map(r=>`<button class="friend" data-act="compare" data-f="${r.f.id}">${av(r.f)}<div class="nm"><b>${esc(r.f.name)}${r.f.close?' <span class="muted" style="font-weight:500;font-size:13px">· close</span>':''}</b><span>${r.per.length} shelves in common</span></div><span class="pct">${r.pct}%</span></button>`).join('')}</div>`
+    ? `<div class="panel">${rows.map(r=>`<button class="friend" data-act="profile" data-f="${r.f.id}">${av(r.f)}<div class="nm"><b>${esc(r.f.name)}${r.f.close?' <span class="muted" style="font-weight:500;font-size:13px">· close</span>':''}</b><span>${r.per.length} shelves in common</span></div><span class="pct">${r.pct}%</span></button>`).join('')}</div>`
     : `<div class="panel"><p class="empty-note">No friends yet. Send your link to someone and you will see how your tastes compare.</p></div>`;
   const lately = UPDATES.length ? `<div class="panel"><h2>Lately</h2><ul class="lately">${lateList(8)}</ul></div>` : '';
   return `<section class="head"><h1>Friends</h1></section>
@@ -5612,7 +5743,7 @@ function viewCompare(f){
   return `<section class="cmp-top"><button class="pill soft" data-act="back-friends" aria-label="Back to friends">←</button>
     <div class="pair">${meAv()}${av(f)}</div>
     <div><h1>You & ${esc(first(f))}</h1><p>${pct}% in common · highlighted picks are on both shelves</p></div></section>
-  <div class="cmp-actions"><button class="pill soft sm" data-act="toggle-close" data-f="${f.id}">${f.close?'Close friend ✓':'Add to close friends'}</button><button class="pill ghost sm" data-act="remove-friend" data-f="${f.id}">Remove friend</button></div>
+  <div class="cmp-actions"><button class="pill soft sm" data-act="toggle-close" data-f="${f.id}">${f.close?'Close friend ✓':'Add to close friends'}</button><button class="pill soft sm" data-act="share-match" data-f="${f.id}">Share our match</button><button class="pill ghost sm" data-act="remove-friend" data-f="${f.id}">Remove friend</button></div>
   ${sorted.length?'':`<p class="empty-note">No shelves in common yet. ${esc(first(f))} has not shared any with you, or you have not added the same categories.</p>`}
   <div class="cmp-grid">${sorted.map(p=>{ const set=new Set(p.shared); const top=f.shelves[p.c].top[0]; return `<article class="card" style="${tint(p.c,top.n)}">
     <div class="card-head"><h2>${esc(CAT[p.c].name)}</h2><span class="meta">${p.shared.length} shared</span></div>
@@ -5744,7 +5875,7 @@ function drawHeader(x,yr,font){
   x.fillStyle='#fff'; x.font=`800 54px ${font}`; x.textAlign='left'; x.fillText('palate',90,262);
   const w=x.measureText('palate').width; x.fillStyle='rgba(255,255,255,.6)'; x.font=`700 54px ${font}`; x.fillText('’'+String(yr).slice(2),90+w+8,262);
   x.font=`700 38px ${font}`; const nm=fitText(x,state.name,330), tw=x.measureText(nm).width, r=30, cxp=SW-90-tw-18-r;
-  const hh=hue(state.name), g=x.createLinearGradient(cxp-r,230,cxp+r,290); g.addColorStop(0,`hsl(${hh} 65% 58%)`); g.addColorStop(1,`hsl(${(hh+50)%360} 55% 42%)`);
+  const gp=gradParts((me&&me.id)||state.name,me&&me.avatar), g=x.createLinearGradient(cxp-r,230,cxp+r,290); g.addColorStop(0,gp.cols[0]); g.addColorStop(1,gp.cols[1]);
   x.fillStyle=g; x.beginPath(); x.arc(cxp,258,r,0,Math.PI*2); x.fill();
   x.fillStyle='#fff'; x.font=`700 30px ${font}`; x.textAlign='center'; x.fillText((state.name[0]||'?').toUpperCase(),cxp,269); x.textAlign='left';
   x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 38px ${font}`; x.fillText(nm,SW-90-tw,271);
@@ -5767,6 +5898,7 @@ function drawRows(x,rows,font,notes,y0,avail){
 async function makeStory(){
   const st=sty, y=ui.year===undefined?CURRENT:ui.year, font=st.font=(getComputedStyle(document.body).fontFamily||'system-ui,sans-serif');
   try{ await document.fonts.ready; }catch(e){}
+  if(st.kind==='match'){ st.hasNotes=false; return makeMatchStory(st,font); }
   const cv=document.createElement('canvas'); cv.width=SW; cv.height=SH; const x=cv.getContext('2d');
   let rows, title, subtitle, also='', h1, h2, yr=CURRENT;
   if(st.kind==='shelf'){
@@ -5796,11 +5928,12 @@ async function renderStory(){
   if(!blob){ toast("Couldn't make the picture. Try again."); closeStory(); return; }
   if(st.url) URL.revokeObjectURL(st.url); st.blob=blob; st.url=URL.createObjectURL(blob);
   const img=$('#story-img'); if(img) img.src=st.url; if(box) box.classList.remove('busy');
-  const sw=$('#story-notes'); if(sw){ sw.disabled=!st.hasNotes; sw.checked=st.notes&&st.hasNotes; const l=$('#story-notes-l'); if(l) l.classList.toggle('off',!st.hasNotes); const h=$('#story-hint'); if(h) h.textContent=st.hasNotes?'':'No notes yet. Add a “why” when you edit a shelf.'; }
+  const sw=$('#story-notes'); if(sw){ sw.disabled=!st.hasNotes; sw.checked=st.notes&&st.hasNotes; const l=$('#story-notes-l'); if(l) l.classList.toggle('off',!st.hasNotes); const h=$('#story-hint'); if(h) h.textContent=(st.hasNotes||st.kind==='match')?'':'No notes yet. Add a “why” when you edit a shelf.'; }
 }
 function openStory(kind,c){
-  track('share_open',kind==='shelf'?c:'profile');
+  track('share_open',kind==='shelf'?c:kind);
   if(kind==='shelf' && !eff(c,ui.year===undefined?CURRENT:ui.year)) return;
+  if(kind==='match' && !FRIENDS.find(x=>x.id===c)) return;
   closeSheet(); sty={kind,cat:c,notes:notesPref(),font:'',url:null,blob:null,hasNotes:true};
   let box=$('#story-root'); if(!box){ box=document.createElement('div'); box.id='story-root'; document.body.appendChild(box); }
   box.className='busy'; document.body.style.overflow='hidden';
@@ -5808,7 +5941,7 @@ function openStory(kind,c){
     <button class="story-x" data-act="story-close" aria-label="Close">✕</button>
     <div class="story-stage"><img id="story-img" alt="Your picture to share"><div class="story-busy">Making your picture…</div></div>
     <div class="story-bar">
-      <label class="story-sw" id="story-notes-l"><input type="checkbox" id="story-notes" ${sty.notes?'checked':''}><span class="knob"></span><span>Show my notes</span></label>
+      <label class="story-sw" id="story-notes-l"${kind==='match'?' style="display:none"':''}><input type="checkbox" id="story-notes" ${sty.notes?'checked':''}><span class="knob"></span><span>Show my notes</span></label>
       <button class="pill soft sm" data-act="story-close">Done</button>
     </div>
     <div class="story-opts">
@@ -5821,7 +5954,7 @@ function openStory(kind,c){
   renderStory();
 }
 function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null; if(box) box.remove(); if(!$('#sheet-root').firstChild) document.body.style.overflow=''; }
-function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
+function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:sty.kind==='match'?'match':'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
 async function storyShare(){
   if(!sty||!sty.blob) return; const f=storyFile();
   try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); track('share_native',sty.cat); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
@@ -5833,7 +5966,9 @@ async function storyCopyImg(){
   try{ await navigator.clipboard.write([new ClipboardItem({'image/png':sty.blob})]); track('share_copy_image',sty.cat); toast('Image copied'); }catch(e){ toast("This browser can't copy images. Use Save image."); }
 }
 function storySms(){
-  if(!sty) return; track('share_sms',sty.cat); const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
+  if(!sty) return; track('share_sms',sty.cat);
+  if(sty.kind==='match'){ const f=FRIENDS.find(x=>x.id===sty.cat); if(f){ location.href='sms:?&body='+encodeURIComponent(`We are a ${compat(f).pct}% taste match on Palate. See yours: `+inviteLink()); return; } }
+  const what=sty.kind==='shelf'?'my '+CAT[sty.cat].name.toLowerCase():'my favorites';
   location.href='sms:?&body='+encodeURIComponent('Check out '+what+' on Palate, and add me: '+inviteLink());
 }
 function storySave(){ if(!sty||!sty.url) return; track('share_save',sty.cat); const a=document.createElement('a'); a.href=sty.url; a.download=storyFile().name; document.body.appendChild(a); a.click(); a.remove(); }
@@ -6451,7 +6586,7 @@ document.addEventListener('click',e=>{
   if(a==='scrim'){ if(e.target===el) closeSheet(); return; }
   if(a==='story-bg'){ if(e.target===el) closeStory(); return; }
   switch(a){
-    case 'tab': ui.tab=el.dataset.tab; ui.compare=null; render(); window.scrollTo(0,0); break;
+    case 'tab': ui.tab=el.dataset.tab; ui.compare=null; ui.profile=null; render(); window.scrollTo(0,0); break;
     case 'view': ui.view=el.dataset.v; render(); break;
     case 'compare-m': break;
     case 'open': openDetail(el.dataset.cat); break;
@@ -6470,8 +6605,12 @@ document.addEventListener('click',e=>{
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
     case 'close': closeSheet(); break;
-    case 'compare': ui.tab='friends'; ui.compare=el.dataset.f; render(); window.scrollTo(0,0); break;
-    case 'back-friends': ui.compare=null; render(); break;
+    case 'compare': ui.profile=(ui.tab==='friends'&&ui.profile===el.dataset.f)?ui.profile:null; ui.tab='friends'; ui.compare=el.dataset.f; render(); window.scrollTo(0,0); break;
+    case 'profile': closeSheet(); ui.tab='friends'; ui.profile=el.dataset.f; ui.compare=null; render(); window.scrollTo(0,0); break;
+    case 'back-friends': if(ui.compare) ui.compare=null; else ui.profile=null; render(); break;
+    case 'person': openPerson(el.dataset.id); break;
+    case 'badge': openBadge(el.dataset.b,el.dataset.u); break;
+    case 'share-match': openStory('match',el.dataset.f); break;
     case 'year-now': $('#year').value=CURRENT; setYear(CURRENT); break;
     case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
       const live=list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n && list.length>(ed.alt.list||[]).length){ ed.alt.list=list; renderEditor(); } };
@@ -6524,7 +6663,7 @@ document.addEventListener('click',e=>{
     case 'remove-friend': {
       if(el.dataset.armed!=='1'){ el.dataset.armed='1'; el.textContent='Tap again to remove'; setTimeout(()=>{ if(el.isConnected){ el.dataset.armed=''; el.textContent='Remove friend'; } },3000); break; }
       const f=FRIENDS.find(x=>x.id===el.dataset.f); if(!f) break;
-      sb.rpc('remove_friend',{fid:f.id}).then(async r=>{ if(r.error){ toast("Couldn't remove that friend"); return; } ui.compare=null; await loadFriends(); render(); toast(`Removed ${first(f)}`); }); break; }
+      sb.rpc('remove_friend',{fid:f.id}).then(async r=>{ if(r.error){ toast("Couldn't remove that friend"); return; } ui.compare=null; ui.profile=null; await loadFriends(); render(); toast(`Removed ${first(f)}`); }); break; }
   }
 });
 document.addEventListener('change',e=>{
