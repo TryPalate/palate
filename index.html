@@ -382,13 +382,15 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .bdg{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;color:#fff;font-weight:700;font-size:13px;line-height:1;flex:none;text-shadow:0 1px 2px rgb(0 0 0 / .2)}
 .bdg.xl{width:96px;height:96px;font-size:46px;box-shadow:0 10px 30px -10px rgb(0 0 0 / .45)}
 .bdg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.who .bdg-row{margin-top:6px}
+.profile > .bdg-row{margin:12px 0 2px}
 .bdg-chip{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--raise);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px 3px 3px;cursor:pointer}
 .bdg-chip .bdg{width:20px;height:20px;font-size:11px}
 .bdg-detail{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:10px 6px 4px}
 .bdg-detail p{margin:0;font-size:15.5px;color:var(--text);max-width:34ch}
 .bdg-rare{font-size:13px;font-weight:700;color:var(--accent);background:var(--raise);border-radius:999px;padding:6px 12px}
-.bdg-detail small{color:var(--muted);font-size:13px}
+.bdg-detail small{color:var(--muted);font-size:13px;max-width:34ch}
+.bdg-how b{color:var(--text)}
+.bdg-chip.locked{opacity:.45}.bdg-chip.locked .bdg{filter:grayscale(1)}
 .pf-top{padding-block:6px 4px}
 .pf-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 18px}
 .pf-hero h1{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:12px 0 0;line-height:1.1}
@@ -4854,11 +4856,16 @@ async function pickAvatar(v){
 /* ---------- Badges ---------- */
 /* What each badge looks like and says. Who has which one comes from the database (supabase/badges.sql). */
 const BADGES={
-  creator:{name:'Creator',glyph:'✦',c:['#B992E3','#E5799B'],blurb:'Built Palate from scratch. There is only one.'},
-  supporter:{name:'Supporter',glyph:'♥',c:['#E5799B','#EE9A6E'],blurb:'Helped keep Palate running without ads.'},
-  alpha:{name:'Alpha',glyph:'α',c:['#EDBB6A','#EE9A6E'],blurb:'Was here during the alpha, before Palate opened up. It is only handed out during the alpha, so no one can get it later.'}
+  creator:{name:'Creator',glyph:'✦',c:['#B992E3','#E5799B'],blurb:'Built Palate from scratch. There is only one.',how:'Not available.'},
+  timetraveler:{name:'Time Traveler',glyph:'↻',c:['#9483E6','#6BB9E0'],blurb:'Kept their shelves going across three different years.',how:'Keep your shelves up to date across 3 different years. The earliest anyone can earn it is January 2028.'},
+  contrarian:{name:'Contrarian',glyph:'≠',c:['#E5799B','#9483E6'],blurb:'Has a #1 pick in three topics that no one else on Palate ranks at all.',how:'Once 10+ people are on Palate: be #1 in 3 topics with a pick nobody else has on their shelf, and keep it for a week.'},
+  dayone:{name:'Day One',glyph:'1',c:['#6BB9E0','#9483E6'],blurb:'One of the first 10 people on Palate.',how:'Closed. Only the first 10 accounts ever got it.'},
+  hunter:{name:'Bug Hunter',glyph:'✱',c:['#EE9A6E','#E5799B'],blurb:'Found a real bug and helped get it fixed.',how:'Given by hand when your feedback leads to a fix.'},
+  supporter:{name:'Supporter',glyph:'♥',c:['#E5799B','#EE9A6E'],blurb:'Helped keep Palate running without ads.',how:'Given to people who chip in to keep Palate free.'},
+  builder:{name:'Catalog Builder',glyph:'+',c:['#EDBB6A','#EE9A6E'],blurb:'Added 25 or more things to the shared catalog that nobody had added before. Everyone searches with their picks.',how:'Add things that are missing from search. Reach 25 to earn it.'},
+  alpha:{name:'Alpha',glyph:'α',c:['#EDBB6A','#EE9A6E'],blurb:'Was here during the alpha, before Palate opened up. It is only handed out during the alpha, so no one can get it later.',how:'Closed when the alpha ends.'}
 };
-const BADGE_ORDER=['creator','supporter','alpha'];   /* rarest first */
+const BADGE_ORDER=['creator','timetraveler','contrarian','dayone','hunter','supporter','builder','alpha'];   /* rarest first */
 let BADGE_OF={}, BSTAT={};
 async function loadBadges(){
   try{
@@ -4867,11 +4874,20 @@ async function loadBadges(){
     BADGE_OF=of; BSTAT=(b&&!b.error)?Object.fromEntries((b.data||[]).map(r=>[r.badge,{holders:+r.holders,total:+r.total}])):{};
   }catch(e){ BADGE_OF={}; BSTAT={}; }
 }
+async function refreshMyBadges(){
+  try{
+    if(!sb||!me) return; const before=new Set((BADGE_OF[me.id]||[]).map(b=>b.id));
+    const r=await sb.rpc('refresh_my_badges'); if(r&&r.error) return;
+    await loadBadges(); const gained=badgesOf(me.id).filter(b=>!before.has(b.id)); if(!gained.length) return;
+    render(); toast(`New badge: ${BADGES[gained[0].id].name}`);
+  }catch(e){}
+}
 const badgesOf = uid => (BADGE_OF[uid]||[]).filter(b=>BADGES[b.id]).sort((a,b)=>BADGE_ORDER.indexOf(a.id)-BADGE_ORDER.indexOf(b.id));
 const bdgIcon = (id,cls='') => { const b=BADGES[id]; return `<span class="bdg ${cls}" style="background:linear-gradient(140deg,${b.c[0]},${b.c[1]})" aria-hidden="true">${b.glyph}</span>`; };
 function rarityLine(id){
   const s=BSTAT[id]; if(!s||!s.total) return '';
-  if(s.holders<=1 && s.total>1) return 'Only 1 person has this badge';
+  if(!s.holders) return 'No one has this badge yet';
+  if(s.holders===1 && s.total>1) return 'Only 1 person has this badge';
   const p=100*s.holders/s.total, t=p<1?'less than 1':p<10?(Math.round(p*10)/10):Math.round(p);
   return p<50 ? `Only ${t}% of people have this badge` : `${t}% of people have this badge so far`;
 }
@@ -4884,7 +4900,7 @@ function openBadge(id,uid){
   const who = uid===(me&&me.id) ? 'You' : (((FRIENDS.find(f=>f.id===uid)||DIRECTORY.find(p=>p.id===uid)||{}).name||'They').split(' ')[0]);
   const since = mine&&mine.at ? new Date(mine.at).toLocaleDateString(undefined,{month:'long',year:'numeric'}) : '';
   sheet(`<div class="sheet-head"><div><h2>${esc(b.name)} badge</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <div class="bdg-detail">${bdgIcon(id,'xl')}<p>${esc(b.blurb)}</p>${line?`<span class="bdg-rare">${esc(line)}</span>`:''}${since?`<small>${esc(who)} earned this in ${esc(since)}</small>`:''}</div>
+  <div class="bdg-detail">${bdgIcon(id,'xl')}<p>${esc(b.blurb)}</p>${line?`<span class="bdg-rare">${esc(line)}</span>`:''}${since?`<small>${esc(who)} earned this in ${esc(since)}</small>`:''}${b.how?`<small class="bdg-how"><b>How to earn:</b> ${esc(b.how)}</small>`:''}</div>
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill" data-act="close">Close</button></div></div>`,'badge');
 }
 
@@ -4950,6 +4966,7 @@ function openAccount(){
     <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
   ${notifyBox()}
   <div class="acct-box"><h3>Profile picture</h3><p>Choose the gradient your friends see next to your name.</p><button class="pill soft sm" data-act="avatar">Change picture</button></div>
+  <div class="acct-box"><h3>Badges</h3><p>Badges are rare on purpose. Tap one to see how it is earned.</p><div class="bdg-row" id="acct-badges">${BADGE_ORDER.map(id=>{ const has=(BADGE_OF[me.id]||[]).some(b=>b.id===id); return `<button class="bdg-chip${has?'':' locked'}" data-act="badge" data-b="${id}" data-u="${me.id}">${bdgIcon(id)}<span>${esc(BADGES[id].name)}</span></button>`; }).join('')}</div></div>
   <div class="acct-box"><h3>Alpha feedback</h3><p>Palate is in alpha with friends. Tell us what is missing, wrong or worth building. Things you add also help fill the shared catalog for everyone.</p><button class="pill soft sm" data-act="feedback">Send feedback</button></div>
   <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
     <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
@@ -5117,7 +5134,7 @@ async function enter(user){
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush();
+    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500);
     if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
@@ -5696,7 +5713,8 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p>${badgeRow(me&&me.id)}</div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    ${badgeRow(me&&me.id)}
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
       ${minYear()<CURRENT?`<div class="years"><label for="year" class="vh">Year</label><input type="range" id="year" min="${minYear()}" max="${CURRENT}" step="1" value="${y}" aria-valuetext="${y}"><output id="year-out" for="year">${y}</output></div>`:''}
