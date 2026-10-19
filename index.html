@@ -336,6 +336,16 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .unl-row{display:flex;gap:12px;background:var(--raise);border-radius:16px;padding:14px}.unl-row.done{opacity:.75}.unl-row.soon{opacity:.6}
 .unl-row .pill{align-self:flex-start;margin-top:8px}.unl-ok{color:#3DDBC6!important;font-weight:600}.unl-need{color:var(--text)!important}.unl-tip{margin-top:4px}
 .unl-prog{font-size:12px;color:var(--muted)}
+.sheet .swap{display:block;width:100%;background:none;border:0;color:var(--muted);font:inherit;font-weight:600;padding:12px 0 4px;cursor:pointer;text-align:center}
+.fr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.fr-tile{display:flex;flex-direction:column;gap:4px;text-align:left;border:0;background:var(--raise);color:var(--text);border-radius:16px;padding:14px;font:inherit;cursor:pointer;min-height:84px}
+.fr-tile b{font-size:16px;letter-spacing:-.02em}.fr-tile span{font-size:12.5px;color:var(--muted);line-height:1.3}
+.how{list-style:none;margin:6px 0 14px;padding:0;display:grid;gap:12px}.how li{font-size:15px;line-height:1.4;color:var(--muted)}.how b{color:var(--text)}
+.how-gift{background:var(--raise);border-radius:16px;padding:14px;margin-bottom:12px;display:grid;gap:2px}.how-gift span{font-size:13.5px;color:var(--muted)}
+.unl-check{list-style:none;margin:0;padding:0;display:grid;gap:14px}.unl-check li{display:flex;gap:12px;align-items:flex-start}
+.unl-check i{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line,#8884);display:grid;place-items:center;font-style:normal;font-size:13px;margin-top:1px}
+.unl-check li.done i{background:var(--text);color:var(--bg);border-color:var(--text)}.unl-check span{display:grid;font-size:15px}.unl-check small{color:var(--muted);font-size:13px}
+.pk.on{background:var(--text);color:var(--bg)}.ch-foot{position:sticky;bottom:0;padding:12px 0 4px;background:var(--sheet,var(--bg))}
 .unl-pop{text-align:center;padding:10px 4px 6px}.unl-pop h2{margin:10px 0 6px}
 .unl-burst{display:grid;place-items:center;width:64px;height:64px;margin:6px auto 0;border-radius:50%;background:linear-gradient(135deg,#6DB3FF,#3DDBC6);color:#fff}.unl-burst svg{width:28px;height:28px}
 .quick{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--raise);border-radius:16px;padding:14px 16px;margin-top:12px}
@@ -552,7 +562,7 @@ const CATS = [
  ['superheroes','Superheroes','Film & TV','square',0],['villains','Villains','Film & TV','square',0],['dinosaurs','Dinosaurs','Nature','wide',0],['catbreeds','Cat breeds','Nature','square',0],['flowers','Flowers','Nature','square',0],
  ['instruments','Instruments','Music','square',0],['languages','Languages','Life','wide',0],['proglangs','Programming languages','Life','square',0],
  ['hobbies','Hobbies','Life','wide',0],['subjects','School subjects','Life','wide',0],['holidays','Holidays','Life','wide',0],['seasons','Seasons','Life','wide',0],
- ['animals','Animals','Life','square',0],['dogs','Dog breeds','Nature','square',0]
+ ['youtube','YouTube videos','Film & TV','wide',0],['animals','Animals','Life','square',0],['dogs','Dog breeds','Nature','square',0]
 ].map(([id,name,group,shape,popular,photo])=>({id,name,group,shape,popular:!!popular,photo:!!photo}));
 /* Most-picked first. Everything not listed keeps its original order after these. */
 const POP = ['artists','albums','movies','tv','songs','games','anime','books','fastfood','countries','cities','celebrities','athletes','restaurants','brands','sneakers','cars','pokemon','fragrances','cocktails','influencers','actors','kdramas','characters','manga','podcasts','clubs','teams','drinks','snacks','desserts','cafes','tech','apps','mobilegames','boardgames','cuisines','pizza','icecream','sports','watches','hobbies','holidays','superheroes','villains','comedians','authors','musicals','painters','languages','proglangs','universities','wonders','themeparks','aircraft','motorcycles','airlines','mythology','civilizations','philosophers','scientists','weapons','dinosaurs','catbreeds','flowers','instruments','spirits','cheese','pasta'];
@@ -5919,6 +5929,100 @@ Henry|Golden Boy|Rifle|
 Steyr|AUG|Bullpup rifle|A1, A2, A3, A3 M1, 
 Steyr|Scout|Rifle|`
 };
+/* ---------- YouTube: famous videos with their video ids (verified against YouTube), so the picture is the real thumbnail. Anything else: paste a YouTube link. ---------- */
+const YT_SRC = `jNQXAC9IVRw|Me at the zoo|jawed|2005
+dQw4w9WgXcQ|Never Gonna Give You Up|Rick Astley|1987
+9bZkp7q19f0|Gangnam Style|PSY|2012
+kJQP7kiw5Fk|Despacito|Luis Fonsi ft. Daddy Yankee|2017
+RgKAFK5djSk|See You Again|Wiz Khalifa ft. Charlie Puth|2015
+_OBlgSz8sSM|Charlie bit my finger - again !|HDCYT|2007
+XqZsoesa55w|Baby Shark Dance|Pinkfong|2016
+JGwWNGJdvx8|Shape of You|Ed Sheeran|2017
+OPf0YbXqDm0|Uptown Funk|Mark Ronson ft. Bruno Mars|2014
+fJ9rUzIMcZQ|Bohemian Rhapsody|Queen|1975
+hTWKbfoikeg|Smells Like Teen Spirit|Nirvana|1991
+Zi_XLOBDo_Y|Billie Jean|Michael Jackson|1983
+sOnqjkJTMaA|Thriller|Michael Jackson|1983
+oRdxUFDoQe0|Beat It|Michael Jackson|1983
+djV11Xbc914|Take On Me|a-ha|1985
+FTQbiNvZqaY|Africa|Toto|1982
+8SbUC-UaAxE|November Rain|Guns N' Roses|1992
+1w7OgIMMRc4|Sweet Child O' Mine|Guns N' Roses|1987
+r7qovpFAGrQ|Old Town Road|Lil Nas X ft. Billy Ray Cyrus|2019
+DyDfgMOUjCI|bad guy|Billie Eilish|2019
+4NRXx6U8ABQ|Blinding Lights|The Weeknd|2020
+hLQl3WQQoQ0|Someone Like You|Adele|2011
+YQHsXMglC9A|Hello|Adele|2015
+rYEDA3JcQqw|Rolling in the Deep|Adele|2010
+CevxZvSJLk8|Roar|Katy Perry|2013
+0KSOMA3QBU0|Dark Horse|Katy Perry ft. Juicy J|2013
+My2FRPA3Gf8|Wrecking Ball|Miley Cyrus|2013
+0e3GPea1Tyg|$456,000 Squid Game In Real Life!|MrBeast|2021
+h6fcK_fRYaI|The Egg - A Short Story|Kurzgesagt|2015
+UF8uR6Z6KLc|Steve Jobs' 2005 Stanford Commencement Address|Steve Jobs|2005
+ji5_MqicxSo|Randy Pausch's Last Lecture|Randy Pausch|2007
+iCvmsMzlF7o|The Power of Vulnerability|Brené Brown|2010
+u4ZoJKF_VuA|Start with why|Simon Sinek|2009
+arj7oStGLkU|Inside the Mind of a Master Procrastinator|Tim Urban|2016
+Ks-_Mh1QhMc|Your Body Language May Shape Who You Are|Amy Cuddy|2012
+iG9CE55wbtY|Do schools kill creativity?|Sir Ken Robinson|2006
+dMH0bHeiRNg|Evolution of Dance|Judson Laipply|2006
+OQSNhk5ICTI|Double Rainbow|Yosemitebear|2010
+J---aiyznGQ|Keyboard Cat|Keyboard Cat|2007
+QH2-TGUlwu4|Nyan Cat|NyanCat|2011
+txqiwrbYGrs|David After Dentist|booba1234|2009
+HPPj6viIBmU|Star Wars Kid|Ghyslain Raza|2003
+IJNR2EpS0jw|Dumb Ways to Die|Metro Trains|2012
+EwTZ2xpQwpA|Chocolate Rain|Tay Zonday|2007
+kffacxfA7G4|Baby|Justin Bieber ft. Ludacris|2010
+fWNaR-rxAic|Call Me Maybe|Carly Rae Jepsen|2012
+YqeW9_5kURI|Lean On|Major Lazer & DJ Snake ft. MØ|2015
+uxpDa-c-4Mc|Hotline Bling|Drake|2015
+kfVsfOSbJY0|Friday|Rebecca Black|2011
+lp-EO5I60KA|Thinking Out Loud|Ed Sheeran|2014
+09R8_2nJtjg|Sugar|Maroon 5|2015
+hT_nvWreIhg|Counting Stars|OneRepublic|2013
+ASO_zypdnsQ|Gentleman|PSY|2013
+VYOjWnS4cMY|This Is America|Childish Gambino|2018
+nfWlot6h_JM|Shake It Off|Taylor Swift|2014
+lWA2pjMjpBs|Diamonds|Rihanna|2012
+y6120QOlsfU|Sandstorm|Darude|1999
+HgzGwKwLmgM|Don't Stop Me Now|Queen|1978
+1lyu1KKwC74|Bitter Sweet Symphony|The Verve|1997
+VtvjbmoDx-I|1984 Apple Macintosh commercial|Apple|1984
+owGykVbfgUE|The Man Your Man Could Smell Like|Old Spice|2010
+qg1ckCkm8YI|Will It Blend? iPhone|Blendtec|2007
+mLyOj_QD4a4|Leeroy Jenkins|World of Warcraft|2005
+RxPZh4AnWyk|Susan Boyle, Britain's Got Talent|Susan Boyle|2009
+1k08yxu57NA|Paul Potts sings Nessun Dorma|Paul Potts|2007
+4-94JhLEiN0|JK Wedding Entrance Dance|The Kheinz|2009
+aircAruvnKk|But what is a neural network?|3Blue1Brown|2017
+A0FZIwabctw|Falcon Heavy & Starman|SpaceX|2018
+FHtvDA0W34I|Felix Baumgartner's supersonic freefall|Red Bull Stratos|2012
+dTAAsCNK7RA|Here It Goes Again|OK Go|2006
+qybUFnY7Y8w|This Too Shall Pass|OK Go|2010
+8UVNT4wvIGY|Somebody That I Used to Know|Gotye ft. Kimbra|2011
+ZbZSe6N_BXs|Happy|Pharrell Williams|2013
+_Yhyp-_hX2s|Lose Yourself|Eminem|2002
+tvTRZJ-4EyI|HUMBLE.|Kendrick Lamar|2017
+h5EofwRzit0|Get Lucky|Daft Punk ft. Pharrell Williams|2013
+yKNxeF4KMsY|Yellow|Coldplay|2000
+dvgZkm1xWPE|Viva La Vida|Coldplay|2008
+7wtfhZwyrcc|Believer|Imagine Dragons|2017
+eVTXPUF4Oz4|In the End|Linkin Park|2001
+bx1Bh8ZvH84|Wonderwall|Oasis|1995
+mrZRURcb1cM|Dreams|Fleetwood Mac|1977
+wp43OdtAAkM|Running Up That Hill|Kate Bush|1985
+H5v3kku4y6Q|As It Was|Harry Styles|2022
+TUVcZfQe-Kw|Levitating|Dua Lipa|2020
+gNi_6U5Pm_o|good 4 u|Olivia Rodrigo|2021
+6ONRf7h3Mdk|SICKO MODE|Travis Scott ft. Drake|2018
+gdZLi9oWNZg|Dynamite|BTS|2020
+IHNzOHi8sJs|DDU-DU DDU-DU|BLACKPINK|2018
+WMweEpGlu_U|Butter|BTS|2021`;
+const YT_ID = {};
+const ytThumb = id => 'https://i.ytimg.com/vi/'+id+'/mqdefault.jpg';
+const ytIdOf = t => { const m=String(t||'').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|music\.youtube\.com\/watch\?(?:.*&)?v=)([\w-]{11})/i); return m?m[1]:''; };
 const NATIVE = {};
 Object.assign(NATIVE, {
 artists:`BTS|방탄소년단 · K-pop
@@ -6500,6 +6604,7 @@ function buildCatalog(){
       if(old){ if(isNat(it.s) && !isNat(old.s)) old.s = segs(it.s).length>1 ? it.s : [it.s,old.s].filter(Boolean).join(' · '); continue; }   /* later list adds the native name to an existing entry */
       byName.set(k,it); out.push(it); }
     CATALOG[id]=out; }
+  { const yl=CATALOG.youtube||(CATALOG.youtube=[]); for(const ln of YT_SRC.split('\n')){ const [vid,t,by,yr]=ln.split('|'); if(!vid||!t) continue; YT_ID[t]=vid; if(!yl.some(x=>x.n===t)) yl.push({n:t,s:by+' · '+yr}); } }
   for(const id in MODEL_SRC){
     const list=CATALOG[id]||(CATALOG[id]=[]), have=new Set(list.map(i=>i.n.toLowerCase()));
     for(const line of MODEL_SRC[id].split('\n')){
@@ -6910,79 +7015,96 @@ function openVsResult(fid,c){
   <div class="cols vs-cols"><div><h3>You</h3>${mini(mine.snap.top,c,set)}</div><div><h3>${esc(first(f))}</h3>${mini(theirs.top,c,set)}</div></div>
   <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="vs-profile" data-f="${f.id}">See ${esc(first(f))}'s profile</button><button class="pill" data-act="share-match" data-f="${f.id}" data-cat="${c}">Share our match</button></div></div>`,'vs');
 }
-/* ---------- Unlocks: 8 starter categories for everyone, the rest in packs that open by coming back, inviting and filling shelves ---------- */
-const STARTER = ['artists','albums','songs','movies','tv','games','anime','fastfood'];
-const PACKS = [
-  {id:'eats',   name:'Eats & drinks',    blurb:'Restaurants, cafés, desserts, cocktails and more',  kind:'invites', n:1,  of:c=>c.group==='Food & drink'},
-  {id:'screen', name:'Screen & stars',   blurb:'Actors, characters, K-dramas, celebrities and more', kind:'days',    n:3,  of:c=>c.group==='People'||c.group==='Film & TV'},
-  {id:'places', name:'Places & nature',  blurb:'Countries, cities, landmarks, animals and more',      kind:'shelves', n:3,  of:c=>c.group==='Places'||c.group==='Nature'},
-  {id:'style',  name:'Style & wheels',   blurb:'Sneakers, cars, fragrances, tech and more',           kind:'invites', n:3,  of:c=>c.group==='Style & stuff'||c.group==='Vehicles'},
-  {id:'culture',name:'Culture & sport',  blurb:'Books, podcasts, sports, board games and more',       kind:'days',    n:7,  of:c=>c.group==='Reading & listening'||c.group==='Sport'||c.group==='Games'||c.group==='Music'},
-  {id:'deep',   name:'Deep cuts',        blurb:'History, ideas, languages, hobbies and more',         kind:'days',    n:14, of:c=>c.group==='History & ideas'||c.group==='Life'}
-];
-const CUSTOM_PACK = {id:'custom', name:'Make your own', blurb:'Your own shelf for your friends, like "Who is the smartest in the group?"', kind:'invites', n:5};
-const packOf = c => { const x=CAT[c]; if(!x||STARTER.includes(c)) return null; return PACKS.find(p=>p.of(x)) || null; };
-const UNL = {loaded:false, gate:false, supporter:false, invites:0, days:0, shelves:0, unlocked:new Set(), rules:{}};   /* gate stays off until the server says on, so nothing locks before unlocks.sql is run */
-const PASS = new Set();                                                                                               /* a link from a friend opens that one topic */
-const need = p => (UNL.rules[p.id]||p);
-const gotOf = k => UNL[k]|0;
-const packDone = p => !UNL.gate || UNL.supporter || UNL.unlocked.has(p.id);
+/* ---------- Unlocks ----------
+   The big, popular categories are open for everyone. The rest are locked, and you earn PICKS: each pick opens one category of your choice.
+   Picks come from finishing your first shelf, from friends who join and make a shelf, and from coming back on different days. */
+const STARTER = ['artists','albums','songs','movies','tv','anime','games','books','fastfood','restaurants','countries','cities','celebrities','actors','athletes','teams','sneakers','cars','dogs','youtube'];
+const FIRST_PICKS = ['artists','albums','movies','tv','games','fastfood','books','countries'];
+const UNL = {loaded:false, gate:false, supporter:false, invites:0, days:0, shelves:0, picksLeft:0, unlocked:new Set(), custom:false, rewards:[]};
+const PASS = new Set();
 function isOpen(c){
   if(!CAT[c]) return false; if(CAT[c].custom||!UNL.gate||UNL.supporter||STARTER.includes(c)||PASS.has(c)||state.shelves[c]) return true;
-  const p=packOf(c); return !p || UNL.unlocked.has(p.id);
+  return UNL.unlocked.has(c);
 }
-const customOpen = () => !UNL.gate || UNL.supporter || UNL.unlocked.has('custom');
-function packText(p){ const r=need(p); return r.kind==='invites' ? (r.n===1?'1 friend joins':r.n+' friends join')+' through your link and makes a shelf'.replace('makes',r.n===1?'makes':'make') : r.kind==='days' ? `Open Palate on ${r.n} different days` : `Make ${r.n} shelves`; }
-function packLeft(p){ const r=need(p), got=gotOf(r.kind), left=Math.max(0,r.n-got); return {got:Math.min(got,r.n), n:r.n, left}; }
-function packCount(p){ return CATS.filter(c=>packOf(c.id)===p).length; }
-function nextPack(){ return PACKS.filter(p=>!packDone(p)).sort((a,b)=>packLeft(a).left/packLeft(a).n-packLeft(b).left/packLeft(b).n)[0]||null; }
-let unlT=0; document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadUnlocks(); });
+const customOpen = () => !UNL.gate || UNL.supporter || UNL.custom;
+const lockedCats = () => CATS.filter(c=>!isOpen(c.id));
+function rewardText(r){ return r.kind==='invites' ? (r.n===1?'A friend joins through your link and makes a shelf':r.n+' friends join through your link and make a shelf') : r.kind==='days' ? 'Open Palate on '+r.n+' different days' : r.n===1?'Finish your first shelf':'Make '+r.n+' shelves'; }
+function rewardMore(r){ const got=Math.min(UNL[r.kind]|0,r.n); return r.kind==='invites'?got+' of '+r.n+' so far':r.kind==='days'?got+' of '+r.n+' days':''; }
+let unlT=0;
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) loadUnlocks(); });
 async function loadUnlocks(force){
-  if(!sb||!me||(!force&&Date.now()-unlT<60000)) return; unlT=Date.now();
+  if(!sb||!me||(!force&&Date.now()-unlT<60000)) return null; unlT=Date.now();
   try{
-    const {data,error}=await sb.rpc('unlock_state'); if(error||!data) return;
+    const {data,error}=await sb.rpc('unlock_state'); if(error||!data) return null;
     UNL.loaded=true; UNL.gate=!!data.gate; UNL.supporter=!!data.supporter; UNL.invites=data.invites|0; UNL.days=data.days|0; UNL.shelves=data.shelves|0;
-    UNL.unlocked=new Set(data.unlocked||[]); UNL.rules=Object.fromEntries((data.rules||[]).map(r=>[r.id,r]));
+    UNL.picksLeft=data.picks_left|0; UNL.unlocked=new Set(data.unlocked||[]); UNL.custom=!!data.custom; UNL.rewards=data.rewards||[];
     const seen=(()=>{ try{ return JSON.parse(localStorage.getItem('palate-unl-seen')||'[]'); }catch(e){ return []; } })();
-    const fresh=(data.fresh||[]).filter(id=>!seen.includes(id)&&(PACKS.find(p=>p.id===id)||id==='custom'));
+    const fresh=(data.fresh||[]).filter(id=>!seen.includes(id));
     if(fresh.length){ try{ localStorage.setItem('palate-unl-seen',JSON.stringify([...seen,...fresh])); }catch(e){} }
-    if(document.body.classList.contains('in')){ if(ui.tab==='me' && !ed) render(); if(fresh.length && !ed) celebrateUnlock(fresh); }
-  }catch(e){ if(window.PALATE_DEBUG) console.warn('unlock state failed',e); }
+    if(document.body.classList.contains('in') && !ed){ if(ui.tab==='me') render(); if(fresh.length && !loadUnlocks.hold) celebrateReward(fresh); }
+    return data;
+  }catch(e){ if(window.PALATE_DEBUG) console.warn('unlock state failed',e); return null; }
 }
-function celebrateUnlock(ids){
-  const items=ids.map(id=>id==='custom'?CUSTOM_PACK:PACKS.find(p=>p.id===id)).filter(Boolean); if(!items.length) return;
-  sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK.replace('<svg','<svg class="open"')}</div><h2>${items.length>1?'New shelves unlocked':'Unlocked: '+esc(items[0].name)}</h2>
-    <p class="muted">${items.map(p=>p.id==='custom'?'You can now make your own shelves.':`${packCount(p)} new categories are open: ${esc(p.blurb.toLowerCase())}.`).join(' ')}</p>
-    ${items.some(p=>p.id!=='custom')?`<button class="pill" style="width:100%;margin-top:14px" data-act="add-shelf">Pick a new shelf</button>`:`<button class="pill" style="width:100%;margin-top:14px" data-act="make-own">Make one</button>`}
-    <button class="swap" data-act="close">Later</button></div>`,'unlock');
+function celebrateReward(ids){
+  const picks=ids.filter(id=>(UNL.rewards.find(r=>r.id===id)||{}).grants==='pick').length, cust=ids.includes('custom');
+  if(picks&&UNL.picksLeft>0&&UNL.gate&&!UNL.supporter){
+    sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK}</div><h2>${picks>1?'You earned '+picks+' shelf picks':'You earned a shelf pick'}</h2>
+      <p class="muted">Choose any locked shelf to open it. Use it now or later.</p>
+      <button class="pill" style="width:100%;margin-top:14px" data-act="choose-pick">Choose a shelf</button><button class="swap" data-act="close">Later</button></div>`,'unlock');
+  } else if(cust) toast('You can now make your own shelves');
 }
-function unlRow(p,custom){
-  const done=custom?customOpen():packDone(p), pr=packLeft(p), pct=Math.round(100*pr.got/pr.n);
-  const act = done?'' : need(p).kind==='invites' ? `<button class="pill sm" data-act="unl-invite">Copy invite link</button>` : need(p).kind==='shelves' ? `<button class="pill sm" data-act="add-shelf">Add a shelf</button>` : `<span class="muted unl-tip">Counts when you open the app</span>`;
-  return `<li class="unl-row${done?' done':''}"><div class="unl-ic">${done?'✓':LOCK}</div><div class="unl-main"><b>${esc(p.name)}${custom?'':` <em>${packCount(p)}</em>`}</b><span>${esc(p.blurb)}</span>
-    ${done?`<span class="unl-ok">Unlocked</span>`:`<span class="unl-need">${esc(packText(p))}</span><div class="unl-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${pr.n}" aria-valuenow="${pr.got}"><i style="width:${pct}%"></i></div><span class="unl-prog">${pr.got} of ${pr.n}</span>${act}`}</div></li>`;
+let pkSel=null;
+function chooserList(){
+  const L=lockedCats(), groups=[...new Set(L.map(c=>c.group))];
+  return groups.map(g=>`<div class="pk-group"><h3>${esc(g)}</h3><div class="pk-grid">${L.filter(c=>c.group===g).map(c=>`<button class="pk${pkSel===c.id?' on':''}" data-act="pick-choose" data-cat="${c.id}" aria-pressed="${pkSel===c.id}">${esc(c.name)}</button>`).join('')}</div></div>`).join('')||'<p class="muted">Everything is open.</p>';
 }
-function openUnlock(c){
-  const p=packOf(c), r=p&&packLeft(p); if(!p){ openUnlocks(); return; }
+function chooserFoot(){ return pkSel?`<button class="pill" style="width:100%" data-act="unlock-go">Unlock ${esc(CAT[pkSel].name)}</button>`:`<button class="pill" style="width:100%" disabled>Choose one</button>`; }
+function openChooser(pre){
+  pkSel=pre&&CAT[pre]&&!isOpen(pre)?pre:null;
+  sheet(`<div class="sheet-head"><div><h2>Choose a shelf to unlock</h2><p>${UNL.picksLeft} pick${UNL.picksLeft===1?'':'s'} available</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div id="ch-list">${chooserList()}</div><div class="ch-foot" id="ch-foot">${chooserFoot()}</div>`,'chooser');
+}
+async function unlockGo(){
+  const c=pkSel; if(!c) return; const b=document.querySelector('#ch-foot button'); if(b) b.disabled=true;
+  try{ const {data,error}=await sb.rpc('unlock_category',{p_cat:c}); if(error) throw error;
+    UNL.picksLeft=data.picks_left|0; UNL.unlocked=new Set(data.unlocked||[]); closeSheet(); render(); track('unlock_cat',c); toast(CAT[c].name+' is open'); setTimeout(()=>openEditor(c,false),350); }
+  catch(e){ if(b) b.disabled=false; toast(/no picks/i.test(e.message||'')?'You have no picks left':"Couldn't unlock. Try again."); }
+}
+function openLocked(c){
+  if(UNL.picksLeft>0){ openChooser(c); return; }
   sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK}</div><h2>${esc(CAT[c].name)} is locked</h2>
-    <p class="muted">It opens with the ${esc(p.name)} pack (${packCount(p)} categories). ${esc(packText(p))}.</p>
-    <div class="unl-bar big"><i style="width:${Math.round(100*r.got/r.n)}%"></i></div><p class="unl-prog" style="text-align:center">${r.got} of ${r.n}</p>
-    ${need(p).kind==='invites'?`<button class="pill" style="width:100%;margin-top:6px" data-act="unl-invite">Copy invite link</button>`:need(p).kind==='shelves'?`<button class="pill" style="width:100%;margin-top:6px" data-act="close">Make a shelf first</button>`:`<p class="muted" style="text-align:center;margin-top:6px">Come back tomorrow, it adds up.</p>`}
-    <button class="swap" data-act="unlocks">See every pack</button></div>`,'unlock');
+    <p class="muted">Earn a pick and you can open any locked shelf. Quickest way: send your link to a friend. When they join and make a shelf, you get one.</p>
+    <button class="pill" style="width:100%;margin-top:14px" data-act="unl-invite">Copy my invite link</button><button class="swap" data-act="unlocks">Other ways to earn picks</button></div>`,'unlock');
 }
 function openUnlocks(){
-  const starter=STARTER.map(id=>CAT[id].name).join(', ');
-  sheet(`<div class="sheet-head"><div><h2>Unlock shelves</h2><p>${UNL.supporter?'You have everything open':'Come back, invite friends, fill shelves'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <p class="muted" style="margin:0 0 12px">Always open: ${esc(starter)}.</p>
-  <ul class="unl-list">${PACKS.map(p=>unlRow(p,false)).join('')}${unlRow(CUSTOM_PACK,true)}
-    <li class="unl-row soon"><div class="unl-ic">★</div><div class="unl-main"><b>Supporter</b><span>Opens every pack at once, and gives you the Supporter badge.</span><span class="unl-need">Coming in the beta</span></div></li></ul>
-  <div style="height:18px"></div>`,'unlocks');
+  const rows=UNL.rewards.filter(r=>r.grants==='pick');
+  sheet(`<div class="sheet-head"><div><h2>Unlock more shelves</h2><p>${UNL.supporter?'You have everything open':UNL.picksLeft>0?UNL.picksLeft+' pick'+(UNL.picksLeft===1?'':'s')+' ready to use':'Earn picks, then choose any shelf'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  ${UNL.picksLeft>0&&!UNL.supporter?`<button class="pill" style="width:100%;margin-bottom:14px" data-act="choose-pick">Use a pick</button>`:''}
+  <ul class="unl-check">${rows.map(r=>`<li class="${r.done?'done':''}"><i>${r.done?'✓':''}</i><span>${esc(rewardText(r))}<small>${r.done?'Earned':esc(rewardMore(r))}</small></span></li>`).join('')}
+    <li class="${customOpen()?'done':''}"><i>${customOpen()?'✓':''}</i><span>Make your own shelves<small>${customOpen()?'Unlocked':'3 friends join through your link'}</small></span></li></ul>
+  <button class="pill soft" style="width:100%;margin-top:14px" data-act="unl-invite">Copy my invite link</button>
+  <p class="muted" style="font-size:13px;margin:12px 0 0;text-align:center">Supporters get every shelf at once. Coming in the beta.</p><div style="height:14px"></div>`,'unlocks');
 }
 function unlockedCard(){
-  if(!UNL.gate||UNL.supporter||!UNL.loaded) return '';
-  const np=nextPack(); if(!np&&customOpen()) return '';
-  const pr=np?packLeft(np):null, pct=np?Math.round(100*pr.got/pr.n):100;
-  return `<button class="unl-card" data-act="unlocks"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>${np?`Next unlock: ${esc(np.name)}`:'Make your own shelves'}</b><span>${np?esc(packText(np))+` · ${pr.got} of ${pr.n}`:'Open the last pack'}</span>${np?`<span class="unl-bar"><i style="width:${pct}%"></i></span>`:''}</span><span class="unl-go">${PACKS.filter(packDone).length} of ${PACKS.length}</span></button>`;
+  if(!UNL.gate||UNL.supporter||!UNL.loaded||UNL.picksLeft<1) return '';
+  return `<button class="unl-card" data-act="choose-pick"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>You have ${UNL.picksLeft===1?'a shelf pick':UNL.picksLeft+' shelf picks'}</b><span>Open any locked shelf</span></span><span class="unl-go">Choose</span></button>`;
+}
+function showFirstRun(){
+  try{ localStorage.setItem('palate-onboard','1'); }catch(e){}
+  sheet(`<div class="sheet-head"><div><h2>Pick your first shelf</h2><p>Your top 5 in anything. Takes about a minute.</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <div class="fr-grid">${FIRST_PICKS.filter(id=>CAT[id]).map(id=>`<button class="fr-tile" data-act="first-pick" data-cat="${id}"><b>${esc(CAT[id].name)}</b><span>${esc((CATALOG[id]||[]).slice(0,2).map(i=>i.n).join(', '))}</span></button>`).join('')}</div>
+  <button class="swap" data-act="add-shelf">See every topic</button>`,'firstrun');
+}
+function afterFirstShelf(){
+  loadUnlocks.hold=true;
+  (async()=>{ try{ await push(); }catch(e){} await loadUnlocks(true); loadUnlocks.hold=false;
+    const gated=UNL.gate&&!UNL.supporter, pick=UNL.picksLeft>0&&gated;
+    sheet(`<div class="sheet-head"><div><h2>That's your first shelf</h2><p>Here's how Palate works</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <ul class="how"><li><b>Friends see it.</b> Send them your link and Palate shows how well your tastes match.</li>
+      <li><b>Shelves are topics.</b> ${gated?'The most popular ones are open. You earn picks to unlock the rest by inviting friends and coming back.':'There are dozens, so keep adding.'}</li></ul>
+    ${pick?`<div class="how-gift"><b>Your reward: pick any shelf to unlock.</b><span>Anything you like. You can choose later too.</span></div><button class="pill" style="width:100%" data-act="choose-pick">Choose my shelf</button><button class="swap" data-act="unl-invite">Copy my invite link instead</button>`
+          :`<button class="pill" style="width:100%" data-act="unl-invite">Copy my invite link</button><button class="swap" data-act="close">Keep going</button>`}`,'welcome2');
+  })();
 }
 /* Make-your-own shelves: the name lives in a small shared table so friends can rank the same thing. */
 function registerCustom(r){ if(!r||!r.id||!String(r.id).startsWith('my:')) return; CAT[r.id]={id:r.id,name:r.name,group:'Made by friends',shape:'square',popular:false,photo:false,custom:true,owner:r.owner||null}; CATALOG[r.id] ||= []; }
@@ -7207,10 +7329,11 @@ async function enter(user){
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
     render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500); setTimeout(()=>loadUnlocks(true),900);
-    if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
+    if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && localStorage.getItem('palate-onboard') && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     const vs = joined&&!joined.err&&joined.id&&joined.cat&&CAT[joined.cat] ? {id:joined.id,name:joined.name,cat:joined.cat} : null;
     if(vs) startVs(vs);
     else if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
+    else if(!state.order.length && !localStorage.getItem('palate-onboard')) setTimeout(showFirstRun,500);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
 
@@ -7685,6 +7808,7 @@ async function sampleTint(url){
 }
 /* The one place that decides which picture belongs to a thing. Used both when something is added and while you search. */
 async function findImage(c,n,subHint){
+  if(c==='youtube' && YT_ID[n]) return {url:ytThumb(YT_ID[n]),src:'youtube',failed:false};
   if(CAT[c]&&CAT[c].custom) return {url:null,src:'',failed:true};
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
   const order=[['music',musicImage],['logo',logoImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
@@ -8100,7 +8224,7 @@ function openDetail(c, fid){
 
 /* Editor */
 function openEditor(c, flow){
-  if(!isOpen(c)){ openUnlock(c); return; }
+  if(!isOpen(c)){ openLocked(c); return; }
   const e=eff(c,CURRENT), s=e?e.snap:{top:[],hm:[]};
   const slots=Array(7).fill(null);
   s.top.forEach((it,i)=>slots[i]={...it}); s.hm.forEach((it,i)=>slots[5+i]={...it});
@@ -8131,10 +8255,28 @@ const DESC_OK = {
   fastfood:/restaurant|fast.?food|chain|franchise|company|brand|mexican grill/i, restaurants:/restaurant|chain|bistro|grill|diner/i, cafes:/coffee|caf[eé]|chain|bakery/i,
   podcasts:/podcast/i, musicals:/musical/i, boardgames:/game/i, cars:/car|automobile|vehicle|sedan|suv|coupe|truck/i, sports:/sport|game/i
 };
+async function ytOembed(id){
+  const u='https://www.youtube.com/watch?v='+id;
+  for(const ep of ['https://www.youtube.com/oembed?format=json&url=','https://noembed.com/embed?url=']){
+    try{ const r=await fetch(ep+encodeURIComponent(u)); if(!r.ok) continue; const j=await r.json(); if(j&&j.title&&!j.error) return j; }catch(e){}
+  }
+  return null;
+}
 const LIVE = new Map();
 const yr = d => (String(d||'').match(/(19|20)\d\d/)||[''])[0];
 async function liveSearch1(c,q,cty){
   const cfg=IMG_SRC[c]||{}, out=[];
+  if(c==='youtube'){
+    const id=ytIdOf(q)||(/^[\w-]{11}$/.test(q.trim())&&/\d|[A-Z]/.test(q.trim())&&!/\s/.test(q.trim())?q.trim():'');
+    if(id){ const j=await ytOembed(id); if(j){ YT_ID[j.title]=id; out.push({n:j.title,s:j.author_name||'YouTube',img:ytThumb(id),full:ytThumb(id),src:'youtube'}); } }
+    else if(window.PALATE_CONFIG&&PALATE_CONFIG.ytKey){
+      const r=await fetch('https://www.googleapis.com/youtube/v3/search?'+new URLSearchParams({part:'snippet',type:'video',maxResults:'8',videoEmbeddable:'any',safeSearch:'moderate',q,key:PALATE_CONFIG.ytKey}));
+      if(!r.ok) throw new Error('yt '+r.status);
+      const dec=t=>{ const d=document.createElement('textarea'); d.innerHTML=t; return d.value; };
+      for(const v of ((await r.json()).items||[])){ const t=dec(v.snippet.title); YT_ID[t]=v.id.videoId; out.push({n:t,s:dec(v.snippet.channelTitle)+' · '+String(v.snippet.publishedAt||'').slice(0,4),img:ytThumb(v.id.videoId),full:ytThumb(v.id.videoId),src:'youtube'}); }
+    }
+    return out;
+  }
   if(c==='pokemon'){
     const ql=normT(q).replace(/ /g,'-'), all=await pokeList();
     const hits=all.filter(p=>p.slug.includes(ql)).sort((a,b)=>(b.slug.startsWith(ql))-(a.slug.startsWith(ql))||a.id-b.id).slice(0,8);
@@ -8282,7 +8424,7 @@ async function fillDetails(c,n){
 }
 function addCustom(c,n){
   const it={n,s:''}; if(!CAT[c].custom) (state.custom[c] ||= []).push(it); (CATALOG[c] ||= []).push(it); save(); addItem(it);
-  if(CAT[c].custom) return;                        /* your own shelf: nothing to look up */
+  if(CAT[c].custom||c==='youtube') return;          /* your own shelf, or a video: nothing to look up */
   noteMiss(c,n);                                   /* it was not in the catalog: tell us so we can add it properly */
   toast('Looking up the details…');
   fillDetails(c,n).then(r=>{ if(r&&r.s) toast('Found: '+r.s); }).catch(()=>{});
@@ -8429,7 +8571,7 @@ function queueLive(){
 let rfRunning=0; const rfQ=[];
 function refineResults(){
   if(!ed) return; const c=ed.cat;
-  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); rfQ.push([c,it,k]); }
+  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); rfQ.push([c,it,k]); }
   rfPump();
 }
 function rfPump(){
@@ -8487,7 +8629,7 @@ function renderEditor(){
   const left = ed.isNew ? '<span></span>' : ed.confirm
     ? `<div class="confirm">Remove for ${CURRENT}?<button class="pill soft danger sm" data-act="del-yes">Remove</button><button class="pill ghost sm" data-act="del-no">Keep</button></div>`
     : `<button class="pill ghost danger" data-act="del-ask">Remove shelf</button>`;
-  const nx = ((ed.flow || ed.isNew) && !ed.vs) ? nextCat() : null;
+  const nx = ((ed.flow || ed.isNew) && !ed.vs) ? (state.order.length ? nextCat() : null) : null;
   const vsF = ed.vs ? FRIENDS.find(x=>x.id===ed.vs.id) : null;
   sheet(`<div class="sheet-head"><div><h2>${esc(c.name)}</h2><p>${CURRENT}${ed.flow?' · quick start':''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
     ${ed.vs?`<div class="vs-note">${vsF?av(vsF,'s'):''}<span>Rank your top 5 ${esc(c.name.toLowerCase())} to see how well you match <b>${esc(ed.vs.name.split(' ')[0])}</b>.</span></div>`:''}
@@ -8531,10 +8673,10 @@ function saveEditor(next){
   const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
   const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
-  const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c); (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
+  const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c), firstEver=!state.order.length; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
-  save(); setTimeout(()=>loadUnlocks(true),2600); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
+  save(); if(isNew&&firstEver&&!vs&&!next){ setTimeout(afterFirstShelf,400); } else setTimeout(()=>loadUnlocks(true),2600); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
   if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(vs&&vs.cat===c){ toast('Saved'); setTimeout(()=>openVsResult(vs.id,c),250); } else if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
 function removeShelf(){
@@ -8587,16 +8729,12 @@ $('#photo-input').addEventListener('change', async e=>{
 });
 
 /* Category picker */
-function unlockPickerCard(){
-  if(!UNL.gate||UNL.supporter) return ''; const np=nextPack(); const locked=CATS.filter(c=>!isOpen(c.id)).length; if(!locked) return '';
-  return `<button class="unl-card" data-act="unlocks"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>${locked} categories locked</b><span>${np?esc(np.name)+': '+esc(packText(np)):'Tap to see what opens them'}</span></span><span class="unl-go">See how</span></button>`;
-}
 function pickerList(){
   const q=(pk.q||'').trim().toLowerCase();
   const btn=c=>isOpen(c.id) ? `<button class="pk" data-act="pick-cat" data-cat="${c.id}" ${eff(c.id,CURRENT)?'disabled':''}>${esc(c.name)}</button>` : `<button class="pk locked" data-act="pk-locked" data-cat="${c.id}" aria-label="${esc(c.name)}, locked"><i class="pk-lock">${LOCK}</i>${esc(c.name)}</button>`;
   if(q){ const m=CATS.filter(c=>c.name.toLowerCase().includes(q)||c.group.toLowerCase().includes(q)); return m.length?`<div class="pk-group"><div class="pk-grid">${m.map(btn).join('')}</div></div>`:`<p class="muted" style="margin-top:16px">No match for “${esc(pk.q.trim())}”.</p>`; }
   const left=CATS.filter(c=>c.popular && isOpen(c.id) && !eff(c.id,CURRENT)).length;
-  return unlockPickerCard()+`<button class="own-btn" data-act="make-own"><span class="plus">+</span><span><b>Make your own</b><small>${customOpen()?'A shelf just for your friends':'Locked · invite friends to open it'}</small></span>${customOpen()?'':`<i class="pk-lock">${LOCK}</i>`}</button>`
+  return unlockedCard()+`<button class="own-btn" data-act="make-own"><span class="plus">+</span><span><b>Make your own</b><small>${customOpen()?'A shelf just for your friends':'Locked · invite friends to open it'}</small></span>${customOpen()?'':`<i class="pk-lock">${LOCK}</i>`}</button>`
     + (left?`<div class="quick"><div><b>Quick start</b><span>Go through the ${left} most popular shelves one after another, with suggestions.</span></div><button class="pill" data-act="quick">Start</button></div>`:'')
     + `<div class="pk-group"><h3>Popular</h3><div class="pk-grid">${CATS.filter(c=>c.popular).map(btn).join('')}</div></div>`
     + `<div class="pk-group"><h3>Browse by topic</h3>${[...new Set(CATS.map(c=>c.group))].map(g=>{ const list=CATS.filter(c=>c.group===g); const open=pk.open&&pk.open.has(g);
@@ -8604,7 +8742,7 @@ function pickerList(){
 }
 function openPicker(){
   pk={q:''};
-  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${CATS.filter(c=>isOpen(c.id)).length} open · ${CATS.length} in all</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${UNL.gate&&!UNL.supporter&&lockedCats().length?lockedCats().length+' locked. Earn picks to open them.':CATS.length+' topics'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="search"><input id="pk-q" type="search" autocomplete="off" aria-label="Search categories" placeholder="Search categories"></div>
   <div id="pk-list">${pickerList()}</div><div style="height:22px"></div>`, 'picker');
   setTimeout(()=>$('#pk-q')?.focus(),30);
@@ -8735,7 +8873,11 @@ document.addEventListener('click',e=>{
     case 'open-friend': openDetail(el.dataset.cat, el.dataset.f); break;
     case 'edit': openEditor(el.dataset.cat); break;
     case 'unlocks': openUnlocks(); break;
-    case 'pk-locked': openUnlock(el.dataset.cat); break;
+    case 'choose-pick': openChooser(); break;
+    case 'pick-choose': pkSel=el.dataset.cat; { const l=document.getElementById('ch-list'), f=document.getElementById('ch-foot'); if(l) l.innerHTML=chooserList(); if(f) f.innerHTML=chooserFoot(); } break;
+    case 'unlock-go': unlockGo(); break;
+    case 'first-pick': closeSheet(); setTimeout(()=>openEditor(el.dataset.cat,false),250); break;
+    case 'pk-locked': openLocked(el.dataset.cat); break;
     case 'make-own': openMakeOwn(); break;
     case 'make-own-go': makeOwn(); break;
     case 'own-ex': { const i=$('#own-name'); if(i){ i.value=el.dataset.t; i.focus(); } break; }
