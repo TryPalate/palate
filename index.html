@@ -72,6 +72,51 @@ body.in::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-a
 .pill.sm{padding:6px 11px;font-size:13px}
 .pill:disabled{opacity:.4;cursor:default}
 
+.gear{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:0;background:var(--raise);color:var(--muted);cursor:pointer;padding:0;flex:none}
+.gear svg{width:19px;height:19px}.gear:hover{color:var(--text)}
+@media (max-width:760px){.gear{margin-left:auto;width:36px;height:36px}}
+/* Settings */
+.set-h{font-size:13px;font-weight:600;color:var(--muted);margin:20px 4px 8px}
+.sheet-head + .set-h{margin-top:4px}
+.set-group{background:var(--raise);border-radius:16px;overflow:hidden;margin:0}
+.set-group + .set-group{margin-top:14px}
+.set-group.pad{padding:12px 14px}.set-group.pad .bdg-row{margin:0}
+.set-row{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:10px 16px;background:none;border:0;border-radius:0;text-align:left;font:inherit;font-size:15.5px;color:var(--text);cursor:pointer}
+.set-row + .set-row{border-top:1px solid var(--line)}
+button.set-row:active{transform:none;background:var(--line)}
+.set-row:disabled{cursor:default}
+.set-t{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.set-t small{font-size:12.5px;color:var(--muted)}
+.set-v{margin-left:auto;color:var(--muted);font-size:14.5px;max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center}
+.set-v em{font-style:normal;color:var(--accent)}
+.set-v .me-av{width:30px;height:30px;font-size:13px}
+.chev{flex:none;width:8px;height:8px;border-right:2px solid var(--faint);border-top:2px solid var(--faint);transform:rotate(45deg);margin-left:4px}
+.set-row.danger .set-t{color:#E5484D}.set-row.center .set-t{align-items:center;color:#E5484D}
+.set-row .seg{margin-left:auto}
+.set-sel{margin-left:auto;background:var(--card);border:0;border-radius:10px;padding:7px 10px;font-size:14.5px;color:var(--text)}
+.set-row.sw{cursor:pointer}.set-row.sw input{position:absolute;opacity:0;pointer-events:none}
+.tgl{flex:none;width:50px;height:30px;border-radius:15px;background:var(--faint);position:relative;transition:background .2s}
+.tgl::after{content:'';position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgb(0 0 0 / .25);transition:transform .3s var(--ease-out)}
+.set-row.sw input:checked + .tgl{background:#34C759}.set-row.sw input:checked + .tgl::after{transform:translateX(20px)}
+.set-row.sw input:focus-visible + .tgl{outline:2px solid var(--accent);outline-offset:2px}
+.set-note{font-size:12.5px;color:var(--muted);margin:8px 6px 0;line-height:1.4}
+.set-back{background:none;border:0;padding:0 0 4px;color:var(--accent);font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.set-form{display:flex;flex-direction:column;gap:10px;padding-bottom:16px}
+.set-form input{width:100%;font-size:17px;padding:12px 14px;background:var(--raise);color:var(--text);border:1px solid transparent;border-radius:14px}
+.set-form input:focus{outline:none;border-color:var(--muted)}
+.set-form .pill{padding:12px 16px;font-size:15.5px}
+.set-err{margin:0;min-height:1.2em;color:#E5484D;font-size:14px}
+.set-hint{margin:0;font-size:13.5px;color:var(--muted)}.set-hint.good{color:var(--good)}.set-hint.bad{color:#E5484D}
+.at-in{display:flex;align-items:center;background:var(--raise);border-radius:14px;padding-left:14px;border:1px solid transparent}
+.at-in:focus-within{border-color:var(--muted)}.at-in span{color:var(--muted);font-size:17px}.at-in input{background:none;border:0;padding-left:4px}.at-in input:focus{border:0}
+.about-mark{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:4px 0 6px}
+.about-mark .logo .mark{height:40px}.about-mark p{margin:0;color:var(--muted)}.about-mark small{color:var(--faint);font-size:12.5px}
+.credits{list-style:none;margin:0;padding:0;background:var(--raise);border-radius:16px}
+.credits li{display:flex;flex-direction:column;gap:2px;padding:11px 16px;font-size:14.5px}.credits li + li{border-top:1px solid var(--line)}
+.credits span{color:var(--muted);font-size:13px;line-height:1.35}
+.about .set-group{margin-top:14px}
+.about-c{text-align:center;color:var(--faint);font-size:12.5px;margin:16px 0 0}
+.credit .linkish{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+.find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 .bottom-nav{display:none}
 @media (max-width:760px){
   .tabs,.top .pill{display:none}
@@ -570,14 +615,15 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
       <button class="tab" data-act="tab" data-tab="recap">Recap</button>
     </nav>
     <button class="pill" data-act="add-shelf">Add shelf</button>
+    <button class="gear" data-act="account" aria-label="Settings" title="Settings"><svg viewBox="0 0 20 20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" d="M8.4 2.5h3.2l.5 2.1 1.5.9 2.1-.6 1.6 2.8-1.6 1.5v1.6l1.6 1.5-1.6 2.8-2.1-.6-1.5.9-.5 2.1H8.4l-.5-2.1-1.5-.9-2.1.6-1.6-2.8 1.6-1.5V9.2L2.7 7.7l1.6-2.8 2.1.6 1.5-.9z"/><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
   </div>
 </header>
 
 <main id="view" class="wrap gutter"><div class="boot" role="status" aria-label="Loading Palate"><svg class="b-pol" viewBox="0 0 48 58" aria-hidden="true"><use href="#pl-polaroid"/></svg><svg class="b-word" viewBox="0 0 304 100" aria-hidden="true"><use href="#pl-word"/></svg></div></main>
 
 <footer class="wrap gutter">
-  <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="account">Account</button><button class="pill ghost" data-act="signout">Sign out</button></div>
-  <p class="credit">Artwork from Wikipedia, Apple, AniList and Open Library.</p>
+  <div class="foot"><span id="acct"></span><button class="pill ghost" data-act="account">Settings</button></div>
+  <p class="credit">© 2026 Palate · <button class="linkish" data-act="set-sub" data-v="about">About and credits</button></p>
 </footer>
 
 <nav class="bottom-nav" aria-label="Sections">
@@ -6771,12 +6817,12 @@ async function loadFriends(){
   FRIENDS=[]; UPDATES=[]; shared={};
   if(!ids.length) return;
   const [pr,sh,ph]=await Promise.all([
-    sb.from('profiles').select('id,name,avatar').in('id',ids).then(r=>r.error?sb.from('profiles').select('id,name').in('id',ids):r),   /* works before the avatar column exists */
+    sb.from('profiles').select('id,name,avatar,username').in('id',ids).then(r=>r.error?sb.from('profiles').select('id,name,avatar').in('id',ids):r).then(r=>r.error?sb.from('profiles').select('id,name').in('id',ids):r),   /* works before newer columns exist */
     sb.from('shelves').select('user_id,cat,years,updated_at,pos').in('user_id',ids),
     sb.from('item_photos').select('user_id,cat,name,url,h,s').in('user_id',ids)]);
   if(pr.error) throw pr.error; if(sh.error) throw sh.error; if(ph.error) throw ph.error;
   const closeOf=Object.fromEntries(rows.map(r=>[r.friend_id,r.close]));
-  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,avatar:p.avatar||0,hue:hue(p.name),close:!!closeOf[p.id],shelves:{},pos:{}}));
+  FRIENDS=(pr.data||[]).map(p=>({id:p.id,name:p.name,username:p.username||null,avatar:p.avatar||0,hue:hue(p.name),close:!!closeOf[p.id],shelves:{},pos:{}}));
   const by=Object.fromEntries(FRIENDS.map(f=>[f.id,f])); const ups=[];
   for(const r of (sh.data||[])){ const f=by[r.user_id]; if(!f||!CAT[r.cat]) continue; const sn=snapAt(r.years,CURRENT); if(!sn) continue; f.shelves[r.cat]=sn; f.pos[r.cat]=r.pos|0; ups.push([f.id,r.cat,r.updated_at]); }
   FRIENDS.sort((a,b)=>a.name.localeCompare(b.name));
@@ -6901,16 +6947,6 @@ async function syncPush(){
     refreshPromo();
   }catch(e){ console.warn(e); }
 }
-function notifyBox(){
-  let body;
-  if(canPush()){
-    const denied=Notification.permission==='denied';
-    body = denied ? `<p>Notifications are blocked for Palate. Turn them on in your phone or browser settings, then come back.</p>`
-      : `<p>${pushOn?'On. You get one short note when a friend changes a shelf, never between 10pm and 8am.':'Get one short note when a friend changes a shelf. Never between 10pm and 8am.'}</p><button class="pill soft sm" data-act="${pushOn?'push-off':'push-on'}" id="push-btn">${pushOn?'Turn off':'Turn on'}</button>`;
-  } else if(IS_IOS && !isStandalone()) body=`<p>On iPhone, notifications need Palate on your home screen first.</p><button class="pill soft sm" data-act="install">Show me how</button>`;
-  else body=`<p>This browser cannot receive notifications.</p>`;
-  return `<div class="acct-box" id="notify-box"><h3>Notifications</h3>${body}</div>`;
-}
 /* ---------- Alpha: everyone on Palate, one tap to add ---------- */
 let DIRECTORY=[];
 async function loadPeople(){
@@ -7027,7 +7063,7 @@ function viewProfile(f){
       <p class="pf-no1"><b>#1</b> ${esc(top[0].n)}</p></button>`; }).join('');
   return `<div class="pf-top"><button class="pill soft" data-act="back-friends" aria-label="Back to friends">←</button></div>
   <section class="pf-hero">${av(f,'xl')}<h1>${esc(f.name)}</h1>
-    <p class="pf-rel">${f.close?'Close friend':'Friend'} · ${cats.length} shelf${cats.length===1?'':'ves'} you can see</p>${badgeRow(f.id)}</section>
+    <p class="pf-rel">${f.username?'@'+esc(f.username)+' · ':''}${f.close?'Close friend':'Friend'} · ${cats.length} shelf${cats.length===1?'':'ves'} you can see</p>${badgeRow(f.id)}</section>
   <div class="panel pf-match"><div class="ring" style="--p:${pct}"><b>${pct}%</b></div>
     <div class="pm-txt"><h2>${esc(matchLabel(pct,per.length))}</h2><p>${per.length?`${nShared} shared pick${nShared===1?'':'s'} across ${per.length} shelf${per.length===1?'':'ves'} you both have`:`Rank the same topics as ${esc(first(f))} to see how you match.`}</p></div></div>
   <div class="pf-btns"><button class="pill" data-act="share-match" data-f="${f.id}">Share our match</button><button class="pill soft" data-act="compare" data-f="${f.id}">Side by side</button></div>
@@ -7201,25 +7237,153 @@ async function makeOwn(){
   catch(e){ if(b) b.disabled=false; toast(/locked/i.test(e.message||'')?'Still locked':(e.message||"Couldn't make it. Try again.").slice(0,80)); }
 }
 
-function openAccount(){
-  const dv=prefs().defVis||'friends';
-  sheet(`<div class="sheet-head"><div><h2>Your account</h2><p>${esc(me.name)}${me.email?' · '+esc(me.email):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-  <div class="acct-box"><h3>Appearance</h3><p>Match your device, or pick light or dark. This is saved on this device.</p>
-    <div class="seg" role="group" aria-label="Appearance">${[['system','Match device'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
-  ${notifyBox()}
-  <div class="acct-box"><h3>Profile picture</h3><p>Choose the gradient your friends see next to your name.</p><button class="pill soft sm" data-act="avatar">Change picture</button></div>
-  <div class="acct-box"><h3>Badges</h3><p>Badges are rare on purpose. Tap one to see how it is earned.</p><div class="bdg-row" id="acct-badges">${BADGE_ORDER.filter(id=>!BADGES[id].year).concat([]).reduce((o,id)=>{ if(id==='dayone'){ const ty=topYear(me.id); o.push(ty?ty.id:'year1'); } o.push(id); return o; },[]).map(id=>{ const has=(BADGE_OF[me.id]||[]).some(b=>b.id===id); return `<button class="bdg-chip${has?'':' locked'}" data-act="badge" data-b="${id}" data-u="${me.id}">${bdgIcon(id)}<span>${esc(BADGES[id].name)}</span></button>`; }).join('')}</div></div>
-  <div class="acct-box"><h3>Alpha feedback</h3><p>Palate is in alpha with friends. Tell us what is missing, wrong or worth building. Things you add also help fill the shared catalog for everyone.</p><button class="pill soft sm" data-act="feedback">Send feedback</button></div>
-  <div class="acct-box"><h3>Privacy</h3><p>Choose who sees a shelf the first time you make it. You can still change any shelf later.</p>
-    <select id="def-vis" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>New shelves start as: ${l}</option>`).join('')}</select>
-    <button class="pill soft sm" data-act="all-private">Make every shelf Only me</button></div>
-  <div class="acct-box"><h3>Sign-in</h3><p>Forgot your password, or want a new one? We will email you a link.</p><button class="pill soft sm" data-act="reset-pw">Email me a reset link</button></div>
-  <div class="acct-box"><h3>Wipe my data</h3><p>Deletes all your shelves, photos and custom items. Your account and friends stay, so you can start over fresh. This cannot be undone.</p>
-    <input id="wipe-in" placeholder='Type WIPE to confirm' autocomplete="off" aria-label="Type WIPE to confirm"><button class="pill danger-solid" id="wipe-btn" data-act="wipe" disabled>Wipe my data</button></div>
-  <div class="acct-box"><h3>Delete my account</h3><p>Permanently deletes your account, shelves, photos and friendships. You will be signed out. This cannot be undone.</p>
-    <input id="del-in" placeholder='Type DELETE to confirm' autocomplete="off" aria-label="Type DELETE to confirm"><button class="pill danger-solid" id="del-btn" data-act="delete-account" disabled>Delete my account</button></div>
-  <details class="acct-adv"><summary>Advanced</summary><div class="acct-box"><h3>Download my data</h3><p>A file with all your shelves, notes and years. It is yours to keep.</p><button class="pill soft sm" data-act="export-data">Download</button></div></details>
-  <div style="height:18px"></div>`,'account');
+/* ---------- Settings: grouped like iPhone Settings. Small editors open in place and come back here. ---------- */
+let NPREF=null;   /* notification switches from the database; null until loaded */
+async function loadNotifyPrefs(){
+  try{ const r=await sb.from('notify_prefs').select('friends,reactions,weekly').eq('user_id',me.id).maybeSingle(); if(r.error) throw r.error; NPREF={friends:true,reactions:true,weekly:true,...(r.data||{}),ok:true}; }
+  catch(e){ NPREF={friends:true,reactions:true,weekly:true,ok:false}; }
+  return NPREF;
+}
+async function saveNotifyPref(k,v){
+  NPREF={...(NPREF||{friends:true,reactions:true,weekly:true}),[k]:v};
+  try{ const r=await sb.from('notify_prefs').upsert({user_id:me.id,friends:NPREF.friends,reactions:NPREF.reactions,weekly:NPREF.weekly,updated_at:new Date().toISOString()},{onConflict:'user_id'}); if(r.error) throw r.error; }
+  catch(e){ toast(/notify_prefs|relation|schema/i.test(String(e.message||''))?'Run supabase/account.sql in Supabase first':"Couldn't save that. Try again."); }
+}
+const swRow = (label, sub, attrs, on) => `<label class="set-row sw"><span class="set-t">${label}${sub?`<small>${sub}</small>`:''}</span><input type="checkbox" ${attrs}${on?' checked':''}><i class="tgl" aria-hidden="true"></i></label>`;
+const navRow = (label, val, act, cls='') => `<button class="set-row ${cls}" data-act="${act}"><span class="set-t">${label}</span>${val!=null?`<span class="set-v">${val}</span>`:''}<span class="chev" aria-hidden="true"></span></button>`;
+function pushLine(){
+  if(canPush()){ if(Notification.permission==='denied') return {v:'Blocked',act:'push-help'}; return pushOn?{v:'On',act:'push-off'}:{v:'Off',act:'push-on'}; }
+  if(IS_IOS && !isStandalone()) return {v:'Add to Home Screen first',act:'install'};
+  return {v:'Not on this browser',act:''};
+}
+function openAccount(sub){
+  if(sub) return openSettingsSub(sub);
+  const dv=prefs().defVis||'friends', np=NPREF||{friends:true,reactions:true,weekly:true}, pl=pushLine();
+  const html=`<div class="sheet-head"><div><h2>Settings</h2><p>${esc(me.name)}${me.username?' · @'+esc(me.username):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  <h3 class="set-h">Profile</h3><div class="set-group">
+    <button class="set-row" data-act="avatar"><span class="set-t">Profile picture</span><span class="set-v">${meAv(false)}</span><span class="chev" aria-hidden="true"></span></button>
+    ${navRow('Name',esc(me.name),'set-sub" data-v="name')}
+    ${navRow('Username',me.username?'@'+esc(me.username):'<em>Choose one</em>','set-sub" data-v="username')}
+  </div>
+  <h3 class="set-h">Sign-in</h3><div class="set-group">
+    ${navRow('Email',esc(me.email||''),'set-sub" data-v="email')}
+    ${navRow('Password','','set-sub" data-v="password')}
+  </div>
+  <h3 class="set-h">Notifications</h3><div class="set-group" id="notify-group">
+    <button class="set-row" ${pl.act?`data-act="${pl.act}"`:'disabled'}><span class="set-t">Notifications on this device</span><span class="set-v">${esc(pl.v)}</span></button>
+    ${swRow('Friend updates','When a friend changes a shelf','data-np="friends"',np.friends)}
+    ${swRow('Reactions','When a friend reacts to one of your picks','data-np="reactions"',np.reactions)}
+    ${swRow('Weekly topic','When it comes out, and when friends’ answers are ready','data-np="weekly"',np.weekly)}
+  </div>
+  <p class="set-note">Never between 10pm and 8am your time.</p>
+  <h3 class="set-h">Feel</h3><div class="set-group">
+    <div class="set-row"><span class="set-t">Appearance</span><div class="seg" role="group" aria-label="Appearance">${[['system','Auto'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
+    ${swRow('Vibration on taps','A light tap when you move around and save','data-pref="haptics"',prefs().haptics!==false)}
+  </div>
+  <h3 class="set-h">Privacy</h3><div class="set-group">
+    <label class="set-row"><span class="set-t">New shelves start as</span><select id="def-vis" class="set-sel" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>${l}</option>`).join('')}</select></label>
+    <button class="set-row" data-act="all-private"><span class="set-t">Make every shelf Only me</span></button>
+  </div>
+  <h3 class="set-h">Badges</h3><div class="set-group pad"><div class="bdg-row" id="acct-badges">${BADGE_ORDER.filter(id=>!BADGES[id].year).reduce((o,id)=>{ if(id==='dayone'){ const ty=topYear(me.id); o.push(ty?ty.id:'year1'); } o.push(id); return o; },[]).map(id=>{ const has=(BADGE_OF[me.id]||[]).some(b=>b.id===id); return `<button class="bdg-chip${has?'':' locked'}" data-act="badge" data-b="${id}" data-u="${me.id}">${bdgIcon(id)}<span>${esc(BADGES[id].name)}</span></button>`; }).join('')}</div></div>
+  <h3 class="set-h">Palate</h3><div class="set-group">
+    ${navRow('Send feedback','','feedback')}
+    ${navRow('About and credits','','set-sub" data-v="about')}
+  </div>
+  <h3 class="set-h">Your data</h3><div class="set-group">
+    ${navRow('Download my data','','export-data')}
+    ${navRow('Wipe my shelves','','set-sub" data-v="wipe')}
+    ${navRow('Delete my account','','set-sub" data-v="delete','danger')}
+  </div>
+  <div class="set-group"><button class="set-row center" data-act="signout"><span class="set-t">Sign out</span></button></div>
+  <div style="height:18px"></div>`;
+  sheet(html,'account',sheetKind==='account'||sheetKind==='set-sub');
+  if(!NPREF) loadNotifyPrefs().then(()=>{ if(sheetKind==='account') openAccount(); });
+}
+function subHead(title, sub){ return `<div class="sheet-head"><div><button class="set-back" data-act="account">‹ Settings</button><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div><button class="x" data-act="close" aria-label="Close">✕</button></div>`; }
+function openSettingsSub(v){
+  let h='';
+  if(v==='name') h=subHead('Name','What friends see next to your shelves')+`<div class="set-form"><input id="set-name" maxlength="40" value="${esc(me.name)}" autocomplete="name" aria-label="Name"><p class="set-err" id="set-err" role="alert"></p><button class="pill" data-act="set-name-go">Save</button></div>`;
+  else if(v==='username') h=subHead('Username','Friends can find you with it. Only one person can have each name.')+`<div class="set-form"><div class="at-in"><span>@</span><input id="set-un" maxlength="20" value="${esc(me.username||'')}" autocapitalize="none" autocomplete="username" spellcheck="false" aria-label="Username"></div><p class="set-hint" id="un-hint">3 to 20 letters, numbers, dots or underscores.</p><button class="pill" id="un-btn" data-act="set-un-go">Save</button></div>`;
+  else if(v==='email') h=subHead('Email',`Now: ${esc(me.email||'none')}`)+`<div class="set-form"><input id="set-email" type="email" autocomplete="email" placeholder="New email" aria-label="New email"><p class="set-err" id="set-err" role="alert"></p><button class="pill" data-act="set-email-go">Send confirmation link</button><p class="set-hint">We email a link to the new address. Your email changes when you tap it.</p></div>`;
+  else if(v==='password') h=subHead('Password')+`<div class="set-form"><input id="set-pw0" type="password" autocomplete="current-password" placeholder="Current password" aria-label="Current password"><input id="set-pw1" type="password" autocomplete="new-password" placeholder="New password, at least 8 characters" aria-label="New password"><p class="set-err" id="set-err" role="alert"></p><button class="pill" data-act="set-pw-go">Change password</button><button class="swap" data-act="reset-pw">Forgot it? Email me a reset link</button></div>`;
+  else if(v==='wipe') h=subHead('Wipe my shelves')+`<div class="set-form"><p class="muted">Deletes all your shelves, photos and custom items. Your account and friends stay, so you can start fresh. This can't be undone.</p><input id="wipe-in" placeholder="Type WIPE to confirm" autocomplete="off" aria-label="Type WIPE to confirm"><button class="pill danger-solid" id="wipe-btn" data-act="wipe" disabled>Wipe my shelves</button></div>`;
+  else if(v==='delete') h=subHead('Delete my account')+`<div class="set-form"><p class="muted">Permanently deletes your account, shelves, photos, reactions and friendships, and signs you out. This can't be undone. You can download your data first.</p><button class="pill soft" data-act="export-data">Download my data</button><input id="del-in" placeholder="Type DELETE to confirm" autocomplete="off" aria-label="Type DELETE to confirm"><button class="pill danger-solid" id="del-btn" data-act="delete-account" disabled>Delete my account</button></div>`;
+  else if(v==='about') h=subHead('About')+aboutHtml();
+  sheet(h,'set-sub',false);
+  const f=$('#sheet-root input:not([type=checkbox])'); if(f && v!=='about' && v!=='delete') setTimeout(()=>{ try{ f.focus(); }catch(e){} },60);
+  if(v==='username') checkUsername();
+}
+const APP_VERSION = 'Alpha · October 2026';
+function aboutHtml(){
+  return `<div class="about">
+  <div class="about-mark">${LOGO_H1}<p>Your taste, ranked. Just for your friends.</p><small>${APP_VERSION}</small></div>
+  <h3 class="set-h">Where pictures and facts come from</h3>
+  <ul class="credits">
+    <li><b>Wikipedia and Wikimedia Commons</b><span>Photos of people, places and things. Each belongs to its photographer and is shared under its own licence, often Creative Commons.</span></li>
+    <li><b>Wikidata</b><span>Years, creators and countries.</span></li>
+    <li><b>Apple</b><span>Album, song, film, TV and app artwork, through the iTunes Search API.</span></li>
+    <li><b>Deezer</b><span>Artist photos and album covers.</span></li>
+    <li><b>AniList</b><span>Anime, manga and character art.</span></li>
+    <li><b>Open Library</b><span>Book covers.</span></li>
+    <li><b>YouTube</b><span>Video thumbnails and titles.</span></li>
+    <li><b>PokéAPI</b><span>Pokémon artwork.</span></li>
+  </ul>
+  <p class="set-note">Names, logos and artwork belong to their owners. Palate isn't affiliated with or endorsed by them. Photos you upload stay yours. Something wrong or yours that should come down? Use Send feedback.</p>
+  <div class="set-group"><button class="set-row" data-act="feedback"><span class="set-t">Send feedback</span><span class="chev" aria-hidden="true"></span></button></div>
+  <p class="about-c">© ${CURRENT} Palate. All rights reserved.</p></div><div style="height:12px"></div>`;
+}
+let unT=0;
+function checkUsername(){
+  const i=$('#set-un'), h=$('#un-hint'), b=$('#un-btn'); if(!i||!h) return;
+  const v=i.value.trim().toLowerCase();
+  clearTimeout(unT);
+  if(v===(me.username||'')){ h.textContent=me.username?'This is your username.':'3 to 20 letters, numbers, dots or underscores.'; h.className='set-hint'; if(b) b.disabled=!v; return; }
+  if(!/^[a-z0-9_.]{3,20}$/.test(v) || /^\.|\.$|\.\./.test(v)){ h.textContent=v.length<3?'At least 3 characters.':'Only letters, numbers, dots and underscores, no dot at the start or end.'; h.className='set-hint bad'; if(b) b.disabled=true; return; }
+  h.textContent='Checking…'; h.className='set-hint'; if(b) b.disabled=true;
+  unT=setTimeout(async()=>{ try{ const r=await sb.rpc('username_free',{p_username:v}); if($('#set-un')?.value.trim().toLowerCase()!==v) return; if(r.error) throw r.error;
+      h.textContent=r.data?`@${v} is free`:`@${v} is taken`; h.className='set-hint '+(r.data?'good':'bad'); if(b) b.disabled=!r.data; }
+    catch(e){ h.textContent=/username_free|function/i.test(String(e.message||''))?'Run supabase/account.sql in Supabase first.':"Couldn't check right now."; h.className='set-hint bad'; } },350);
+}
+async function saveName(){
+  const v=($('#set-name')?.value||'').trim(), err=$('#set-err'); if(!v){ err.textContent='Enter a name.'; return; }
+  const r=await sb.rpc('set_profile',{p_name:v,p_username:null});
+  if(r.error){ err.textContent=/set_profile|function/i.test(r.error.message)?'Run supabase/account.sql in Supabase first.':r.error.message; return; }
+  me.name=state.name=r.data.name; $('#acct').textContent=`Signed in as ${me.name}`; render(); haptic('success'); toast('Name saved'); openAccount();
+}
+async function saveUsername(){
+  const v=($('#set-un')?.value||'').trim().toLowerCase(), h=$('#un-hint'), b=$('#un-btn'); if(b) b.disabled=true;
+  const r=await sb.rpc('set_profile',{p_name:null,p_username:v});
+  if(r.error){ if(h){ h.textContent=/set_profile|function/i.test(r.error.message)?'Run supabase/account.sql in Supabase first.':r.error.message; h.className='set-hint bad'; } if(b) b.disabled=false; return; }
+  me.username=r.data.username; render(); haptic('success'); toast(`You're @${me.username}`); openAccount();
+}
+async function saveEmail(){
+  const v=($('#set-email')?.value||'').trim(), err=$('#set-err');
+  if(!/^\S+@\S+\.\S+$/.test(v)){ err.textContent='Enter a valid email.'; return; }
+  if(v.toLowerCase()===(me.email||'').toLowerCase()){ err.textContent='That is already your email.'; return; }
+  const {error}=await sb.auth.updateUser({email:v},{emailRedirectTo:location.origin+location.pathname});
+  if(error){ err.textContent=error.message||"Couldn't change it. Try again."; return; }
+  toast('Check '+v+' for the link'); openAccount();
+}
+async function savePassword(){
+  const p0=$('#set-pw0')?.value||'', p1=$('#set-pw1')?.value||'', err=$('#set-err');
+  if(p1.length<8){ err.textContent='Use at least 8 characters.'; return; }
+  if(p1===p0){ err.textContent='Pick a password you are not using now.'; return; }
+  const chk=await sb.auth.signInWithPassword({email:me.email,password:p0});
+  if(chk.error){ err.textContent='Your current password is not right.'; return; }
+  const {error}=await sb.auth.updateUser({password:p1});
+  if(error){ err.textContent=error.message||"Couldn't change it. Try again."; return; }
+  haptic('success'); toast('Password changed'); openAccount();
+}
+/* Friends: find someone by their exact username */
+async function findPerson(){
+  const i=$('#find-in'), out=$('#find-out'); if(!i||!out) return; const v=i.value.trim().replace(/^@/,'').toLowerCase();
+  if(v.length<3){ out.innerHTML='<p class="muted">Type their whole username.</p>'; return; }
+  out.innerHTML='<p class="muted">Looking…</p>';
+  const r=await sb.rpc('find_person',{p_username:v});
+  if(r.error){ out.innerHTML=`<p class="muted">${/find_person|function/i.test(r.error.message)?'Run supabase/account.sql in Supabase first.':"Couldn't look that up."}</p>`; return; }
+  const p=(r.data||[])[0];
+  if(!p){ out.innerHTML=`<p class="muted">Nobody is @${esc(v)} yet. Usernames have to match exactly.</p>`; return; }
+  out.innerHTML=`<div class="person"><button class="person-open" data-act="${p.is_friend?'profile':'person'}" data-f="${p.id}" data-id="${p.id}">${av({id:p.id,name:p.name,avatar:p.avatar})}<b>${esc(p.name)} <span class="muted" style="font-weight:500">@${esc(p.username)}</span></b></button>${p.is_friend?'<span class="muted" style="font-size:13px">Friends</span>':`<button class="pill soft sm" data-act="add-person" data-id="${p.id}">Add friend</button>`}</div>`;
 }
 async function resetPassword(email,msgEl){
   if(!/^\S+@\S+\.\S+$/.test(email||'')){ if(msgEl) msgEl.textContent='Enter your email first.'; return; }
@@ -7379,7 +7543,7 @@ async function enter(user){
     if(pr.error) throw pr.error;
     let prof=pr.data;
     if(!prof){ const name=((user.user_metadata&&user.user_metadata.name)||(user.email||'friend').split('@')[0]).slice(0,40); const ins=await sb.from('profiles').insert({id:me.id,name}).select().single(); if(ins.error) throw ins.error; prof=ins.data; }
-    me.name=prof.name; me.invite=prof.invite_code; me.avatar=prof.avatar||0; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
+    me.name=prof.name; me.username=prof.username||null; me.invite=prof.invite_code; me.avatar=prof.avatar||0; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
     if(sh.error) throw sh.error; if(ph.error) throw ph.error; if(us.error) throw us.error;
     for(const r of sh.data||[]){ if(!CAT[r.cat]) continue; state.shelves[r.cat]={years:r.years||{}}; state.order.push(r.cat); if(r.vis!=='friends') state.vis[r.cat]=r.vis; }
     for(const p of ph.data||[]) state.photos[pkey(p.cat,p.name)]={src:p.url,h:p.h||0,s:p.s||30};
@@ -8014,7 +8178,7 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p>${badgeRow(me&&me.id,'wide-only')}</div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${countLine(y)}</p>${badgeRow(me&&me.id,'wide-only')}</div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
     ${badgeRow(me&&me.id,'narrow-only')}
     ${unlockedCard()}
     <div class="controls">
@@ -8025,8 +8189,9 @@ function viewMe(){
   </section>
   <div id="me-dyn">${meDyn()}</div>`;
 }
+function countLine(y){ return `${me&&me.username?'@'+me.username+' · ':''}${shelfList(y).length} shel${shelfList(y).length===1?'f':'ves'} · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}`; }
 function minYear(){ let m=CURRENT; for(const c in state.shelves) for(const y of Object.keys(state.shelves[c].years)) m=Math.min(m,+y); return m; }
-function setYear(v){ ui.year=v; $('#year-out').textContent=v; $('#year').setAttribute('aria-valuetext',v); $('#count').textContent=`${shelfList(v).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}`; $('#me-dyn').innerHTML=meDyn(); }
+function setYear(v){ ui.year=v; $('#year-out').textContent=v; $('#year').setAttribute('aria-valuetext',v); $('#count').textContent=countLine(v); $('#me-dyn').innerHTML=meDyn(); }
 
 /* ---------- Friends ---------- */
 function compat(f){
@@ -8040,7 +8205,8 @@ function compat(f){
   return {pct: per.length ? Math.round(100*per.reduce((s,p)=>s+p.score,0)/per.length) : 0, per};
 }
 function invitePanel(){
-  return `<div class="panel invite"><h2>Invite a friend</h2><p class="muted">Anyone with this link can add you as a friend, so only send it to people you trust.</p>
+  return `<div class="panel invite find"><h2>Find by username</h2><div class="link-row"><input id="find-in" placeholder="@username" autocapitalize="none" spellcheck="false" aria-label="Their username"><button class="pill soft sm" data-act="find-go">Find</button></div><div id="find-out"></div></div><div style="height:12px"></div>
+  <div class="panel invite"><h2>Invite a friend</h2><p class="muted">Anyone with this link can add you as a friend, so only send it to people you trust.</p>
     <div class="link-row"><input readonly value="${esc(inviteLink())}" aria-label="Your invite link" onfocus="this.select()"><button class="pill sm" data-act="copy-invite">Copy</button></div>
     <button class="swap" data-act="new-invite">Make a new link</button></div>`;
 }
@@ -8162,7 +8328,7 @@ async function showInsights(c){
   }catch(err){}
 }
 function exportMyData(){
-  const data={app:'Palate',exported_at:new Date().toISOString(),name:state.name,shelves:state.shelves,order:state.order,visibility:state.vis,custom:state.custom,photos:Object.fromEntries(Object.entries(state.photos||{}).map(([k,v])=>[k,v.src]))};
+  const data={app:'Palate',exported_at:new Date().toISOString(),name:state.name,username:me.username||null,email:me.email||null,friends:FRIENDS.map(f=>({name:f.name,username:f.username||null,close:!!f.close})),shelves:state.shelves,order:state.order,visibility:state.vis,custom:state.custom,photos:Object.fromEntries(Object.entries(state.photos||{}).map(([k,v])=>[k,v.src]))};
   const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
   const a=document.createElement('a'); a.href=url; a.download='palate-my-data-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
   track('export_data'); toast('Your data was downloaded');
@@ -9183,8 +9349,15 @@ document.addEventListener('click',e=>{
     case 'fb-send': sendFeedback(); break;
     case 'install': if(deferredInstall){ deferredInstall.prompt(); deferredInstall.userChoice.finally(()=>{ deferredInstall=null; refreshPromo(); }); } else iosSteps(); break;
     case 'tip-x': tipHide(el.dataset.k); refreshPromo(); break;
-    case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(ok&&$('#notify-box')) $('#notify-box').outerHTML=notifyBox(); }); break;
-    case 'push-off': disablePush().then(()=>{ if($('#notify-box')) $('#notify-box').outerHTML=notifyBox(); toast('Notifications are off'); }); break;
+    case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(sheetKind==='account') openAccount(); if(ok){ haptic('success'); toast('Notifications are on'); } }); break;
+    case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
+    case 'push-help': toast(IS_IOS?'Settings app › Notifications › Palate › Allow':'Turn notifications on for this site in your browser settings'); break;
+    case 'set-sub': openSettingsSub(el.dataset.v); break;
+    case 'set-name-go': saveName(); break;
+    case 'set-un-go': saveUsername(); break;
+    case 'set-email-go': saveEmail(); break;
+    case 'set-pw-go': savePassword(); break;
+    case 'find-go': findPerson(); break;
     case 'theme': setTheme(el.dataset.v); document.querySelectorAll('[data-act="theme"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===el.dataset.v))); break;
     case 'account': openAccount(); break;
     case 'export-data': exportMyData(); break;
@@ -9209,12 +9382,16 @@ document.addEventListener('click',e=>{
 document.addEventListener('change',e=>{
   const t=e.target;
   if(t.id==='def-vis'){ setPref('defVis',t.value); toast('New shelves start as: '+VIS[t.value]); return; }
+  if(t.dataset && t.dataset.np){ saveNotifyPref(t.dataset.np,t.checked); haptic(); return; }
+  if(t.dataset && t.dataset.pref==='haptics'){ setPref('haptics',t.checked); haptic(); return; }
   if(t.dataset && t.dataset.vis){ state.vis[t.dataset.vis]=t.value; save(); render(); toast(`${CAT[t.dataset.vis].name}: ${VIS[t.value]}`); if(sheetKind==='detail') openDetail(...detailArgs); }
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape' && sty){ closeStory(); return; }
   if(e.key==='Escape' && $('#sheet-root').firstChild){ closeSheet(); return; }
   if((e.key==='Enter'||e.key===' ') && e.target.matches('[role="button"][data-act]')){ e.preventDefault(); e.target.click(); }
+  if(e.key==='Enter' && e.target.id==='find-in'){ e.preventDefault(); findPerson(); }
+  if(e.key==='Enter' && ['set-name','set-un','set-email','set-pw1'].includes(e.target.id)){ e.preventDefault(); ({'set-name':saveName,'set-un':saveUsername,'set-email':saveEmail,'set-pw1':savePassword})[e.target.id](); }
   if(e.key==='Enter' && e.target.id==='ed-q'){ e.preventDefault(); if(ed.res[0]) addItem(ed.res[0]); else if(ed.query.trim()) $('[data-act="custom"]')?.click(); }
 });
 document.addEventListener('toggle',e=>{ const d=e.target; if(d.classList&&d.classList.contains('pk-acc')&&pk){ (pk.open ||= new Set())[d.open?'add':'delete'](d.dataset.g); } },true);
@@ -9224,6 +9401,7 @@ document.addEventListener('input',e=>{
   else if(t.id==='story-notes'){ if(sty){ sty.notes=t.checked; try{ localStorage.setItem('palate-story-notes',t.checked?'1':'0'); }catch(e){} renderStory(); } }
   else if(t.id==='wipe-in'){ $('#wipe-btn').disabled=t.value.trim()!=='WIPE'; }
   else if(t.id==='del-in'){ $('#del-btn').disabled=t.value.trim()!=='DELETE'; }
+  else if(t.id==='set-un'){ checkUsername(); }
   else if(t.id==='ed-q'){ ed.query=t.value; queueLive(); $('#ed-results').innerHTML=results(); }
   else if(t.classList.contains('why-in')){ const s=ed.slots[+t.dataset.i]; if(s) s.why=t.value; }
   else if(t.id==='pk-q'){ pk.q=t.value; $('#pk-list').innerHTML=pickerList(); }
