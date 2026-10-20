@@ -1,4 +1,4 @@
-// Sends "friend updated their shelf" notifications. Run by .github/workflows/notify.yml every few minutes.
+// Sends "friend updated their shelf" and "friend reacted to your pick" notifications. Run by .github/workflows/notify.yml every few minutes.
 // Needs two secrets: PUSH_KEY (select value from app_config where key = 'push_key') and VAPID_PRIVATE_KEY.
 import fs from 'node:fs';
 import webpush from 'web-push';
@@ -33,26 +33,46 @@ export function message(items) {            // items: Map friend name -> [shelf 
   return { title: `${who} updated their shelves`, body: shelves.slice(0, 3).join(', ') + (shelves.length > 3 ? '…' : '') };
 }
 
-const rows = await rpc('push_pending', { p_key: PUSH_KEY });
-if (!rows || !rows.length) { console.log('No friend updates to send.'); process.exit(0); }
-const asOf = rows[0].as_of;
+const KIND = { same: 'Same', nope: 'No way', curious: 'Curious' };
+export function reactionMessage(list) {    // list: [{friend, cat, item, kind}], newest first
+  if (list.length === 1) { const r = list[0]; return { title: `${r.friend}: “${KIND[r.kind] || r.kind}”`, body: `On ${r.item}, in your ${NAME[r.cat] || r.cat}` }; }
+  const people = [...new Set(list.map(r => r.friend))];
+  const who = people.length === 1 ? people[0] : people.length === 2 ? `${people[0]} and ${people[1]}` : `${people[0]} and ${people.length - 1} others`;
+  return { title: `${who} reacted to ${list.length} of your picks`, body: list.slice(0, 2).map(r => `${KIND[r.kind] || r.kind} on ${r.item}`).join(', ') + (list.length > 2 ? '…' : '') };
+}
+
+const rows = (await rpc('push_pending', { p_key: PUSH_KEY })) || [];
+let asOf = rows.length ? rows[0].as_of : null;
+let reacts = [];
+try { reacts = (await rpc('push_reactions_pending', { p_key: PUSH_KEY, p_as_of: asOf })) || []; }
+catch (e) { console.log('Reactions are not set up yet (run supabase/reactions.sql):', e.message.slice(0, 120)); }
+if (!asOf && reacts.length) asOf = reacts[0].as_of;
+if (!rows.length && !reacts.length) { console.log('Nothing to send.'); process.exit(0); }
+
 const subs = new Map();
+const subOf = r => { if (!subs.has(r.endpoint)) subs.set(r.endpoint, { sub: { endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth_key } }, items: new Map(), reacts: [] }); return subs.get(r.endpoint); };
 for (const r of rows) {
-  if (!subs.has(r.endpoint)) subs.set(r.endpoint, { sub: { endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth_key } }, items: new Map() });
-  const m = subs.get(r.endpoint).items, nm = NAME[r.cat] || r.cat;
+  const m = subOf(r).items, nm = NAME[r.cat] || r.cat;
   if (!m.has(r.friend)) m.set(r.friend, []);
   if (!m.get(r.friend).includes(nm)) m.get(r.friend).push(nm);
 }
+for (const r of reacts) subOf(r).reacts.push(r);
+
 const sent = [];
-for (const [endpoint, { sub, items }] of subs) {
-  const { title, body } = message(items);
-  try {
-    await webpush.sendNotification(sub, JSON.stringify({ title, body, url: './#friends', tag: 'palate-friends' }), { TTL: 86400 });
-    sent.push(endpoint); console.log('sent:', title);
-  } catch (e) {
-    if (e.statusCode === 404 || e.statusCode === 410) { console.log('removing expired subscription'); await rpc('push_drop', { p_key: PUSH_KEY, p_endpoint: endpoint }).catch(() => {}); }
-    else console.log('could not send, will retry next run:', e.statusCode || e.message);
+for (const [endpoint, { sub, items, reacts: rs }] of subs) {
+  const notes = [];
+  if (items.size) notes.push({ ...message(items), url: './#friends', tag: 'palate-friends' });
+  if (rs.length) notes.push({ ...reactionMessage(rs), url: './#activity', tag: 'palate-reactions' });
+  let ok = true;
+  for (const n of notes) {
+    try { await webpush.sendNotification(sub, JSON.stringify(n), { TTL: 86400 }); console.log('sent:', n.title); }
+    catch (e) {
+      ok = false;
+      if (e.statusCode === 404 || e.statusCode === 410) { console.log('removing expired subscription'); await rpc('push_drop', { p_key: PUSH_KEY, p_endpoint: endpoint }).catch(() => {}); break; }
+      else console.log('could not send, will retry next run:', e.statusCode || e.message);
+    }
   }
+  if (ok) sent.push(endpoint);
 }
 if (sent.length) await rpc('push_done', { p_key: PUSH_KEY, p_endpoints: sent, p_as_of: asOf });
-console.log(`Done: ${sent.length} of ${subs.size} notifications sent.`);
+console.log(`Done: ${sent.length} of ${subs.size} phones notified.`);

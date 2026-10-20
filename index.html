@@ -116,6 +116,16 @@ button.set-row:active{transform:none;background:var(--line)}
 .about .set-group{margin-top:14px}
 .about-c{text-align:center;color:var(--faint);font-size:12.5px;margin:16px 0 0}
 .credit .linkish{background:none;border:0;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer}
+.rx{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.rx-b{border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600;cursor:pointer}
+.rx-b.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.rx-got{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rx-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text);background:var(--raise);border-radius:999px;padding:2px 9px 2px 2px}
+.rx-chip .av{width:18px;height:18px;font-size:8px;border:0}
+.k-nope{color:#FF7A7A}.k-same{color:var(--good)}.k-curious{color:#7FB6FF}
+.activity li.unseen p{color:var(--text)}
+.activity li.unseen button::before{content:'';position:absolute;left:-10px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--accent)}
+.activity li button{position:relative}
 .find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 .bottom-nav{display:none}
 @media (max-width:760px){
@@ -6766,8 +6776,9 @@ function setPref(k,v){ state.custom._prefs={...prefs(),[k]:v}; save(); }
 function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.custom[c])) for(const it of state.custom[c]) if(CATALOG[c] && !CATALOG[c].some(x=>x.n.toLowerCase()===it.n.toLowerCase())) CATALOG[c].push(it); }
 const ui = {tab:'me', year:CURRENT, compare:null, profile:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
-if(location.hash==='#friends') ui.tab='friends';
-addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me) navTo({tab:'friends'},{quiet:true}); });
+if(location.hash==='#friends'||location.hash==='#activity') ui.tab='friends';
+addEventListener('hashchange',()=>{ if((location.hash==='#friends'||location.hash==='#activity') && me) navTo({tab:'friends'},{quiet:true}); });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && me && document.body.classList.contains('in')){ const t=Date.now(); if(t-(loadReactions.t||0)>60000){ loadReactions.t=t; loadReactions().then(()=>{ if(!$('#sheet-root .scrim')) render(); }); } } });
 
 /* Saving: any change calls save(); a moment later only what changed is sent to Supabase. */
 const synced = {shelves:{}, photos:{}, custom:'{}'};
@@ -6836,6 +6847,48 @@ function updateLine(u){
   return {f,c:u.c,html:`updated <b>${esc(CAT[u.c].name)}</b>: ${esc(names.join(', '))}${sh.top.length>2?'…':''}`+(both?` · <span class="both">you both have <b>${esc(both.n)}</b></span>`:''),when:ago(u.t)};
 }
 function lateList(n){ return UPDATES.map(updateLine).filter(Boolean).slice(0,n).map(l=>`<li><button data-act="open-friend" data-f="${l.f.id}" data-cat="${l.c}">${av(l.f,'s')}<p><b>${esc(first(l.f))}</b> ${l.html} · ${l.when}</p></button></li>`).join(''); }
+/* ---------- Reactions: "Same", "No way" or "Curious" on one of a friend's picks ----------
+   Only the shelf's owner and the person reacting see a reaction. There are no counts for others to pile onto. */
+const RX = {got:[], mine:new Map(), ok:false};
+const RXL = {same:'Same', nope:'No way', curious:'Curious'};
+const rxKey = (o,c,n) => o+'|'+c+'|'+n;
+async function loadReactions(){
+  try{
+    const r=await sb.from('reactions').select('owner,cat,item,reactor,kind,seen,created_at').order('created_at',{ascending:false}).limit(400); if(r.error) throw r.error;
+    RX.got=[]; RX.mine=new Map();
+    for(const x of r.data||[]){ if(x.owner===me.id) RX.got.push(x); else if(x.reactor===me.id) RX.mine.set(rxKey(x.owner,x.cat,x.item),x.kind); }
+    RX.ok=true;
+  }catch(e){ RX.ok=false; }
+}
+const rxUnseen = () => RX.got.filter(x=>!x.seen && FRIENDS.some(f=>f.id===x.reactor)).length;
+function rxPick(fid,c,n){
+  if(!RX.ok) return '';
+  const cur=RX.mine.get(rxKey(fid,c,n));
+  return `<div class="rx" data-noswipe>${Object.entries(RXL).map(([k,l])=>`<button type="button" class="rx-b${cur===k?' on':''}" data-act="rx" data-f="${fid}" data-cat="${c}" data-n="${esc(n)}" data-k="${k}" aria-pressed="${cur===k}">${l}</button>`).join('')}</div>`;
+}
+function rxGot(c,n){
+  const list=RX.got.filter(x=>x.cat===c && x.item===n).map(x=>({x,f:FRIENDS.find(f=>f.id===x.reactor)})).filter(o=>o.f);
+  return list.length?`<div class="rx-got">${list.map(o=>`<span class="rx-chip k-${o.x.kind}">${av(o.f)}${esc(first(o.f))} · ${RXL[o.x.kind]}</span>`).join('')}</div>`:'';
+}
+async function react(el){
+  const fid=el.dataset.f, c=el.dataset.cat, n=el.dataset.n, k=el.dataset.k, key=rxKey(fid,c,n), was=RX.mine.get(key), next=was===k?null:k;
+  if(next) RX.mine.set(key,next); else RX.mine.delete(key);
+  const box=el.closest('.rx'); if(box) box.outerHTML=rxPick(fid,c,n);
+  haptic();
+  const r=await sb.rpc('react',{p_owner:fid,p_cat:c,p_item:n,p_kind:next});
+  if(r.error){ if(was) RX.mine.set(key,was); else RX.mine.delete(key); const b=document.querySelector(`.rx [data-f="${fid}"][data-cat="${c}"][data-n="${CSS.escape(n)}"]`); if(b) b.closest('.rx').outerHTML=rxPick(fid,c,n);
+    toast(/react|function/i.test(r.error.message)&&!/shelf|pick|reactions for one day/i.test(r.error.message)?'Run supabase/reactions.sql in Supabase first':r.error.message); return; }
+  if(next) toast(`Only ${first(FRIENDS.find(f=>f.id===fid)||{name:'they'})} sees this`);
+}
+function activityPanel(){
+  const list=RX.got.map(x=>({x,f:FRIENDS.find(f=>f.id===x.reactor)})).filter(o=>o.f && CAT[o.x.cat] && eff(o.x.cat,CURRENT)).slice(0,12);
+  if(!list.length) return '';
+  return `<div class="panel activity" id="activity"><h2>Reactions to your picks</h2><ul class="lately">${list.map(({x,f})=>`<li class="${x.seen?'':'unseen'}"><button data-act="open" data-cat="${x.cat}">${av(f,'s')}<p><b>${esc(first(f))}</b> said <b class="k-${x.kind}">${RXL[x.kind]}</b> to ${esc(x.item)} · ${esc(CAT[x.cat].name)} · ${ago(x.created_at)}</p></button></li>`).join('')}</ul></div>`;
+}
+function markReactionsSeen(){
+  if(!rxUnseen()) return;
+  sb.rpc('reactions_seen').then(r=>{ if(!r.error) setTimeout(()=>{ RX.got.forEach(x=>x.seen=true); },4000); },()=>{});
+}
 const seenKey = KEY+'-seen';
 function unreadUpdates(){ let seen=0; try{ seen=+localStorage.getItem(seenKey)||0; if(!seen){ localStorage.setItem(seenKey,String(Date.now())); seen=Date.now(); } }catch(e){} return UPDATES.filter(u=>new Date(u.t)>seen).length; }
 function showWelcome(name){
@@ -7063,9 +7116,9 @@ function viewProfile(f){
       <p class="pf-no1"><b>#1</b> ${esc(top[0].n)}</p></button>`; }).join('');
   return `<div class="pf-top"><button class="pill soft" data-act="back-friends" aria-label="Back to friends">←</button></div>
   <section class="pf-hero">${av(f,'xl')}<h1>${esc(f.name)}</h1>
-    <p class="pf-rel">${f.username?'@'+esc(f.username)+' · ':''}${f.close?'Close friend':'Friend'} · ${cats.length} shelf${cats.length===1?'':'ves'} you can see</p>${badgeRow(f.id)}</section>
+    <p class="pf-rel">${f.username?'@'+esc(f.username)+' · ':''}${f.close?'Close friend':'Friend'} · ${cats.length} shel${cats.length===1?'f':'ves'} you can see</p>${badgeRow(f.id)}</section>
   <div class="panel pf-match"><div class="ring" style="--p:${pct}"><b>${pct}%</b></div>
-    <div class="pm-txt"><h2>${esc(matchLabel(pct,per.length))}</h2><p>${per.length?`${nShared} shared pick${nShared===1?'':'s'} across ${per.length} shelf${per.length===1?'':'ves'} you both have`:`Rank the same topics as ${esc(first(f))} to see how you match.`}</p></div></div>
+    <div class="pm-txt"><h2>${esc(matchLabel(pct,per.length))}</h2><p>${per.length?`${nShared} shared pick${nShared===1?'':'s'} across ${per.length} shel${per.length===1?'f':'ves'} you both have`:`Rank the same topics as ${esc(first(f))} to see how you match.`}</p></div></div>
   <div class="pf-btns"><button class="pill" data-act="share-match" data-f="${f.id}">Share our match</button><button class="pill soft" data-act="compare" data-f="${f.id}">Side by side</button></div>
   <div class="cmp-actions pf-rel-btns"><button class="pill soft sm" data-act="toggle-close" data-f="${f.id}">${f.close?'Close friend ✓':'Add to close friends'}</button><button class="pill ghost sm" data-act="remove-friend" data-f="${f.id}">Unfriend</button></div>
   <h2 class="pf-h">${esc(first(f))}'s shelves</h2>
@@ -7100,7 +7153,7 @@ async function makeMatchStory(st,font){
   x.font=`800 290px ${font}`; x.fillText(pct+'%',SW/2,1000);
   x.fillStyle='rgba(255,255,255,.86)'; x.font=`700 68px ${font}`; x.fillText(matchLabel(pct,per.length),SW/2,1090);
   x.fillStyle='rgba(255,255,255,.55)'; x.font=`500 38px ${font}`;
-  x.fillText(st.mcat?`${CAT[st.mcat].name} · ${nShared} shared pick${nShared===1?'':'s'}`:per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shelf${per.length===1?'':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
+  x.fillText(st.mcat?`${CAT[st.mcat].name} · ${nShared} shared pick${nShared===1?'':'s'}`:per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shel${per.length===1?'f':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
   x.textAlign='left';
   if(rows.length){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`700 34px ${font}`; x.letterSpacing='4px'; x.fillText('YOU BOTH PICKED',90,1250); x.letterSpacing='0px'; drawRows(x,rows,font,false,1272,rows.length*120); }
   x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Find your match · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
@@ -7561,7 +7614,7 @@ async function enter(user){
     }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
-    await Promise.all([loadPeople(),loadBadges()]);
+    await Promise.all([loadPeople(),loadBadges(),loadReactions()]);
     await preloadForBoot();
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
@@ -8218,8 +8271,9 @@ function viewFriends(){
     ? `<div class="panel">${rows.map(r=>`<button class="friend" data-act="profile" data-f="${r.f.id}">${av(r.f)}<div class="nm"><b>${esc(r.f.name)}${r.f.close?' <span class="muted" style="font-weight:500;font-size:13px">· close</span>':''}</b><span>${r.per.length} shelves in common</span></div><span class="pct">${r.pct}%</span></button>`).join('')}</div>`
     : `<div class="panel"><p class="empty-note">No friends yet. Send your link to someone and you will see how your tastes compare.</p></div>`;
   const lately = UPDATES.length ? `<div class="panel"><h2>Lately</h2><ul class="lately">${lateList(8)}</ul></div>` : '';
+  const act=activityPanel(); if(act) markReactionsSeen();
   return `<section class="head"><h1>Friends</h1></section>
-  <div class="friends"><div>${list}${DIRECTORY.length?'<div style="height:12px"></div>'+peoplePanel():''}</div><div>${invitePanel()}${lately?'<div style="height:12px"></div>'+lately:''}</div></div>`;
+  <div class="friends"><div>${act?act+'<div style="height:12px"></div>':''}${list}${DIRECTORY.length?'<div style="height:12px"></div>'+peoplePanel():''}</div><div>${invitePanel()}${lately?'<div style="height:12px"></div>'+lately:''}</div></div>`;
 }
 function mini(items,c,set){ return `<ol class="mini">${[0,1,2,3,4].map(i=>{const it=items[i]; return it?`<li class="${set.has(it.n)?'':'off'}"><span class="rk">${i+1}</span>${art(it.n,c,'sm')}<b>${esc(it.n)}</b></li>`:`<li class="off"><span class="rk">${i+1}</span><span></span><b>—</b></li>`;}).join('')}</ol>`; }
 function viewCompare(f){
@@ -8488,7 +8542,7 @@ function openDetail(c, fid){
   if(fid){ const f=FRIENDS.find(x=>x.id===fid); s=f.shelves[c]; who=first(f); y=CURRENT; }
   else { y=ui.year; s=eff(c,y).snap; prev=prevFor(c,y); who=state.name; }
   const editable = own && y===CURRENT && ui.view==='me';
-  const extra = it => frTags(c)(it);
+  const extra = it => frTags(c)(it) + (own ? rxGot(c,it.n) : rxPick(fid,c,it.n));
   const rows = s.top.map((it,i)=>`<li class="row"><span class="rk">${i+1}</span>${editable?photoBtn(c,it.n,'row'):art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${own&&y===CURRENT?`<em class="pstat" data-n="${esc(it.n)}"></em>`:''}${extra(it)}</div>${change(it,i,prev)}</li>`).join('');
   sheet(`<div class="sheet-head"><div><h2>${esc(CAT[c].name)}</h2><p>${esc(who)} · ${y}${own?' · '+VIS[visOf(c)]:''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <ol class="rows detail">${rows}</ol>
@@ -9268,7 +9322,7 @@ function render(){
   try{ localStorage.setItem(KEY+'-tab',ui.tab); }catch(e){}
   rememberImages();
   if(ui.tab==='friends'){ try{ localStorage.setItem(seenKey,String(Date.now())); }catch(e){} }
-  const nu = ui.tab==='friends' ? 0 : unreadUpdates();
+  const nu = ui.tab==='friends' ? 0 : unreadUpdates()+rxUnseen();
   document.querySelectorAll('[data-tab="friends"]').forEach(b=>{ if(nu) b.dataset.new=nu; else b.removeAttribute('data-new'); });
   syncHistory();
 }
@@ -9351,6 +9405,7 @@ document.addEventListener('click',e=>{
     case 'tip-x': tipHide(el.dataset.k); refreshPromo(); break;
     case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(sheetKind==='account') openAccount(); if(ok){ haptic('success'); toast('Notifications are on'); } }); break;
     case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
+    case 'rx': react(el); break;
     case 'push-help': toast(IS_IOS?'Settings app › Notifications › Palate › Allow':'Turn notifications on for this site in your browser settings'); break;
     case 'set-sub': openSettingsSub(el.dataset.v); break;
     case 'set-name-go': saveName(); break;
@@ -9363,7 +9418,7 @@ document.addEventListener('click',e=>{
     case 'export-data': exportMyData(); break;
     case 'forgot': resetPassword(($('#au-email')||{}).value?.trim(),$('#au-err')); break;
     case 'reset-pw': resetPassword(me.email,null); break;
-    case 'all-private': { let n=0; for(const c of state.order) if(visOf(c)!=='private'){ state.vis[c]='private'; n++; } save(); render(); toast(n?`${n} shelf${n===1?'':'ves'} now Only me`:'Everything is already private'); break; }
+    case 'all-private': { let n=0; for(const c of state.order) if(visOf(c)!=='private'){ state.vis[c]='private'; n++; } save(); render(); toast(n?`${n} shel${n===1?'f':'ves'} now Only me`:'Everything is already private'); break; }
     case 'wipe': wipeData(); break;
     case 'delete-account': deleteAccount(); break;
     case 'signout': sb.auth.signOut().finally(()=>location.reload()); break;
