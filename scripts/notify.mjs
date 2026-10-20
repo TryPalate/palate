@@ -1,4 +1,4 @@
-// Sends "friend updated their shelf" and "friend reacted to your pick" notifications. Run by .github/workflows/notify.yml every few minutes.
+// Sends "friend updated their shelf", "friend reacted to your pick" and "this week's topic" notifications. Run by .github/workflows/notify.yml every few minutes.
 // Needs two secrets: PUSH_KEY (select value from app_config where key = 'push_key') and VAPID_PRIVATE_KEY.
 import fs from 'node:fs';
 import webpush from 'web-push';
@@ -47,7 +47,27 @@ let reacts = [];
 try { reacts = (await rpc('push_reactions_pending', { p_key: PUSH_KEY, p_as_of: asOf })) || []; }
 catch (e) { console.log('Reactions are not set up yet (run supabase/reactions.sql):', e.message.slice(0, 120)); }
 if (!asOf && reacts.length) asOf = reacts[0].as_of;
-if (!rows.length && !reacts.length) { console.log('Nothing to send.'); process.exit(0); }
+
+// The weekly topic: one ping per phone per week, from Monday 10am their time, until they answer.
+let weekly = [];
+try { weekly = (await rpc('push_weekly_pending', { p_key: PUSH_KEY })) || []; }
+catch (e) { console.log('Weekly topic is not set up yet (run supabase/progression.sql):', e.message.slice(0, 120)); }
+if (weekly.length) {
+  const done = [];
+  for (const w of weekly) {
+    try {
+      await webpush.sendNotification({ endpoint: w.endpoint, keys: { p256dh: w.p256dh, auth: w.auth_key } },
+        JSON.stringify({ title: `This week: ${w.title}`, body: (w.prompt ? w.prompt + '. ' : '') + 'Answer to see your friends\u2019 picks.', url: './#week', tag: 'palate-weekly' }), { TTL: 86400 });
+      done.push(w.endpoint); console.log('sent weekly:', w.title);
+    } catch (e) {
+      if (e.statusCode === 404 || e.statusCode === 410) await rpc('push_drop', { p_key: PUSH_KEY, p_endpoint: w.endpoint }).catch(() => {});
+      else console.log('weekly not sent, will retry:', e.statusCode || e.message);
+    }
+  }
+  if (done.length) await rpc('push_weekly_done', { p_key: PUSH_KEY, p_endpoints: done, p_week: weekly[0].week });
+}
+
+if (!rows.length && !reacts.length) { console.log('Nothing else to send.'); process.exit(0); }
 
 const subs = new Map();
 const subOf = r => { if (!subs.has(r.endpoint)) subs.set(r.endpoint, { sub: { endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth_key } }, items: new Map(), reacts: [] }); return subs.get(r.endpoint); };

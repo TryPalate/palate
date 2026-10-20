@@ -126,6 +126,36 @@ button.set-row:active{transform:none;background:var(--line)}
 .activity li.unseen p{color:var(--text)}
 .activity li.unseen button::before{content:'';position:absolute;left:-10px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--accent)}
 .activity li button{position:relative}
+/* Weekly topic card */
+.card.wk{gap:4px}
+.wk-tag{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.wk-tag span{letter-spacing:0;text-transform:none;font-weight:500;color:var(--muted);font-size:12.5px}
+.card.wk h2{font-size:24px;font-weight:700;letter-spacing:-.022em;margin:6px 0 0;line-height:1.15}
+.wk-p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
+.wk-mine{display:flex;gap:6px;margin:14px 0 2px}
+.wk-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:auto;padding-top:14px;font-size:13.5px;color:var(--muted)}
+.wk-foot b{color:var(--text);background:rgb(255 255 255 / .12);padding:7px 13px;border-radius:999px;font-size:14px;white-space:nowrap}
+:root[data-theme="light"] .wk-foot b{background:rgb(0 0 0 / .07)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .wk-foot b{background:rgb(0 0 0 / .07)}}
+.wk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px 20px;margin-bottom:6px}
+.wk-ans h3{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 2px}
+.mini li.both b{color:var(--accent)}
+/* Unlock meter */
+.meter{display:inline-flex;gap:5px;flex:none}.meter i{width:10px;height:10px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--faint)}
+.meter i.on{background:linear-gradient(135deg,#FFD166,#FF6F9C);box-shadow:none}
+.unl-meter{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--raise);border-radius:16px;padding:14px 16px}
+.unl-meter div{display:flex;flex-direction:column}.unl-meter span{font-size:13px;color:var(--muted)}.unl-meter .meter i{width:14px;height:14px}
+.ways{list-style:none;margin:0;padding:0;background:var(--raise);border-radius:16px}
+.ways li{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;font-size:15px}.ways li + li{border-top:1px solid var(--line)}.ways b{color:var(--good)}
+.free-wk{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,rgb(255 209 102 / .14),rgb(255 111 156 / .14))}
+.free-wk div{display:flex;flex-direction:column;gap:2px}.free-wk span{font-size:13px;color:var(--muted)}
+.pk.free{box-shadow:inset 0 0 0 1.5px var(--accent)}.pk em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--accent);margin-left:6px}
+.reveal h2{font-size:26px}
+.rv-burst{position:relative;width:84px;height:84px;margin:8px auto 4px}
+.rv-burst i{position:absolute;inset:0;border-radius:22px;background:linear-gradient(135deg,#FFD166,#FF6F9C);transform:rotate(-8deg);animation:rv 1.1s var(--ease-out) both}
+.rv-burst i:nth-child(2){background:linear-gradient(135deg,#B992E3,#6BB9E0);transform:rotate(6deg) translate(6px,-4px);animation-delay:.08s;opacity:.85}
+.rv-burst i:nth-child(3){background:linear-gradient(135deg,#7BD88F,#6BB9E0);transform:rotate(16deg) translate(12px,-8px);animation-delay:.16s;opacity:.7}
+@keyframes rv{from{opacity:0;transform:translateY(18px) scale(.8) rotate(0)}}
 .find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 .bottom-nav{display:none}
 @media (max-width:760px){
@@ -6777,7 +6807,7 @@ function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.cust
 const ui = {tab:'me', year:CURRENT, compare:null, profile:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
 if(location.hash==='#friends'||location.hash==='#activity') ui.tab='friends';
-addEventListener('hashchange',()=>{ if((location.hash==='#friends'||location.hash==='#activity') && me) navTo({tab:'friends'},{quiet:true}); });
+addEventListener('hashchange',()=>{ if((location.hash==='#friends'||location.hash==='#activity') && me) navTo({tab:'friends'},{quiet:true}); else if(location.hash==='#week' && me && WK){ navTo({tab:'me'},{quiet:true}); openWeekly(); } });
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && me && document.body.classList.contains('in')){ const t=Date.now(); if(t-(loadReactions.t||0)>60000){ loadReactions.t=t; loadReactions().then(()=>{ if(!$('#sheet-root .scrim')) render(); }); } } });
 
 /* Saving: any change calls save(); a moment later only what changed is sent to Supabase. */
@@ -7182,13 +7212,16 @@ function openVsResult(fid,c){
    Picks come from finishing your first shelf, from friends who join and make a shelf, and from coming back on different days. */
 const STARTER = ['artists','albums','songs','movies','tv','anime','games','books','fastfood','restaurants','countries','cities','celebrities','actors','athletes','teams','sneakers','cars','dogs','youtube'];
 const FIRST_PICKS = ['artists','albums','movies','tv','games','fastfood','books','countries'];
-const UNL = {loaded:false, gate:false, supporter:false, invites:0, days:0, shelves:0, picksLeft:0, unlocked:new Set(), custom:false, rewards:[]};
+const UNL = {loaded:false, v3:false, gate:false, supporter:false, revealed:true, invites:0, days:0, shelves:0, weekly:0, points:0, perPick:3, toNext:3, picksLeft:0, unlocked:new Set(), custom:false, rewards:[], freeCat:null};
 const PASS = new Set();
 function isOpen(c){
-  if(!CAT[c]) return false; if(CAT[c].custom||!UNL.gate||UNL.supporter||STARTER.includes(c)||PASS.has(c)||state.shelves[c]) return true;
+  if(!CAT[c]) return false; if(CAT[c].custom||!UNL.gate||UNL.supporter||STARTER.includes(c)||PASS.has(c)||state.shelves[c]||c===UNL.freeCat) return true;
   return UNL.unlocked.has(c);
 }
 const customOpen = () => !UNL.gate || UNL.supporter || UNL.custom;
+/* In the first days the locked topics are not shown at all: you only see what you can rank. */
+const hiddenCat = c => UNL.gate && UNL.v3 && !UNL.revealed && !UNL.supporter && !isOpen(c);
+const shownCats = () => CATS.filter(c=>!hiddenCat(c.id));
 const lockedCats = () => CATS.filter(c=>!isOpen(c.id));
 function rewardText(r){ return r.kind==='invites' ? (r.n===1?'A friend joins through your link and makes a shelf':r.n+' friends join through your link and make a shelf') : r.kind==='days' ? 'Open Palate on '+r.n+' different days' : r.n===1?'Finish your first shelf':'Make '+r.n+' shelves'; }
 function rewardMore(r){ const got=Math.min(UNL[r.kind]|0,r.n); return r.kind==='invites'?got+' of '+r.n+' so far':r.kind==='days'?got+' of '+r.n+' days':''; }
@@ -7200,6 +7233,7 @@ async function loadUnlocks(force){
     const {data,error}=await sb.rpc('unlock_state'); if(error||!data) return null;
     UNL.loaded=true; UNL.gate=!!data.gate; UNL.supporter=!!data.supporter; UNL.invites=data.invites|0; UNL.days=data.days|0; UNL.shelves=data.shelves|0;
     UNL.picksLeft=data.picks_left|0; UNL.unlocked=new Set(data.unlocked||[]); UNL.custom=!!data.custom; UNL.rewards=data.rewards||[];
+    UNL.v3=data.v===3; UNL.revealed=UNL.v3?!!data.revealed:true; UNL.weekly=data.weekly|0; UNL.points=data.points|0; UNL.perPick=data.per_pick|0||3; UNL.toNext=data.to_next==null?UNL.perPick:data.to_next|0; UNL.freeCat=CAT[data.free_cat]?data.free_cat:null;
     const seen=(()=>{ try{ return JSON.parse(localStorage.getItem('palate-unl-seen')||'[]'); }catch(e){ return []; } })();
     const fresh=(data.fresh||[]).filter(id=>!seen.includes(id));
     if(fresh.length){ try{ localStorage.setItem('palate-unl-seen',JSON.stringify([...seen,...fresh])); }catch(e){} }
@@ -7208,12 +7242,24 @@ async function loadUnlocks(force){
   }catch(e){ if(window.PALATE_DEBUG) console.warn('unlock state failed',e); return null; }
 }
 function celebrateReward(ids){
+  if(ids.includes('reveal') && UNL.gate && !UNL.supporter){ showReveal(); return; }
   const picks=ids.filter(id=>(UNL.rewards.find(r=>r.id===id)||{}).grants==='pick').length, cust=ids.includes('custom');
   if(picks&&UNL.picksLeft>0&&UNL.gate&&!UNL.supporter){
     sheet(`<div class="unl-pop"><div class="unl-burst" aria-hidden="true">${LOCK}</div><h2>${picks>1?'You earned '+picks+' shelf picks':'You earned a shelf pick'}</h2>
       <p class="muted">Choose any locked shelf to open it. Use it now or later.</p>
       <button class="pill" style="width:100%;margin-top:14px" data-act="choose-pick">Choose a shelf</button><button class="swap" data-act="close">Later</button></div>`,'unlock');
   } else if(cust) toast('You can now make your own shelves');
+}
+function showReveal(){
+  const more=lockedCats().length;
+  haptic('success');
+  sheet(`<div class="unl-pop reveal"><div class="rv-burst" aria-hidden="true"><i></i><i></i><i></i></div><h2>There's more to Palate</h2>
+    <p class="muted">You've been ranking for a few days, so here's the rest: ${more} more topics, from desserts to dinosaurs. They open one at a time, and the first one is on us.</p>
+    <button class="pill" style="width:100%;margin-top:16px" data-act="choose-pick">Choose a free shelf</button><button class="swap" data-act="unlocks">How to open more</button></div>`,'unlock');
+}
+function meter(){
+  const per=UNL.perPick||3, have=Math.max(0,per-UNL.toNext);
+  return `<span class="meter" aria-label="${have} of ${per} points to your next pick">${Array.from({length:per},(_,i)=>`<i class="${i<have?'on':''}"></i>`).join('')}</span>`;
 }
 let pkSel=null;
 function chooserList(){
@@ -7239,6 +7285,7 @@ function openLocked(c){
     <button class="pill" style="width:100%;margin-top:14px" data-act="unl-invite">Copy my invite link</button><button class="swap" data-act="unlocks">Other ways to earn picks</button></div>`,'unlock');
 }
 function openUnlocks(){
+  if(UNL.v3) return openUnlocks3();
   const rows=UNL.rewards.filter(r=>r.grants==='pick');
   sheet(`<div class="sheet-head"><div><h2>Unlock more shelves</h2><p>${UNL.supporter?'You have everything open':UNL.picksLeft>0?UNL.picksLeft+' pick'+(UNL.picksLeft===1?'':'s')+' ready to use':'Earn picks, then choose any shelf'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   ${UNL.picksLeft>0&&!UNL.supporter?`<button class="pill" style="width:100%;margin-bottom:14px" data-act="choose-pick">Use a pick</button>`:''}
@@ -7247,7 +7294,21 @@ function openUnlocks(){
   <button class="pill soft" style="width:100%;margin-top:14px" data-act="unl-invite">Copy my invite link</button>
   <p class="muted" style="font-size:13px;margin:12px 0 0;text-align:center">Supporters get every shelf at once. Coming in the beta.</p><div style="height:14px"></div>`,'unlocks');
 }
+function openUnlocks3(){
+  const per=UNL.perPick||3, ways=[['Open Palate on a new day','+1'],['Answer the weekly topic','+2'],['A friend joins with your link and makes a shelf','+5']];
+  sheet(`<div class="sheet-head"><div><h2>Open more shelves</h2><p>${UNL.supporter?'You have everything open':UNL.picksLeft>0?UNL.picksLeft+' pick'+(UNL.picksLeft===1?'':'s')+' ready to use':'Every '+per+' points opens one shelf you choose'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  ${UNL.picksLeft>0&&!UNL.supporter?`<button class="pill" style="width:100%;margin-bottom:16px" data-act="choose-pick">Use a pick</button>`:''}
+  <div class="unl-meter"><div><b>Next pick</b><span>${UNL.toNext} point${UNL.toNext===1?'':'s'} to go</span></div>${meter()}</div>
+  <h3 class="set-h">Ways to earn points</h3>
+  <ul class="ways">${ways.map(([t,p])=>`<li><span>${t}</span><b>${p}</b></li>`).join('')}</ul>
+  ${UNL.freeCat&&CAT[UNL.freeCat]?`<div class="free-wk"><div><b>Free this week: ${esc(CAT[UNL.freeCat].name)}</b><span>Open for everyone until Sunday. Make the shelf and it's yours to keep.</span></div><button class="pill soft sm" data-act="pick-cat" data-cat="${UNL.freeCat}">Rank it</button></div>`:''}
+  <h3 class="set-h">Make your own shelves</h3>
+  <ul class="unl-check"><li class="${customOpen()?'done':''}"><i>${customOpen()?'✓':''}</i><span>${customOpen()?'Unlocked':'Opens when 3 friends join with your link'}<small>${customOpen()?'Anything you and your friends want to rank':Math.min(UNL.invites,3)+' of 3 so far'}</small></span></li></ul>
+  <button class="pill soft" style="width:100%;margin-top:16px" data-act="unl-invite">Copy my invite link</button><div style="height:14px"></div>`,'unlocks');
+}
 function unlockedCard(){
+  if(UNL.v3 && UNL.gate && !UNL.supporter && UNL.loaded && UNL.revealed && UNL.picksLeft<1 && lockedCats().length)
+    return `<button class="unl-card" data-act="unlocks"><span class="unl-main"><b>Next shelf pick</b><span>${UNL.toNext} point${UNL.toNext===1?'':'s'} to go · come back tomorrow or answer this week's topic</span></span>${meter()}</button>`;
   if(!UNL.gate||UNL.supporter||!UNL.loaded||UNL.picksLeft<1) return '';
   return `<button class="unl-card" data-act="choose-pick"><span class="unl-ic">${LOCK}</span><span class="unl-main"><b>You have ${UNL.picksLeft===1?'a shelf pick':UNL.picksLeft+' shelf picks'}</b><span>Open any locked shelf</span></span><span class="unl-go">Choose</span></button>`;
 }
@@ -7263,7 +7324,7 @@ function afterFirstShelf(){
     const gated=UNL.gate&&!UNL.supporter, pick=UNL.picksLeft>0&&gated;
     sheet(`<div class="sheet-head"><div><h2>That's your first shelf</h2><p>Here's how Palate works</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
     <ul class="how"><li><b>Friends see it.</b> Send them your link and Palate shows how well your tastes match.</li>
-      <li><b>Shelves are topics.</b> ${gated?'The most popular ones are open. You earn picks to unlock the rest by inviting friends and coming back.':'There are dozens, so keep adding.'}</li></ul>
+      <li><b>Shelves are topics.</b> ${gated&&UNL.revealed?'The most popular ones are open. You earn picks to unlock the rest by coming back, answering the weekly topic and inviting friends.':'There are lots to choose from, so keep adding.'}</li></ul>
     ${pick?`<div class="how-gift"><b>Your reward: pick any shelf to unlock.</b><span>Anything you like. You can choose later too.</span></div><button class="pill" style="width:100%" data-act="choose-pick">Choose my shelf</button><button class="swap" data-act="unl-invite">Copy my invite link instead</button>`
           :`<button class="pill" style="width:100%" data-act="unl-invite">Copy my invite link</button><button class="swap" data-act="close">Keep going</button>`}`,'welcome2');
   })();
@@ -7326,7 +7387,7 @@ function openAccount(sub){
     <button class="set-row" ${pl.act?`data-act="${pl.act}"`:'disabled'}><span class="set-t">Notifications on this device</span><span class="set-v">${esc(pl.v)}</span></button>
     ${swRow('Friend updates','When a friend changes a shelf','data-np="friends"',np.friends)}
     ${swRow('Reactions','When a friend reacts to one of your picks','data-np="reactions"',np.reactions)}
-    ${swRow('Weekly topic','When it comes out, and when friends’ answers are ready','data-np="weekly"',np.weekly)}
+    ${swRow('Weekly topic','When a new one comes out','data-np="weekly"',np.weekly)}
   </div>
   <p class="set-note">Never between 10pm and 8am your time.</p>
   <h3 class="set-h">Feel</h3><div class="set-group">
@@ -7614,7 +7675,7 @@ async function enter(user){
     }
     else await friendsP;
     $('#acct').textContent=`Signed in as ${me.name}`;
-    await Promise.all([loadPeople(),loadBadges(),loadReactions()]);
+    await Promise.all([loadPeople(),loadBadges(),loadReactions(),loadWeekly()]);
     await preloadForBoot();
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
@@ -7625,6 +7686,7 @@ async function enter(user){
     if(vs) startVs(vs);
     else if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
     else if(!state.order.length && !localStorage.getItem('palate-onboard')) setTimeout(showFirstRun,500);
+    else if(location.hash==='#week' && WK) setTimeout(openWeekly,400);
   }catch(e){ console.error(e); showFatal("Couldn't load your shelves. Check your connection and try again.",e); }
 }
 
@@ -8217,16 +8279,67 @@ function capsule(y){
     ? `<span class="cap-r">${art(r.b.n,r.c,'sm')}<b>${esc(r.b.n)}</b><em>still #1 since ${r.ty}</em></span>`
     : `<span class="cap-r">${art(r.a.n,r.c,'sm')}<b>${esc(r.a.n)}</b><i>→</i>${art(r.b.n,r.c,'sm')}<b>${esc(r.b.n)}</b></span>`}</li>`).join('')}</ul></div>`;
 }
+/* ---------- The weekly topic: everyone ranks the same thing, and friends' answers stay hidden until you answer ---------- */
+let WK=null, WKF=[];                     /* this week's topic, and friends' answers once you have answered */
+async function loadWeekly(){
+  try{ const r=await sb.rpc('weekly_state'); if(r.error||!r.data||!CAT[r.data.base_cat]){ WK=null; return; } WK=r.data; await loadWeeklyFriends(); }
+  catch(e){ WK=null; }
+}
+async function loadWeeklyFriends(){
+  WKF=[]; if(!WK||!WK.answered) return;
+  try{ const r=await sb.from('weekly_answers').select('user_id,top,updated_at').eq('week',WK.week).neq('user_id',me.id); if(!r.error) WKF=(r.data||[]).map(a=>({f:FRIENDS.find(x=>x.id===a.user_id),top:a.top||[],t:a.updated_at})).filter(a=>a.f); }catch(e){}
+}
+const wkEnds = () => { if(!WK) return ''; const d=Math.max(0,Math.ceil((new Date(WK.ends+'T00:00:00Z')-Date.now())/864e5)); return d<=1?'ends tonight':d+' days left'; };
+function weeklyCard(){
+  if(!WK) return '';
+  const base=WK.base_cat, mine=WK.mine||[], first1=mine[0];
+  const style=first1?tint(base,first1.n):`--h:${hue(WK.title)}`;
+  const n=WK.answered?WKF.length:(WK.friends_answered|0);
+  return `<article class="card wk tap" style="${style}" role="button" tabindex="0" data-act="${WK.answered?'weekly':'weekly-answer'}">
+    <div class="wk-tag">This week<span>${esc(wkEnds())}</span></div>
+    <h2>${esc(WK.title)}</h2>${WK.prompt?`<p class="wk-p">${esc(WK.prompt)}</p>`:''}
+    ${WK.answered
+      ? `<div class="wk-mine">${mine.slice(0,5).map(it=>`<span title="${esc(it.n)}">${art(it.n,base,'sm')}</span>`).join('')}</div><div class="wk-foot"><span>${n?`${n} friend${n===1?'':'s'} answered`:'No friends have answered yet'}</span><b>${n?'See their picks':'See yours'}</b></div>`
+      : `<div class="wk-foot"><span>${n?`${n} friend${n===1?' has':'s have'} answered. Answer to see theirs.`:'Be the first of your friends.'}</span><b>Answer</b></div>`}
+  </article>`;
+}
+function openWeekly(){
+  if(!WK) return; if(!WK.answered){ openWeeklyEditor(); return; }
+  const base=WK.base_cat, mine=WK.mine||[], mset=new Set(mine.map(x=>x.n));
+  const block=(who,top,mine1)=>`<div class="wk-ans"><h3>${who}</h3><ol class="mini">${top.slice(0,5).map((it,i)=>`<li class="${!mine1&&mset.has(it.n)?'both':''}"><span class="rk">${i+1}</span>${art(it.n,base,'sm')}<b>${esc(it.n)}</b></li>`).join('')}</ol></div>`;
+  sheet(`<div class="sheet-head"><div><h2>${esc(WK.title)}</h2><p>This week · ${esc(wkEnds())}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <div class="wk-grid">${block('You',mine,true)}${WKF.map(a=>block(esc(first(a.f)),a.top,false)).join('')}</div>
+    ${WKF.length?'':`<p class="muted" style="margin:6px 0 0">None of your friends have answered yet. Their picks show up here as soon as they do.</p>`}
+    <div class="sheet-foot"><button class="pill ghost" data-act="weekly-answer">Change my answer</button><div class="foot-right"><button class="pill soft" data-act="unl-invite">Invite a friend</button></div></div>`,'weekly');
+}
+function openWeeklyEditor(){
+  if(!WK) return; const base=WK.base_cat, slots=Array(7).fill(null);
+  (WK.mine||[]).slice(0,5).forEach((it,i)=>slots[i]={...it});
+  ed={cat:base,slots,query:'',confirm:false,isNew:!WK.answered,res:[],flow:false,live:[],liveQ:'',shown:!!$('#sheet-root .scrim'),weekly:true};
+  renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),30);
+}
+async function saveWeekly(){
+  const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s||'',why:(x.why||'').trim()}));
+  if(!top.length){ toast('Add at least one pick first.'); return; }
+  const b=$('#sheet-root [data-act="save"]'); if(b) b.disabled=true;
+  haptic('success');
+  const isFirst=!WK.answered, r=await sb.rpc('weekly_answer',{p_top:top});
+  if(r.error){ if(b) b.disabled=false; toast(/weekly_answer|function/i.test(r.error.message)?'Run supabase/progression.sql in Supabase first':r.error.message); return; }
+  WK=r.data; await loadWeeklyFriends(); render();
+  if(isFirst){ setTimeout(()=>loadUnlocks(true),1500); }
+  openWeekly(); if(isFirst) toast(WKF.length?`Here's what ${WKF.length===1?first(WKF[0].f)+' picked':'your friends picked'}`:'Saved. Friends’ picks show up here when they answer');
+}
 function meDyn(){
   const y=ui.year, view=ui.view, list=shelfList(y,view);
   let note='';
   if(view!=='me') note=`<div class="note"><span>This is what ${view==='close'?'close friends':'friends'} see</span><button class="pill soft sm" data-act="view" data-v="me">Back to my view</button></div>`;
   else if(y<CURRENT) note=`<div class="note"><span>Your shelves in ${y}</span><button class="pill soft sm" data-act="year-now">Back to ${CURRENT}</button></div>`;
   if(view==='me' && y===CURRENT && !shelfList(CURRENT).length) note=`<div class="panel"><h2>Start with 3 favorites</h2><p class="muted" style="margin:0">Pick a topic, add a few things you love, and you will instantly see how you match your friends. You do not need to fill all five spots.</p><div class="starter">${['artists','movies','albums','tv','games'].filter(id=>CAT[id]).map(id=>`<button class="pk" data-act="pick-cat" data-cat="${id}">${esc(CAT[id].name)}</button>`).join('')}</div><div style="margin-top:10px"><button class="pill sm" data-act="quick">Walk me through it</button></div></div>`;
-  const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${CATS.length-shelfList(CURRENT).length} categories to choose from</small></button>` : '';
+  const add = (y===CURRENT && view==='me') ? `<button class="add-card" data-act="add-shelf">+ Add a shelf<small>${shownCats().length-shelfList(CURRENT).length} topics to choose from</small></button>` : '';
   const strip=(view==='me' && y===CURRENT && UPDATES.length && lateList(3)) ? `<div class="panel lately-strip"><h2>Friends lately <button class="pill ghost sm" data-act="tab" data-tab="friends">See all</button></h2><ul class="lately">${lateList(3)}</ul></div>` : '';
   const cap=(view==='me')?capsule(y):'';
-  return note + friendsCard() + promoCard() + strip + cap + `<section class="shelves">${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
+  const wk=(view==='me' && y===CURRENT && shelfList(CURRENT).length) ? weeklyCard() : '';
+  return note + friendsCard() + promoCard() + strip + cap + `<section class="shelves">${wk}${list.map(c=>shelfCard(c,y,view)).join('')}${add}</section>`;
 }
 function viewMe(){
   const y=ui.year;
@@ -8956,6 +9069,14 @@ function slotRow(i){
 function nextCat(){ const free=c=>isOpen(c.id) && !eff(c.id,CURRENT) && c.id!==ed?.cat; return (CATS.find(c=>c.popular&&free(c))||CATS.find(free))?.id; }
 function renderEditor(){
   const c=CAT[ed.cat];
+  if(ed.weekly){
+    sheet(`<div class="sheet-head"><div><h2>${esc(WK.title)}</h2><p>This week's topic${WK.prompt?' · '+esc(WK.prompt):''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+      <div class="search"><input id="ed-q" type="search" autocomplete="off" aria-label="Search ${esc(c.name.toLowerCase())}" placeholder="Search ${esc(c.name.toLowerCase())}" value="${esc(ed.query)}"><ul id="ed-results" class="results">${results()}</ul></div>
+      <div class="dz" data-dz="editor"><div class="label">Your top 5 <span>${WK.answered?'You can change it until Sunday':'Friends\u2019 picks show once you save'}</span></div>
+      <ol class="rows">${[0,1,2,3,4].map(slotRow).join('')}</ol></div>
+      <div class="sheet-foot"><span></span><div class="foot-right"><button class="pill soft" data-act="close">Cancel</button><button class="pill" data-act="save">${WK.answered?'Save':'Save and see friends'}</button></div></div>`, 'editor', ed.shown);
+    ed.shown=true; return;
+  }
   const left = ed.isNew ? '<span></span>' : ed.confirm
     ? `<div class="confirm">Remove for ${CURRENT}?<button class="pill soft danger sm" data-act="del-yes">Remove</button><button class="pill ghost sm" data-act="del-no">Keep</button></div>`
     : `<button class="pill ghost danger" data-act="del-ask">Remove shelf</button>`;
@@ -9000,6 +9121,7 @@ function addItem(it){
   setTimeout(()=>$('#ed-q')?.focus(),20);
 }
 function saveEditor(next){
+  if(ed.weekly){ saveWeekly(); return; }
   if(ed.slots.slice(0,5).some(Boolean)) haptic('success');
   const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
   const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
@@ -9063,10 +9185,13 @@ $('#photo-input').addEventListener('change', async e=>{
 /* Category picker */
 function pickerList(){
   const q=(pk.q||'').trim().toLowerCase();
-  const btn=c=>isOpen(c.id) ? `<button class="pk" data-act="pick-cat" data-cat="${c.id}" ${eff(c.id,CURRENT)?'disabled':''}>${esc(c.name)}</button>` : `<button class="pk locked" data-act="pk-locked" data-cat="${c.id}" aria-label="${esc(c.name)}, locked"><i class="pk-lock">${LOCK}</i>${esc(c.name)}</button>`;
+  const free=c=>c.id===UNL.freeCat&&UNL.gate&&!STARTER.includes(c.id)&&!eff(c.id,CURRENT);
+  const btn=c=>isOpen(c.id) ? `<button class="pk${free(c)?' free':''}" data-act="pick-cat" data-cat="${c.id}" ${eff(c.id,CURRENT)?'disabled':''}>${esc(c.name)}${free(c)?'<em>Free this week</em>':''}</button>` : `<button class="pk locked" data-act="pk-locked" data-cat="${c.id}" aria-label="${esc(c.name)}, locked"><i class="pk-lock">${LOCK}</i>${esc(c.name)}</button>`;
+  const CATS=shownCats();
   if(q){ const m=CATS.filter(c=>c.name.toLowerCase().includes(q)||c.group.toLowerCase().includes(q)); return m.length?`<div class="pk-group"><div class="pk-grid">${m.map(btn).join('')}</div></div>`:`<p class="muted" style="margin-top:16px">No match for “${esc(pk.q.trim())}”.</p>`; }
   const left=CATS.filter(c=>c.popular && isOpen(c.id) && !eff(c.id,CURRENT)).length;
-  return unlockedCard()+`<button class="own-btn" data-act="make-own"><span class="plus">+</span><span><b>Make your own</b><small>${customOpen()?'A shelf just for your friends':'Locked · invite friends to open it'}</small></span>${customOpen()?'':`<i class="pk-lock">${LOCK}</i>`}</button>`
+  const ownBtn = (UNL.v3 && !UNL.revealed && !customOpen()) ? '' : `<button class="own-btn" data-act="make-own"><span class="plus">+</span><span><b>Make your own</b><small>${customOpen()?'A shelf just for your friends':'Locked · invite friends to open it'}</small></span>${customOpen()?'':`<i class="pk-lock">${LOCK}</i>`}</button>`;
+  return unlockedCard() + ownBtn
     + (left?`<div class="quick"><div><b>Quick start</b><span>Go through the ${left} most popular shelves one after another, with suggestions.</span></div><button class="pill" data-act="quick">Start</button></div>`:'')
     + `<div class="pk-group"><h3>Popular</h3><div class="pk-grid">${CATS.filter(c=>c.popular).map(btn).join('')}</div></div>`
     + `<div class="pk-group"><h3>Browse by topic</h3>${[...new Set(CATS.map(c=>c.group))].map(g=>{ const list=CATS.filter(c=>c.group===g); const open=pk.open&&pk.open.has(g);
@@ -9074,7 +9199,7 @@ function pickerList(){
 }
 function openPicker(){
   pk={q:''};
-  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${UNL.gate&&!UNL.supporter&&lockedCats().length?lockedCats().length+' locked. Earn picks to open them.':CATS.length+' topics'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+  sheet(`<div class="sheet-head"><div><h2>New shelf</h2><p>${UNL.gate&&!UNL.supporter&&UNL.revealed&&lockedCats().length?lockedCats().length+' locked. Earn picks to open them.':shownCats().length+' topics'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   <div class="search"><input id="pk-q" type="search" autocomplete="off" aria-label="Search categories" placeholder="Search categories"></div>
   <div id="pk-list">${pickerList()}</div><div style="height:22px"></div>`, 'picker');
   setTimeout(()=>$('#pk-q')?.focus(),30);
@@ -9406,6 +9531,8 @@ document.addEventListener('click',e=>{
     case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(sheetKind==='account') openAccount(); if(ok){ haptic('success'); toast('Notifications are on'); } }); break;
     case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
     case 'rx': react(el); break;
+    case 'weekly': openWeekly(); break;
+    case 'weekly-answer': openWeeklyEditor(); break;
     case 'push-help': toast(IS_IOS?'Settings app › Notifications › Palate › Allow':'Turn notifications on for this site in your browser settings'); break;
     case 'set-sub': openSettingsSub(el.dataset.v); break;
     case 'set-name-go': saveName(); break;
