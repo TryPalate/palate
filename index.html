@@ -1,3 +1,6 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
 <title>Palate</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Your taste, ranked. Just for your friends.">
@@ -13,29 +16,27 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Palate">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: equal-size tinted cards, one per shelf, packed tight. Artwork and names carry the page; each card's tint comes from its #1 photo. Dark-first; every colour lives in these tokens. */
 :root{
   --bg:#0A0A0D; --card:#15151A; --raise:#22222A; --text:#F5F5F7; --muted:#8E8E98; --faint:#55555E; --line:rgb(255 255 255 / .08);
   --accent:#FFB06B; --scrim:rgb(0 0 0 / .62); --good:#7BD88F;
-  --tint-s:38%; --tint-l:24%; --art-s:40%; --art-l:44%; --polaroid:#F5F5F7; --gk:1;
-  --font:"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --tint-s:38%; --tint-l:24%; --art-s:40%; --art-l:44%; --polaroid:#F5F5F7; --gk:1; --edge:rgb(255 255 255 / .06);
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --font:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
     --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#6C6C75; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
     --accent:#C8641E; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
-    --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; color-scheme:light;
+    --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; --edge:rgb(0 0 0 / .05); color-scheme:light;
   }
 }
 :root[data-theme="light"]{
   --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#6C6C75; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
   --accent:#C8641E; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
-  --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; color-scheme:light;
+  --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; --edge:rgb(0 0 0 / .05); color-scheme:light;
 }
 
 *{box-sizing:border-box}
@@ -86,7 +87,7 @@ body.in::before{content:'';position:fixed;top:0;left:0;right:0;height:env(safe-a
 .profile{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding-block:6px 14px}
 .who{display:flex;align-items:center;gap:12px;min-width:0}
 .me-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;color:#fff;background:linear-gradient(140deg,hsl(28 70% 55%),hsl(345 55% 42%));flex:none}
-.who h1{font-size:26px;font-weight:700;letter-spacing:-.03em;margin:0;line-height:1.1}
+.who h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0;line-height:1.1}
 .who p{margin:1px 0 0;color:var(--muted);font-size:14px}
 .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .seg{display:inline-flex;background:var(--raise);border-radius:999px;padding:3px}
@@ -111,15 +112,24 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 
 /* Shelf cards — all the same size */
 .shelves{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;padding-bottom:40px}
-.card{border-radius:20px;padding:16px 16px 12px;min-width:0;display:flex;flex-direction:column;
+.card{border-radius:22px;padding:16px 16px 12px;min-width:0;display:flex;flex-direction:column;box-shadow:inset 0 0 0 1px var(--edge),inset 0 1px 0 var(--edge);
   background:
-    radial-gradient(120% 75% at 100% 0%, hsl(var(--h) var(--ts, var(--tint-s)) var(--tint-l)) 0%, transparent 70%),
-    radial-gradient(90% 60% at 0% 100%, hsl(calc(var(--h) + 30) var(--ts, var(--tint-s)) calc(var(--tint-l) - 3%)) 0%, transparent 72%),
+    var(--grain),
+    radial-gradient(130% 85% at 100% 0%, hsl(var(--h) var(--ts, var(--tint-s)) var(--tint-l)) 0%, hsl(var(--h) var(--ts, var(--tint-s)) var(--tint-l) / .62) 30%, hsl(var(--h) var(--ts, var(--tint-s)) var(--tint-l) / .22) 55%, transparent 76%),
+    radial-gradient(100% 70% at 0% 100%, hsl(calc(var(--h) + 30) var(--ts, var(--tint-s)) calc(var(--tint-l) - 3%)) 0%, hsl(calc(var(--h) + 30) var(--ts, var(--tint-s)) calc(var(--tint-l) - 3%) / .55) 35%, transparent 78%),
     var(--card)}
+/* Your #1 leads each shelf: a bigger picture and name, the rest stay the same size */
+.card .rows .row:first-child{height:86px;grid-template-columns:18px 78px minmax(0,1fr) auto}
+.card .rows .row:first-child .art{--w:72px;--ht:72px;border-radius:12px}
+.card .rows .row:first-child .art.sh-round{border-radius:50%}
+.card .rows .row:first-child .art.sh-poster{--w:54px;--ht:76px}
+.card .rows .row:first-child .art.sh-wide{--w:78px;--ht:56px}
+.card .rows .row:first-child .nm b{font-size:18px;font-weight:700;letter-spacing:-.02em}
+.card .rows .row:first-child .rk{font-size:19px;color:var(--text)}
 .card.tap{cursor:pointer;transition:transform .15s ease}
 .card.tap:hover{transform:translateY(-2px)}
 .card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;min-height:30px}
-.card-head h2{font-size:20px;font-weight:700;letter-spacing:-.03em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-head h2{font-size:20px;font-weight:700;letter-spacing:-.022em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .meta{display:flex;align-items:center;gap:8px;flex:none;color:var(--muted);font-size:12.5px}
 .vis{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);background:rgb(0 0 0 / .18);padding:3px 8px;border-radius:999px}
 .vis svg{width:11px;height:11px}
@@ -151,6 +161,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .lately li button{all:unset;cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:center;width:100%}
 .lately li button:focus-visible{outline:2px solid var(--text);outline-offset:3px;border-radius:8px}
 .lately .both{color:var(--text)}
+.lately-strip{margin-bottom:12px}
 .lately-strip h2{display:flex;justify-content:space-between;align-items:center}
 .tab[data-new]::after,.bottom-nav [data-new]::after{content:attr(data-new);display:inline-block;min-width:16px;height:16px;line-height:16px;margin-left:6px;border-radius:8px;background:var(--accent,#ff6a3d);color:#fff;font-size:10px;font-weight:700;text-align:center;padding:0 4px;vertical-align:middle}
 .starter{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 2px}
@@ -190,7 +201,13 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
   background:linear-gradient(150deg, hsl(var(--ah) var(--art-s) calc(var(--art-l) + 8%)), hsl(calc(var(--ah) + 28) var(--art-s) calc(var(--art-l) - 14%)));
   background-size:cover;background-position:center}
 .art.photo{background-color:var(--raise)}
-.art b{font-weight:700;font-size:calc(var(--ht) * .32);letter-spacing:-.03em;text-transform:uppercase}
+.art.photo::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(150deg, hsl(var(--ah,220) var(--art-s) calc(var(--art-l) + 8%)), hsl(calc(var(--ah,220) + 28) var(--art-s) calc(var(--art-l) - 14%)));opacity:1;transition:opacity .45s ease}
+.art.photo.ld::before{opacity:0}.art.photo.now::before{transition:none}
+.art.photo::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .07);pointer-events:none}
+.art.photo.pp:not(.sh-round){background-position:50% 25%}
+.sz-alt{--w:72px;--ht:72px;border-radius:12px}.sz-alt.sh-poster{--w:56px;--ht:80px}.sz-alt.sh-wide{--w:84px;--ht:60px}
+.alt-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))!important}
+.art b{font-weight:700;font-size:calc(var(--ht) * .32);letter-spacing:-.022em;text-transform:uppercase}
 .sh-round{border-radius:50%}
 .art.photo.sh-round{background-position:50% 22%}
 .alt-panel{grid-column:1/-1;background:var(--raise);border-radius:14px;padding:10px 12px;margin-top:8px}
@@ -209,7 +226,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 
 /* Friends */
 .head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:6px 14px}
-.head h1{font-size:26px;font-weight:700;letter-spacing:-.03em;margin:0}
+.head h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0}
 .friends{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px;padding-bottom:40px;align-items:start}
 @media (max-width:820px){.friends{grid-template-columns:1fr}}
 .panel{background:var(--card);border-radius:20px;padding:6px 18px}
@@ -218,7 +235,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .friend + .friend{border-top:1px solid var(--line)}
 .av{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:17px;background:linear-gradient(140deg,hsl(var(--h) 50% 52%),hsl(calc(var(--h) + 30) 45% 36%));flex:none}
 .av.s{width:30px;height:30px;font-size:11px}
-.pct{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.pct{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.022em}
 .lately{list-style:none;margin:0;padding:0}
 .lately li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:11px 0;align-items:center}
 .lately li + li{border-top:1px solid var(--line)}
@@ -229,7 +246,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .pair{display:flex}
 .pair .me-av,.pair .av{width:50px;height:50px;border:3px solid var(--bg)}
 .pair > :last-child{margin-left:-14px}
-.cmp-top h1{font-size:26px;font-weight:700;letter-spacing:-.03em;margin:0;line-height:1.15}
+.cmp-top h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0;line-height:1.15}
 .cmp-top p{margin:2px 0 0;color:var(--muted)}
 .cmp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px;padding-bottom:16px}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -246,11 +263,11 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 /* Recap stories */
 .stories{display:grid;grid-auto-flow:column;grid-auto-columns:min(330px, 84%);gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;scrollbar-width:thin}
 .story{scroll-snap-align:start;aspect-ratio:9/16;max-width:100%;display:flex;flex-direction:column;gap:12px;overflow:hidden;padding:20px}
-.story .tag{display:flex;justify-content:space-between;font-weight:800;font-size:16px;letter-spacing:-.04em}
+.story .tag{display:flex;justify-content:space-between;font-weight:800;font-size:16px;letter-spacing:-.03em}
 .story .tag span{color:var(--muted);font-weight:500;letter-spacing:0;font-size:14px}
-.story h2{font-size:22px;font-weight:700;letter-spacing:-.03em;margin:6px 0 0;line-height:1.15}
+.story h2{font-size:22px;font-weight:700;letter-spacing:-.022em;margin:6px 0 0;line-height:1.15}
 .feature{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px}
-.feature b{font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.feature b{font-size:26px;font-weight:700;letter-spacing:-.022em;line-height:1.1}
 .feature span{color:var(--muted);font-size:15px}
 .recap-foot{display:flex;gap:10px;flex-wrap:wrap;padding-block:4px 40px}
 
@@ -262,7 +279,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
   .sheet{max-height:min(94dvh,calc(100dvh - env(safe-area-inset-top,0px) - 12px));border-radius:24px 24px 0 0;padding:16px max(16px, env(safe-area-inset-left,0px)) 0 max(16px, env(safe-area-inset-right,0px))}
 }
 .sheet-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
-.sheet-head h2{font-size:24px;font-weight:700;letter-spacing:-.03em;margin:0}
+.sheet-head h2{font-size:24px;font-weight:700;letter-spacing:-.022em;margin:0}
 .sheet-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .x{background:var(--raise);border:0;width:34px;height:34px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;flex:none;color:var(--muted)}
 .sheet-foot{position:sticky;bottom:0;background:var(--card);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-top:14px}
@@ -287,7 +304,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .res .add{font-size:13px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px}
 .res .stack .av{border-color:var(--card)}
 .plus{width:38px;height:38px;border-radius:10px;border:1.5px dashed var(--faint);display:grid;place-items:center;color:var(--muted);justify-self:center}
-.label{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:15px;font-weight:600;margin:18px 0 2px}
+.label{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;align-items:baseline;font-size:15px;font-weight:600;margin:18px 0 2px}
 .label span{font-size:13px;font-weight:400;color:var(--muted)}
 .slot{display:grid;grid-template-columns:18px 58px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
 .slot[draggable="true"]{cursor:grab}
@@ -365,7 +382,14 @@ body.dragging{user-select:none;-webkit-user-select:none}
 .manage select{background:var(--raise);border:0;border-radius:10px;padding:8px 10px;font-size:14px}
 
 .foot{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding-block:4px 24px;font-size:13px;color:var(--faint)}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--text);color:var(--bg);font-size:14px;font-weight:500;padding:10px 16px;border-radius:999px;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate3d(0,14px,0) scale(.96);z-index:60;background:var(--text);color:var(--bg);font-size:14.5px;font-weight:500;padding:11px 18px;border-radius:999px;max-width:calc(100% - 32px);
+  display:flex;align-items:center;gap:14px;opacity:0;pointer-events:none;box-shadow:0 10px 30px -8px rgb(0 0 0 / .45);transition:opacity .22s ease,transform .38s var(--ease-out)}
+.net{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));margin:0 auto;width:max-content;max-width:calc(100% - 32px);z-index:300;display:flex;align-items:center;gap:8px;
+  background:var(--raise);color:var(--text);border:1px solid var(--line);font-size:13.5px;font-weight:500;padding:8px 14px;border-radius:999px;box-shadow:0 8px 24px -10px rgb(0 0 0 / .5);
+  opacity:0;transform:translate3d(0,-10px,0);transition:opacity .25s ease,transform .4s var(--ease-out)}
+.net.on{opacity:1;transform:none}.net-dot{width:7px;height:7px;border-radius:50%;background:#E5A04D;flex:none}
+.toast.on{opacity:1;transform:translate3d(0,0,0) scale(1);pointer-events:auto}
+.toast button{background:none;border:0;padding:0;margin:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap}
 @media (max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
 /* Loading screen: polaroid and word over a soft light leak. Colours dim in light mode. */
 .boot{position:fixed;top:0;left:0;right:0;bottom:calc(-1 * env(safe-area-inset-bottom,0px));min-height:100lvh;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;color:var(--text);
@@ -384,7 +408,42 @@ body:not(.in) .bottom-nav{display:none!important;visibility:hidden}
 .boot .b-pol{width:96px;height:auto;aspect-ratio:48/58;filter:drop-shadow(0 8px 22px rgb(0 0 0 / .22))}
 .boot .b-word{height:44px;width:auto;aspect-ratio:3.038}
 @keyframes boot-in{from{opacity:0}to{opacity:1}}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}.boot{animation:none}}
+/* Motion: things arrive from where they come from and settle, quick to start and soft to finish */
+:root{--ease-out:cubic-bezier(.22,1,.36,1);--ease-in:cubic-bezier(.45,0,.9,.5)}
+#view.v-r{animation:v-in-r .44s var(--ease-out) both}
+#view.v-l{animation:v-in-l .44s var(--ease-out) both}
+#view.v-up{animation:v-in-up .38s var(--ease-out) both}
+@keyframes v-in-r{from{opacity:0;transform:translate3d(36px,0,0)}}
+@keyframes v-in-l{from{opacity:0;transform:translate3d(-36px,0,0)}}
+@keyframes v-in-up{from{opacity:0;transform:translate3d(0,12px,0)}}
+.scrim{animation:fade-in .28s ease both}
+.sheet{animation:sheet-pop .36s var(--ease-out) both}
+.scrim.still,.scrim.still .sheet{animation:none}
+.scrim.out{animation:fade-out .26s ease forwards;pointer-events:none}
+.scrim.out .sheet{animation:sheet-drop .22s var(--ease-in) forwards}
+@media (max-width:640px){
+  .sheet{animation:sheet-up .5s var(--ease-out) both}
+  .scrim.out .sheet{animation:sheet-down .3s var(--ease-in) forwards}
+  .sheet::before{content:'';display:block;width:38px;height:5px;border-radius:3px;background:var(--faint);opacity:.55;margin:-7px auto 9px}
+}
+@keyframes fade-in{from{opacity:0}}
+@keyframes fade-out{to{opacity:0}}
+@keyframes sheet-pop{from{opacity:0;transform:translate3d(0,16px,0) scale(.97)}}
+@keyframes sheet-drop{to{opacity:0;transform:translate3d(0,10px,0) scale(.98)}}
+@keyframes sheet-up{from{transform:translate3d(0,100%,0)}}
+@keyframes sheet-down{to{transform:translate3d(0,105%,0)}}
+#story-root .sty-view{animation:story-in .4s var(--ease-out) both}
+#story-root.out{pointer-events:none}#story-root.out .sty-view{animation:fade-out .24s ease forwards}
+@keyframes story-in{from{opacity:0;transform:scale(1.04)}}
+/* Press: buttons sink a little under your finger */
+button,[role="button"],.card.tap{-webkit-tap-highlight-color:transparent}
+button{transition:transform .2s var(--ease-out),background-color .15s,color .15s,opacity .15s}
+@media (hover:none){
+  button:active:not(:disabled):not(.grip):not(.x){transform:scale(.96)}
+  .card.tap{transition:transform .25s var(--ease-out)}
+  .card.tap:active{transform:scale(.985)}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}.boot,#view,.scrim,.sheet,.sty-view{animation:none!important}}
 
 /* Sign-in + invite */
 body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{display:none}
@@ -425,6 +484,10 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .bdg.sh-legend{background:radial-gradient(circle at 50% 50%,#2b2336 0 63%,transparent 65%),conic-gradient(from 0deg,#EDBB6A,#E5799B,#B992E3,#6BB9E0,#EDBB6A);color:#F5D78E;--ring:0 0 .7em rgb(237 187 106 / .55)}
 .bdg-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .profile > .bdg-row{margin:12px 0 2px}
+.who .bdg-row{margin-top:8px}
+.profile > .bdg-row.narrow-only{flex-basis:100%;margin:0}
+@media (min-width:761px){.narrow-only{display:none!important}}
+@media (max-width:760px){.wide-only{display:none!important}}
 .bdg-chip{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--raise);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px 3px 3px;cursor:pointer}
 .bdg-chip .bdg{width:20px;height:20px;font-size:11px}
 .bdg-detail{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:0 4px 8px}
@@ -438,12 +501,12 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .bdg-ladder .locked{opacity:.35;filter:grayscale(1)}
 .pf-top{padding-block:6px 4px}
 .pf-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 18px}
-.pf-hero h1{font-size:30px;font-weight:700;letter-spacing:-.03em;margin:12px 0 0;line-height:1.1}
+.pf-hero h1{font-size:30px;font-weight:700;letter-spacing:-.022em;margin:12px 0 0;line-height:1.1}
 .pf-rel{margin:4px 0 0;color:var(--muted);font-size:14.5px}
 .pf-hero .bdg-row{justify-content:center}
 .pf-match{display:flex;align-items:center;gap:16px;padding:16px 18px}
 .ring{--p:0;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;flex:none;background:conic-gradient(var(--accent) calc(var(--p) * 1%),var(--raise) 0)}
-.ring b{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:var(--card);font-size:22px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ring b{display:grid;place-items:center;width:74px;height:74px;border-radius:50%;background:var(--card);font-size:22px;letter-spacing:-.022em;font-variant-numeric:tabular-nums}
 .pm-txt h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--text)}
 .pm-txt p{margin:3px 0 0;color:var(--muted);font-size:14.5px}
 .panel .pm-txt h2{margin:0}
@@ -527,6 +590,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 <input type="file" id="photo-input" accept="image/*" class="vh" tabindex="-1" aria-hidden="true">
 <div id="sheet-root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="net" class="net" role="status" aria-live="polite" hidden><span class="net-dot"></span>Offline. Changes save when you're back.</div>
 
 <script>/* Start fetching last visit's pictures right now, in parallel with the app code and the database. */
 try{var _m=JSON.parse(localStorage.getItem('palate-imgs')||'{}'),_t=localStorage.getItem('palate-v3-tab')||'me',_l=(_m[_t]||_m.me||[]).slice(0,90);window.__pre=_l.map(function(u){var i=new Image();i.decoding='async';i.src=u;return i})}catch(e){}</script>
@@ -6657,7 +6721,7 @@ function applyCustom(){ for(const c in state.custom) if(Array.isArray(state.cust
 const ui = {tab:'me', year:CURRENT, compare:null, profile:null, view:'me'};
 try{ const t=localStorage.getItem(KEY+'-tab'); if(t==='me'||t==='friends'||t==='recap') ui.tab=t; }catch(e){}
 if(location.hash==='#friends') ui.tab='friends';
-addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me){ ui.tab='friends'; ui.compare=null; ui.profile=null; render(); window.scrollTo(0,0); } });
+addEventListener('hashchange',()=>{ if(location.hash==='#friends' && me) navTo({tab:'friends'},{quiet:true}); });
 
 /* Saving: any change calls save(); a moment later only what changed is sent to Supabase. */
 const synced = {shelves:{}, photos:{}, custom:'{}'};
@@ -6682,10 +6746,19 @@ async function push(){
     for(const k of pd){ const i=k.indexOf('|'); const {error}=await sb.from('item_photos').delete().eq('user_id',me.id).eq('cat',k.slice(0,i)).eq('name',k.slice(i+1)); if(error) throw error; delete synced.photos[k]; }
     const cj=JSON.stringify(state.custom);
     if(cj!==synced.custom){ const {error}=await sb.from('user_settings').upsert({user_id:me.id,custom:state.custom},{onConflict:'user_id'}); if(error) throw error; synced.custom=cj; }
-  }catch(e){ console.error(e); toast("Couldn't save. Check your connection."); setTimeout(()=>save(),6000); }
+  }catch(e){ console.error(e); if(navigator.onLine) toast("Couldn't save yet. Trying again…"); setTimeout(()=>save(),6000); }
   finally{ pushing=false; if(again){ again=false; save(); } }
 }
 window.addEventListener('pagehide',()=>{ clearTimeout(pushT); push(); });
+/* Offline: a small bar says so; when the connection comes back, unsaved changes go out and a failed start tries again by itself. */
+function netState(){
+  const el=$('#net'); if(!el) return; const off=navigator.onLine===false;
+  if(off){ el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); }
+  else if(!el.hidden){ el.classList.remove('on'); setTimeout(()=>{ if(navigator.onLine!==false) el.hidden=true; },300); }
+}
+addEventListener('offline',netState);
+addEventListener('online',()=>{ netState(); if(me && document.body.classList.contains('in')){ toast('Back online'); save(); loadFriends().then(()=>render()).catch(()=>{}); } else if($('#view [data-act="reload"]')) location.reload(); });
+document.addEventListener('DOMContentLoaded',netState);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ clearTimeout(pushT); push(); } });
 
 /* Friends: everything here is filtered by the database rules, so we only ever receive what we may see. */
@@ -6862,7 +6935,7 @@ async function addPerson(id){
   const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(r.error){ toast(r.error.message||'Could not add that person'); return; }
   const fromSheet=sheetKind==='person';
   track('friend_added'); await afterFriendsChanged('You and '+r.data+' are now friends');
-  if(fromSheet){ closeSheet(); ui.tab='friends'; ui.compare=null; ui.profile=id; render(); window.scrollTo(0,0); }
+  if(fromSheet){ closeSheet(); navTo({tab:'friends',profile:id},{quiet:true}); }
 }
 async function addAll(){
   const ids=DIRECTORY.map(p=>p.id); let n=0; for(const id of ids){ const r=await sb.rpc('alpha_add_friend',{p_id:id}); if(!r.error) n++; }
@@ -6928,9 +7001,9 @@ function rarityLine(id){
   const p=100*s.holders/s.total, t=p<1?'less than 1':p<10?(Math.round(p*10)/10):Math.round(p);
   return p<50 ? `Only ${t}% of people have this badge` : `${t}% of people have this badge so far`;
 }
-function badgeRow(uid){
+function badgeRow(uid,cls){
   const list=badgesOf(uid); if(!list.length) return '';
-  return `<div class="bdg-row">${list.map(b=>`<button class="bdg-chip" data-act="badge" data-b="${b.id}" data-u="${uid}" aria-label="${esc(BADGES[b.id].name)} badge">${bdgIcon(b.id)}<span>${esc(BADGES[b.id].name)}</span></button>`).join('')}</div>`;
+  return `<div class="bdg-row${cls?' '+cls:''}">${list.map(b=>`<button class="bdg-chip" data-act="badge" data-b="${b.id}" data-u="${uid}" aria-label="${esc(BADGES[b.id].name)} badge">${bdgIcon(b.id)}<span>${esc(BADGES[b.id].name)}</span></button>`).join('')}</div>`;
 }
 function openBadge(id,uid){
   const b=BADGES[id]; if(!b) return; const mine=(BADGE_OF[uid]||[]).find(x=>x.id===id), line=rarityLine(id);
@@ -7000,8 +7073,8 @@ async function makeMatchStory(st,font){
 /* ---------- Coming from a friend's shared shelf: rank the same topic right away, then see the match ---------- */
 function startVs(vs){
   PASS.add(vs.cat);
-  if(eff(vs.cat,CURRENT)){ ui.tab='friends'; ui.profile=vs.id; ui.compare=null; render(); openVsResult(vs.id,vs.cat); return; }
-  ui.tab='me'; render(); openEditor(vs.cat,false); ed.vs=vs; renderEditor(); toast(`You and ${vs.name} are now friends`);
+  if(eff(vs.cat,CURRENT)){ navTo({tab:'friends',profile:vs.id},{quiet:true}); openVsResult(vs.id,vs.cat); return; }
+  navTo({tab:'me'},{quiet:true}); render(); openEditor(vs.cat,false); ed.vs=vs; renderEditor(); toast(`You and ${vs.name} are now friends`);
 }
 function openVsResult(fid,c){
   const f=FRIENDS.find(x=>x.id===fid), mine=eff(c,CURRENT); if(!f||!mine||!CAT[c]) return;
@@ -7275,10 +7348,11 @@ function loadAll(urls,ms){
     urls=[...new Set(urls)]; if(!urls.length) return res();
     let n=urls.length; const t=setTimeout(res,ms);
     const done=()=>{ if(--n<=0){ clearTimeout(t); res(); } };
-    urls.forEach(u=>{ const im=new Image(); im.decoding='async'; im.onload=im.onerror=done; im.src=u; BOOT_KEEP.push(im); });
+    urls.forEach(u=>{ const im=new Image(); im.decoding='async'; im.onload=()=>{ IMG_OK.add(u); done(); }; im.onerror=done; im.src=u; BOOT_KEEP.push(im); });
   });
 }
 async function preloadForBoot(){
+  try{ (window.__pre||[]).forEach(im=>{ if(im.complete&&im.naturalWidth) IMG_OK.add(im.src); }); }catch(e){}
   try{
     const shelf=[]; for(const c of state.order){ const e=eff(c,CURRENT); if(!e) continue; for(const it of (e.snap.top||[]).slice(0,5)){ const p=photo(c,it.n); if(p) shelf.push(dispSrc(c,p.src)); } }
     await loadAll(shelf,2000);
@@ -7328,7 +7402,7 @@ async function enter(user){
     document.body.classList.add('in');
     const fresh = joined && !joined.err && !shelfList(CURRENT).length;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
-    render(); window.scrollTo(0,0); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500); setTimeout(()=>loadUnlocks(true),900);
+    render(); window.scrollTo(0,0); navInit(); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500); setTimeout(()=>loadUnlocks(true),900);
     if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && localStorage.getItem('palate-onboard') && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     const vs = joined&&!joined.err&&joined.id&&joined.cat&&CAT[joined.cat] ? {id:joined.id,name:joined.name,cat:joined.cat} : null;
     if(vs) startVs(vs);
@@ -7347,9 +7421,22 @@ function initials(n){ const w=n.replace(/[^\p{L}\p{N}\s]/gu,' ').trim().split(/\
 const pkey = (c,n) => c+'|'+n;
 const photo = (c,n) => state.photos[pkey(c,n)] || shared[pkey(c,n)] || AUTO.map[pkey(c,n)];
 const cssUrl = u => String(u).replace(/'/g,'%27').replace(/[()"\\\s]/g, ch=>encodeURIComponent(ch));
+/* Pictures fade in once loaded, over a soft colour taken from the picture, so nothing pops or jumps. Pictures already seen show at once. */
+const IMG_OK = new Set();
+function photoSpan(cat, url, size, label, h){
+  const shape=CAT[cat]?.shape||'square', u=dispSrc(cat,url);
+  return `<span class="art photo${IMG_OK.has(u)?' ld':''}${PERSON_CATS.has(cat)?' pp':''} sh-${shape} sz-${size}" style="--ah:${h==null?hue(label||''):Math.round(h)};background-image:url('${cssUrl(u)}')" data-src="${esc(u)}" role="img" aria-label="${esc(label||'')}"></span>`;
+}
+function watchImg(el){
+  const u=el.dataset.src; if(!u || el.dataset.w) return; el.dataset.w='1';
+  const done=ok=>{ if(ok) IMG_OK.add(u); document.querySelectorAll('.art.photo:not(.ld)').forEach(x=>{ if(x.dataset.src===u) x.classList.add(ok?'ld':'ld-err'); }); };
+  if(IMG_OK.has(u)){ el.classList.add('ld'); return; }
+  const im=new Image(); im.decoding='async'; im.onload=()=>{ (im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(()=>done(true)); }; im.onerror=()=>done(false); im.src=u;
+  if(im.complete && im.naturalWidth){ IMG_OK.add(u); el.classList.add('ld','now'); }
+}
 function art(name, cat, size, noh){
   const shape=CAT[cat]?.shape||'square', p=photo(cat,name);
-  if(p) return `<span class="art photo sh-${shape} sz-${size}" style="background-image:url('${cssUrl(dispSrc(cat,p.src))}')" role="img" aria-label="${esc(name)}"></span>`;
+  if(p) return photoSpan(cat,p.src,size,name,p.h);
   return `<span class="art sh-${shape} sz-${size}" style="--ah:${hue(name)}" data-c="${esc(cat)}" data-n="${esc(name)}"${noh?' data-noh="1"':''} aria-hidden="true"><b>${esc(initials(name))}</b></span>`;
 }
 function tint(c,name){ const p=photo(c,name); return p?`--h:${p.h};--ts:${Math.round(Math.min(65,Math.max(16,p.s)))}%`:`--h:${hue(name)}`; }
@@ -7386,7 +7473,14 @@ function change(item,i,prev){
 /* who else ranked this */
 function sharers(c, n){ const out=[]; FRIENDS.forEach(f=>{ const s=f.shelves[c]; if(!s) return; const i=s.top.findIndex(x=>x.n===n); if(i>=0) out.push({f,label:'#'+(i+1)}); else if(s.hm.some(x=>x.n===n)) out.push({f,label:'HM'}); }); return out; }
 function shelfSharers(c, s){ const set=new Map(); s.top.forEach(it=>sharers(c,it.n).forEach(x=>set.set(x.f.id,x.f))); return [...set.values()]; }
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2400); }
+/* Short message at the bottom. With an action (like Undo) it stays a little longer. */
+function toast(msg, act){
+  const t=$('#toast'); t.hidden=false; t.textContent='';
+  const sp=document.createElement('span'); sp.textContent=msg; t.appendChild(sp);
+  if(act&&act.label){ const b=document.createElement('button'); b.type='button'; b.textContent=act.label; b.onclick=()=>{ clearTimeout(toast._t); t.classList.remove('on'); haptic(); try{ act.fn(); }catch(e){ console.error(e); } }; t.appendChild(b); }
+  t.classList.remove('on'); void t.offsetWidth; t.classList.add('on');
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'), act?5200:2600);
+}
 
 function row(it,i,c,prev,extra){ return `<li class="row"><span class="rk">${i+1}</span>${art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${extra?extra(it):''}</div>${change(it,i,prev)}</li>`; }
 function emptyRow(i){ return `<li class="row empty"><span class="rk">${i+1}</span><span class="ghost-art"></span><div class="nm"><b>—</b></div><span></span></li>`; }
@@ -7602,7 +7696,7 @@ async function altCandidates(c,n,sub,onUpdate){
 function altPanel(){
   const a=ed.alt; if(!a) return '';
   const body = !a.list ? '<p class="muted">Looking for pictures…</p>' : !a.list.length ? '<p class="muted">Nothing found. Tap the picture to upload your own.</p>'
-    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt${x.current?' cur':''}" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}"><span class="art photo sh-${CAT[ed.cat]?.shape||'square'} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,x.img))}')"></span><small>${esc(x.current?'Current':String(x.label).split(' · ')[0])}</small></button>`).join('')}</div>`;
+    : `<div class="alt-grid">${a.list.map((x,i)=>`<button type="button" class="alt-opt${x.current?' cur':''}" data-act="alt-pick" data-i="${i}" title="${esc(x.label)}">${photoSpan(ed.cat,x.img,'alt',x.label)}<small>${esc(x.current?'Current':String(x.label).split(' · ')[0])}</small></button>`).join('')}</div>`;
   return `<div class="alt-panel"><div class="alt-head"><b>Pick the right picture</b><button type="button" class="linkish" data-act="alt-close">Close</button></div><p class="muted" style="margin:0 0 8px;font-size:12.5px">Current picture first, then the best matches, then more to choose from.</p>${body}</div>`;
 }
 async function wikiTitleImage(c,n){
@@ -7860,12 +7954,14 @@ function scheduleRerender(){ clearTimeout(rerenderT); rerenderT=setTimeout(funct
 function applyImg(c,n){
   const p=photo(c,n); if(!p) return;
   document.querySelectorAll('.art[data-n]:not(.photo)').forEach(el=>{ if(el.dataset.c===c && el.dataset.n===n){
-    el.classList.add('photo'); el.style.backgroundImage=`url('${cssUrl(dispSrc(c,p.src))}')`; el.textContent=''; el.setAttribute('role','img'); el.setAttribute('aria-label',n); el.removeAttribute('aria-hidden'); } });
+    const u=dispSrc(c,p.src); el.classList.add('photo'); if(PERSON_CATS.has(c)) el.classList.add('pp'); el.dataset.src=u; delete el.dataset.w; el.style.setProperty('--ah',Math.round(p.h||hue(n))); el.style.backgroundImage=`url('${cssUrl(u)}')`; el.textContent=''; watchImg(el); el.setAttribute('role','img'); el.setAttribute('aria-label',n); el.removeAttribute('aria-hidden'); } });
   scheduleRerender();
 }
 function hydrate(){
+  document.querySelectorAll('.art.photo:not(.ld):not(.ld-err)').forEach(watchImg);
   if(!me) return;
   const seen=new Set();
+  document.querySelectorAll('.art.photo:not(.ld):not(.ld-err)').forEach(watchImg);
   document.querySelectorAll('.art[data-n]:not(.photo):not([data-noh])').forEach(el=>{ const c=el.dataset.c, n=el.dataset.n, k=pkey(c,n); if(seen.has(k)) return; seen.add(k); if(photo(c,n)) applyImg(c,n); else enqueue(c,n); });
 }
 let hydrateT=null;
@@ -7918,8 +8014,8 @@ function meDyn(){
 function viewMe(){
   const y=ui.year;
   return `<section class="profile">
-    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p></div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
-    ${badgeRow(me&&me.id)}
+    <div class="who">${meAv(true)}<div><h1>${esc(state.name)}</h1><p id="count">${shelfList(y).length} shelves · ${FRIENDS.length} friend${FRIENDS.length===1?'':'s'}</p>${badgeRow(me&&me.id,'wide-only')}</div>${shelfList(CURRENT,'friends').length?`<button class="pill soft sm" style="margin-left:auto" data-act="share-profile">Share profile</button>`:''}</div>
+    ${badgeRow(me&&me.id,'narrow-only')}
     ${unlockedCard()}
     <div class="controls">
       <div class="seg" role="group" aria-label="Preview your profile as">${[['me','Me'],['close','Close friends'],['friends','Friends']].map(([v,l])=>`<button data-act="view" data-v="${v}" aria-pressed="${ui.view===v}">${l}</button>`).join('')}</div>
@@ -8016,12 +8112,22 @@ function viewRecap(){
 /* ---------- Sheets ---------- */
 let lastFocus=null, ed=null, pk=null, sheetKind=null, detailArgs=null;
 function sheet(html, kind, keep){
-  const root=$('#sheet-root'); if(!root.firstChild) lastFocus=document.activeElement;
+  const root=$('#sheet-root'), fresh=!root.firstChild; if(fresh) lastFocus=document.activeElement;
   const old=keep && root.querySelector('.sheet'), top=old?old.scrollTop:0;     /* re-rendering the same sheet keeps your scroll position */
-  sheetKind=kind; root.innerHTML=`<div class="scrim" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; document.body.style.overflow='hidden';
+  sheetKind=kind; root.innerHTML=`<div class="scrim${fresh?'':' still'}" data-act="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; document.body.style.overflow='hidden';
   if(old){ const n=root.querySelector('.sheet'); if(n) n.scrollTop=top; }
+  if(fresh) syncHistory();
 }
-function closeSheet(){ $('#sheet-root').innerHTML=''; document.body.style.overflow=''; ed=null; pk=null; sheetKind=null; try{lastFocus&&lastFocus.focus();}catch(e){} }
+/* Closing slides the sheet away: the old one is moved out of the way to animate, so a new sheet can open at once. */
+function closeSheet(fromBack){
+  const root=$('#sheet-root'), sc=root.firstElementChild;
+  if(sc && !reduceMotion()){
+    sc.classList.add('out'); sc.removeAttribute('data-act'); sc.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id')); sc.setAttribute('aria-hidden','true');
+    document.body.appendChild(sc); setTimeout(()=>sc.remove(),340);
+  }
+  root.innerHTML=''; document.body.style.overflow=''; ed=null; pk=null; sheetKind=null; try{lastFocus&&lastFocus.focus({preventScroll:true});}catch(e){}
+  if(sc) syncHistory();
+}
 function frTags(c){ return it=>{ const sh=sharers(c,it.n); return (sh.length?`<div class="also-fr">${sh.map(x=>`<span class="fr-tag">${av(x.f)}${esc(first(x.f))} ${x.label}</span>`).join('')}</div>`:'') + (it.why?`<p class="why">${esc(it.why)}</p>`:''); }; }
 function photoBtn(c,n,size){ return `<button type="button" class="art-btn" data-act="photo" data-cat="${c}" data-n="${esc(n)}" aria-label="${photo(c,n)?'Change':'Add'} photo for ${esc(n)}">${art(n,c,size)}<span class="hint">${photo(c,n)?'Edit':'+ Photo'}</span></button>`; }
 
@@ -8175,9 +8281,13 @@ function openStory(kind,c,mcat){
       <button class="pill soft" data-act="story-copy-link">Copy message</button>
       <button class="pill soft" data-act="story-sms">Text a friend</button>
     </div><p class="story-msg">“${esc(shareMsg())}”</p><p id="story-hint" class="story-hint"></p></div>`;
-  renderStory();
+  renderStory(); syncHistory();
 }
-function closeStory(){ const box=$('#story-root'); if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null; if(box) box.remove(); if(!$('#sheet-root').firstChild) document.body.style.overflow=''; }
+function closeStory(){
+  const box=$('#story-root'), was=!!sty; if(sty&&sty.url) URL.revokeObjectURL(sty.url); sty=null;
+  if(box){ if(reduceMotion()) box.remove(); else { box.id=''; box.classList.add('out'); setTimeout(()=>box.remove(),300); } }
+  if(!$('#sheet-root').firstChild) document.body.style.overflow=''; if(was) syncHistory();
+}
 function storyFile(){ const nm=sty.kind==='shelf'?sty.cat:sty.kind==='match'?'match':'profile'; return new File([sty.blob],'palate-'+nm+'.png',{type:'image/png'}); }
 /* The short note that goes with anything shared: iMessage, Instagram, WhatsApp, and so on. The link inside it opens straight into ranking the same topic. */
 /* A category's name inside a sentence: "Fast food" -> "fast food", but keep "NBA, NFL & MLB teams", "Pokémon", "K-dramas". */
@@ -8237,7 +8347,7 @@ const rfKey=(c,it)=>c+'|'+normT(it.n)+'|'+normT(it.s||'');
 function resArt(it){
   const k0=photo(ed.cat,it.n); const rf=REFINED.get(rfKey(ed.cat,it));
   const best=(k0&&k0.src)||rf; if(best) it={...it,img:best};
-  if(it.img){ const shape=CAT[ed.cat]?.shape||'square'; return `<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(dispSrc(ed.cat,it.img))}')" role="img" aria-label="${esc(it.n)}"></span>`; }
+  if(it.img) return photoSpan(ed.cat,it.img,'sm',it.n,k0&&k0.h);
   return art(it.n,ed.cat,'sm',true);
 }
 function resBtn(it,k,q,right){ return `<li><button type="button" class="res" data-act="pick" data-k="${k}" data-rf="${esc(rfKey(ed.cat,it))}">${resArt(it)}<div class="nm"><b>${q?hl(it.n,q):esc(it.n)}</b><span>${esc(it.s)}</span></div><span class="add">${right||''}Add</span></button></li>`; }
@@ -8576,7 +8686,7 @@ function refineResults(){
 }
 function rfPump(){
   while(rfRunning<3 && rfQ.length){ const [c,it,k]=rfQ.shift(); rfRunning++;
-    findImage(c,it.n,it.s).then(r=>{ if(r&&r.url){ REFINED.set(k,r.url); if(ed&&ed.cat===c){ document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a&&a.classList.contains('photo')) a.style.backgroundImage=`url('${cssUrl(dispSrc(c,r.url))}')`; else if(a){ const shape=CAT[c]?.shape||'square'; a.outerHTML=`<span class="art photo sh-${shape} sz-sm" style="background-image:url('${cssUrl(dispSrc(c,r.url))}')" role="img" aria-label="${esc(it.n)}"></span>`; } } }); } } })
+    findImage(c,it.n,it.s).then(r=>{ if(r&&r.url){ REFINED.set(k,r.url); if(ed&&ed.cat===c){ document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a) a.outerHTML=photoSpan(c,r.url,'sm',it.n); } }); } } })
       .catch(()=>{}).finally(()=>{ rfRunning--; rfPump(); }); }
 }
 function results(){
@@ -8655,7 +8765,7 @@ function move(i,dir){
 function addItem(it){
   let k=ed.slots.findIndex((s,i)=>i<5&&!s); if(k<0) k=ed.slots.findIndex((s,i)=>i>=5&&!s);
   if(k<0){ toast('Full. Remove one first.'); return; }
-  ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; ed.live=[]; ed.liveQ='';
+  ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; ed.live=[]; ed.liveQ=''; haptic();
   if(NAT_CATS.has(ed.cat) && !isNat(it.s) && !isNat(it.n)){
     const cat=ed.cat, slot=ed.slots[k];
     findNative(cat,it.n,it.s).then(nm=>{ if(nm && ed && ed.cat===cat && ed.slots.includes(slot) && !isNat(slot.s)){ slot.s=[nm,slot.s].filter(Boolean).join(' · '); renderEditor(); } }).catch(()=>{});
@@ -8670,20 +8780,22 @@ function addItem(it){
   setTimeout(()=>$('#ed-q')?.focus(),20);
 }
 function saveEditor(next){
+  if(ed.slots.slice(0,5).some(Boolean)) haptic('success');
   const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
   const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
   const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c), firstEver=!state.order.length; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
-  save(); if(isNew&&firstEver&&!vs&&!next){ setTimeout(afterFirstShelf,400); } else setTimeout(()=>loadUnlocks(true),2600); ui.tab='me'; ui.year=CURRENT; ui.view='me'; render();
+  save(); if(isNew&&firstEver&&!vs&&!next){ setTimeout(afterFirstShelf,400); } else setTimeout(()=>loadUnlocks(true),2600); ui.year=CURRENT; ui.view='me'; if(ui.tab!=='me'||ui.profile||ui.compare) navTo({tab:'me'},{quiet:true}); else render();
   if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(vs&&vs.cat===c){ toast('Saved'); setTimeout(()=>openVsResult(vs.id,c),250); } else if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
 function removeShelf(){
-  const c=ed.cat, sh=state.shelves[c];
+  const c=ed.cat, sh=state.shelves[c], keep=JSON.parse(JSON.stringify(sh)), order=state.order.slice();
   if(Object.keys(sh.years).some(y=>+y!==CURRENT)) sh.years[CURRENT]={top:[],hm:[],removed:true};
   else { delete state.shelves[c]; state.order=state.order.filter(x=>x!==c); }
-  save(); closeSheet(); render(); toast('Removed');
+  haptic('warn'); save(); closeSheet(); render();
+  toast(`Removed ${CAT[c].name}`,{label:'Undo',fn:()=>{ state.shelves[c]=keep; state.order=order.filter(x=>state.shelves[x]); save(); render(); toast(`${CAT[c].name} is back`); }});
 }
 
 /* Photos: cropped square, downsized, and sampled for the card tint */
@@ -8761,6 +8873,7 @@ function openManage(){
 const GRIP_SVG='<svg viewBox="0 0 10 16" aria-hidden="true"><g fill="currentColor"><circle cx="2" cy="2" r="1.5"/><circle cx="8" cy="2" r="1.5"/><circle cx="2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="2" cy="14" r="1.5"/><circle cx="8" cy="14" r="1.5"/></g></svg>';
 function grip(label){ return `<button type="button" class="grip" aria-label="Drag to move ${esc(label)}. Arrow keys also move it.">${GRIP_SVG}</button>`; }
 function commitDrop(zone){
+  haptic();
   const items=[...zone.querySelectorAll('.dz-item')];
   if(zone.dataset.dz==='arrange'){
     const list=items.map(x=>x.dataset.cat); const rest=state.order.filter(x=>!list.includes(x));
@@ -8849,6 +8962,140 @@ function rememberImages(){
     }catch(e){}
   },600);
 }
+/* ---------- Moving around: screens slide, the back button and swipe-back work, and taps can give a small vibration ----------
+   The browser history always mirrors where you are: your shelf, then a tab, then a friend's profile or comparison, then an open sheet.
+   After anything changes, syncHistory() lines the history up with that list, so Back closes a sheet first, then steps back through
+   screens, and Back from any tab lands on your shelf. */
+const TABS = ['me','friends','recap'];
+const NAV = {i:0, busy:false, want:false, edgeT:0, t:0, ready:false};
+const reduceMotion = () => { try{ return matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
+const overlayOpen = () => !!(sty || $('#sheet-root .scrim'));
+function navStack(){
+  const L=[{tab:'me',profile:null,compare:null}];
+  if(ui.tab!=='me') L.push({tab:ui.tab,profile:null,compare:null});
+  if(ui.tab==='friends' && ui.profile) L.push({tab:'friends',profile:ui.profile,compare:null});
+  if(ui.tab==='friends' && ui.compare) L.push({tab:'friends',profile:ui.profile||null,compare:ui.compare});
+  if(overlayOpen()) L.push({...L[L.length-1],ov:true});
+  return L;
+}
+function syncHistory(){ if(!me || !NAV.ready || NAV.t) return; NAV.t=setTimeout(()=>{ NAV.t=0; reconcile(); },0); }
+function reconcile(){
+  if(NAV.busy){ NAV.want=true; return; }
+  const L=navStack(), D=L.length-1, st=k=>({pl:1,i:k,ov:false,...L[k]});
+  try{
+    if(D<NAV.i){ NAV.busy=true; NAV.want=true; history.go(D-NAV.i); setTimeout(()=>{ if(NAV.busy){ NAV.busy=false; reconcile(); } },900); return; }
+    history.replaceState(st(NAV.i),'');
+    for(let k=NAV.i+1;k<=D;k++) history.pushState(st(k),'');
+    NAV.i=D;
+  }catch(e){}
+}
+function navInit(){ NAV.ready=true; try{ const s=history.state; NAV.i=(s&&s.pl)?(s.i|0):0; }catch(e){ NAV.i=0; } reconcile(); }
+const depthOf = s => s.tab==='me'?0:s.compare?3:s.profile?2:1;
+/* Go to a screen. It slides in from the right when you go forward or deeper, from the left when you go back. */
+function navTo(next, opts={}){
+  const from={tab:ui.tab,profile:ui.profile||null,compare:ui.compare||null};
+  const to={tab:next.tab||ui.tab, profile:next.profile||null, compare:next.compare||null};
+  if(from.tab===to.tab && from.profile===to.profile && from.compare===to.compare){ if(!opts.fromPop && !opts.quiet) window.scrollTo({top:0,behavior:reduceMotion()?'auto':'smooth'}); return; }
+  let dir=opts.dir;
+  if(dir===undefined) dir = from.tab!==to.tab && depthOf(from)<=1 && depthOf(to)<=1 ? Math.sign(TABS.indexOf(to.tab)-TABS.indexOf(from.tab)) : Math.sign(depthOf(to)-depthOf(from));
+  Object.assign(ui,to);
+  render(); window.scrollTo(0,0); slideView(dir);
+  if(!opts.fromPop && !opts.quiet) haptic();
+}
+function slideView(dir){
+  const v=$('#view'); if(!v || reduceMotion()) return;
+  v.style.transition=''; v.style.transform=''; v.style.opacity='';
+  v.classList.remove('v-r','v-l','v-up'); void v.offsetWidth;
+  v.classList.add(dir>0?'v-r':dir<0?'v-l':'v-up');
+  clearTimeout(slideView.t); slideView.t=setTimeout(()=>v.classList.remove('v-r','v-l','v-up'),560);
+}
+function goBack(){
+  if(NAV.i>0 && !NAV.busy){ try{ history.back(); return; }catch(e){} }
+  if(ui.compare) navTo({tab:'friends',profile:ui.profile}); else if(ui.profile) navTo({tab:'friends'}); else if(ui.tab!=='me') navTo({tab:'me'});
+}
+addEventListener('popstate',e=>{
+  const s=(e.state&&e.state.pl)?e.state:{i:0,tab:'me',profile:null,compare:null};
+  if(NAV.busy){ NAV.busy=false; NAV.i=s.i|0; if(NAV.want){ NAV.want=false; reconcile(); } return; }
+  NAV.i=s.i|0;
+  if(!me || !document.body.classList.contains('in')) return;
+  if(sty){ closeStory(true); syncHistory(); return; }
+  if($('#sheet-root .scrim')){ closeSheet(true); syncHistory(); return; }
+  const native = Date.now()-NAV.edgeT<800;   /* Safari already animated its own edge swipe */
+  navTo({tab:s.tab||'me',profile:s.profile,compare:s.compare},{fromPop:true,quiet:true,dir:native?0:undefined});
+  if(native){ const v=$('#view'); if(v) v.classList.remove('v-r','v-l','v-up'); }
+  syncHistory();
+});
+
+/* Swipe sideways to move between Shelf, Friends and Recap; on a friend's profile, swipe right to go back. */
+(function swipes(){
+  let s=null;
+  const blocked = t => t.closest('input,textarea,select,.grip,.stories,.alt-grid,.pf-art,.seg,.years,[data-noswipe]');
+  addEventListener('touchstart',e=>{
+    if(e.touches.length!==1){ s=null; return; }
+    const t=e.touches[0];
+    if(t.clientX<24 || t.clientX>innerWidth-24){ NAV.edgeT=Date.now(); s=null; return; }   /* leave the screen edges to the browser */
+    if(!me || !document.body.classList.contains('in') || $('#sheet-root .scrim') || sty || document.body.classList.contains('dragging') || blocked(e.target) || innerWidth>900){ s=null; return; }
+    s={x:t.clientX,y:t.clientY,t:Date.now(),lock:0,dx:0};
+  },{passive:true});
+  addEventListener('touchmove',e=>{
+    if(!s) return; const t=e.touches[0], dx=t.clientX-s.x, dy=t.clientY-s.y;
+    if(!s.lock){ if(Math.abs(dx)<10 && Math.abs(dy)<10) return; s.lock=Math.abs(dx)>Math.abs(dy)*1.3?1:-1; }
+    if(s.lock<0) return;
+    const i=TABS.indexOf(ui.tab), sub=!!(ui.profile||ui.compare);
+    const can = dx>0 ? (sub || i>0) : (!sub && i<TABS.length-1);
+    s.dx = can ? dx : dx*.18;
+    const v=$('#view'); if(v){ v.style.transition='none'; v.style.transform=`translate3d(${s.dx*.45}px,0,0)`; v.style.opacity=String(1-Math.min(.35,Math.abs(s.dx)/900)); }
+  },{passive:true});
+  const end=()=>{
+    if(!s) return; const st=s; s=null; const v=$('#view'); if(!v || st.lock<1) return;
+    const fast=Math.abs(st.dx)/Math.max(1,Date.now()-st.t)>.45, go=Math.abs(st.dx)>80 || (fast && Math.abs(st.dx)>30);
+    const i=TABS.indexOf(ui.tab), sub=!!(ui.profile||ui.compare);
+    if(go && st.dx>0 && sub){ v.style.transition=''; v.style.transform=''; v.style.opacity=''; haptic(); goBack(); return; }
+    if(go && st.dx>0 && i>0){ v.style.transition=''; v.style.transform=''; v.style.opacity=''; navTo({tab:TABS[i-1]}); return; }
+    if(go && st.dx<0 && !sub && i<TABS.length-1){ v.style.transition=''; v.style.transform=''; v.style.opacity=''; navTo({tab:TABS[i+1]}); return; }
+    v.style.transition='transform .34s var(--ease-out),opacity .34s var(--ease-out)'; v.style.transform=''; v.style.opacity='';
+    setTimeout(()=>{ v.style.transition=''; },360);
+  };
+  addEventListener('touchend',end,{passive:true}); addEventListener('touchcancel',end,{passive:true});
+})();
+
+/* Pull a sheet down to close it, like on iPhone. Starts only when the sheet is scrolled to the top and you pull downwards. */
+(function sheetDrag(){
+  let d=null;
+  addEventListener('touchstart',e=>{
+    const sh=e.target.closest && e.target.closest('#sheet-root .sheet');
+    if(!sh || innerWidth>640 || e.touches.length!==1 || e.target.closest('input,textarea,select,.grip,[data-noswipe]') || document.body.classList.contains('dragging')){ d=null; return; }
+    d={sh, sc:sh.parentElement, y:e.touches[0].clientY, x:e.touches[0].clientX, t:Date.now(), dy:0, lock:0, top:sh.scrollTop};
+  },{passive:true});
+  addEventListener('touchmove',e=>{
+    if(!d) return; const dy=e.touches[0].clientY-d.y, dx=e.touches[0].clientX-d.x;
+    if(!d.lock){ if(Math.abs(dy)<8 && Math.abs(dx)<8) return; d.lock = (dy>0 && Math.abs(dy)>Math.abs(dx) && d.sh.scrollTop<=0 && d.top<=0) ? 1 : -1; }
+    if(d.lock<0) return;
+    d.dy=Math.max(0,dy); d.sh.style.transition='none'; d.sh.style.transform=`translate3d(0,${d.dy}px,0)`; d.sc.style.transition='none'; d.sc.style.opacity=String(1-Math.min(.6,d.dy/600));
+  },{passive:true});
+  const end=()=>{
+    if(!d) return; const g=d; d=null; if(g.lock<1) return;
+    const v=g.dy/Math.max(1,Date.now()-g.t);
+    if(g.dy>120 || (v>.5 && g.dy>40)){ haptic(); closeSheet(); return; }
+    g.sh.style.transition='transform .36s var(--ease-out)'; g.sh.style.transform=''; g.sc.style.transition='opacity .3s'; g.sc.style.opacity='';
+    setTimeout(()=>{ g.sh.style.transition=''; g.sc.style.transition=''; },380);
+  };
+  addEventListener('touchend',end,{passive:true}); addEventListener('touchcancel',end,{passive:true});
+})();
+
+/* A light tap of vibration. Android vibrates; iPhone Safari has no vibration API, but toggling a hidden switch gives the same system tap.
+   It only works straight after a tap, so it is used for taps, not for things that finish later. */
+let hapticEl=null;
+function haptic(kind){
+  try{
+    if(prefs().haptics===false) return;
+    if(IS_IOS){
+      if(!hapticEl){ hapticEl=document.createElement('label'); hapticEl.setAttribute('aria-hidden','true'); hapticEl.style.cssText='position:fixed;left:-200px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; hapticEl.innerHTML='<input type="checkbox" switch tabindex="-1">'; document.body.appendChild(hapticEl); }
+      hapticEl.click(); if(kind==='success') setTimeout(()=>{ try{ hapticEl.click(); }catch(e){} },110);
+    } else if(navigator.vibrate) navigator.vibrate(kind==='success'?[10,60,14]:kind==='warn'?[18,40,18]:8);
+  }catch(e){}
+}
+
 function render(){
   $('#view').innerHTML = ui.tab==='friends'?viewFriends():ui.tab==='recap'?viewRecap():viewMe();
   document.querySelectorAll('.tab[data-tab], .bottom-nav [data-tab]').forEach(b=>{ if(b.dataset.tab===ui.tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
@@ -8857,6 +9104,7 @@ function render(){
   if(ui.tab==='friends'){ try{ localStorage.setItem(seenKey,String(Date.now())); }catch(e){} }
   const nu = ui.tab==='friends' ? 0 : unreadUpdates();
   document.querySelectorAll('[data-tab="friends"]').forEach(b=>{ if(nu) b.dataset.new=nu; else b.removeAttribute('data-new'); });
+  syncHistory();
 }
 
 
@@ -8866,7 +9114,7 @@ document.addEventListener('click',e=>{
   if(a==='scrim'){ if(e.target===el) closeSheet(); return; }
   if(a==='story-bg'){ if(e.target===el) closeStory(); return; }
   switch(a){
-    case 'tab': ui.tab=el.dataset.tab; ui.compare=null; ui.profile=null; render(); window.scrollTo(0,0); break;
+    case 'tab': navTo({tab:el.dataset.tab}); break;
     case 'view': ui.view=el.dataset.v; render(); break;
     case 'compare-m': break;
     case 'open': openDetail(el.dataset.cat); break;
@@ -8895,13 +9143,13 @@ document.addEventListener('click',e=>{
     case 'pick-cat': openEditor(el.dataset.cat); break;
     case 'manage': openManage(); break;
     case 'close': closeSheet(); break;
-    case 'compare': ui.profile=(ui.tab==='friends'&&ui.profile===el.dataset.f)?ui.profile:null; ui.tab='friends'; ui.compare=el.dataset.f; render(); window.scrollTo(0,0); break;
-    case 'profile': closeSheet(); ui.tab='friends'; ui.profile=el.dataset.f; ui.compare=null; render(); window.scrollTo(0,0); break;
-    case 'back-friends': if(ui.compare) ui.compare=null; else ui.profile=null; render(); break;
+    case 'compare': navTo({tab:'friends',profile:(ui.tab==='friends'&&ui.profile===el.dataset.f)?ui.profile:null,compare:el.dataset.f}); break;
+    case 'profile': closeSheet(); navTo({tab:'friends',profile:el.dataset.f}); break;
+    case 'back-friends': goBack(); break;
     case 'person': openPerson(el.dataset.id); break;
     case 'badge': openBadge(el.dataset.b,el.dataset.u); break;
     case 'share-match': openStory('match',el.dataset.f,el.dataset.cat); break;
-    case 'vs-profile': closeSheet(); ui.tab='friends'; ui.profile=el.dataset.f; ui.compare=null; render(); window.scrollTo(0,0); break;
+    case 'vs-profile': closeSheet(); navTo({tab:'friends',profile:el.dataset.f}); break;
     case 'year-now': $('#year').value=CURRENT; setYear(CURRENT); break;
     case 'alt-photo': { const n=el.dataset.n, it=ed.slots.find(x=>x&&x.n===n); if(!it) break; const cat=ed.cat; ed.alt={n,list:null}; renderEditor();
       const live=list=>{ if(ed && ed.cat===cat && ed.alt && ed.alt.n===n && list.length>(ed.alt.list||[]).length){ ed.alt.list=list; renderEditor(); } };
@@ -8914,7 +9162,8 @@ document.addEventListener('click',e=>{
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
     case 'custom': { const n=ed.query.trim(); if(!n) break; addCustom(ed.cat,n); break; }
-    case 'rm': ed.slots[+el.dataset.i]=null; compact(); renderEditor(); break;
+    case 'rm': { const i=+el.dataset.i, it=ed.slots[i]; if(!it) break; const before=ed.slots.map(x=>x&&{...x}), cat=ed.cat; ed.slots[i]=null; compact(); renderEditor();
+      toast(`Removed ${it.n}`,{label:'Undo',fn:()=>{ if(ed && ed.cat===cat){ ed.slots=before; renderEditor(); } }}); break; }
     case 'save': saveEditor(); break;
     case 'save-next': saveEditor(el.dataset.next); break;
     case 'del-ask': ed.confirm=true; renderEditor(); break;
@@ -8954,7 +9203,7 @@ document.addEventListener('click',e=>{
     case 'remove-friend': {
       if(el.dataset.armed!=='1'){ el.dataset.armed='1'; el.textContent='Tap again to remove'; setTimeout(()=>{ if(el.isConnected){ el.dataset.armed=''; el.textContent='Remove friend'; } },3000); break; }
       const f=FRIENDS.find(x=>x.id===el.dataset.f); if(!f) break;
-      sb.rpc('remove_friend',{fid:f.id}).then(async r=>{ if(r.error){ toast("Couldn't remove that friend"); return; } ui.compare=null; ui.profile=null; await loadFriends(); render(); toast(`Removed ${first(f)}`); }); break; }
+      sb.rpc('remove_friend',{fid:f.id}).then(async r=>{ if(r.error){ toast("Couldn't remove that friend"); return; } await loadFriends(); ui.compare=null; ui.profile=null; render(); slideView(-1); toast(`Removed ${first(f)}`); }); break; }
   }
 });
 document.addEventListener('change',e=>{
