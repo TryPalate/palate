@@ -332,6 +332,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .shelves + .capsule{margin-top:-28px}
 .slim{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:8px 8px 8px 16px;border-radius:16px;background:var(--card)}
 .slim-t{display:flex;flex-direction:column;min-width:0;flex:1}.slim-t b{font-size:14.5px;font-weight:600;line-height:1.25}.slim-t small{font-size:12.5px;color:var(--muted);line-height:1.3}
+.rerank{flex-wrap:wrap;padding:12px 8px 12px 16px}.rr-act{display:flex;gap:8px;flex-basis:100%;order:3;padding-top:2px}
 .slim-x{border:0;background:none;color:var(--muted);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;flex:none;position:relative}
 .slim-x::after{content:'';position:absolute;inset:-6px}
 .lately-strip h2{display:flex;justify-content:space-between;align-items:center}
@@ -6884,6 +6885,7 @@ let me = null;                                   /* {id, name, invite} */
 let state = {name:'', shelves:{}, order:[], vis:{}, photos:{}, custom:{}};
 let FRIENDS = [], UPDATES = [], shared = {};      /* friends' shelves, activity, and their photos */
 const KEY = 'palate-v3';
+let RANKED = {};   /* shelf -> when its picks last changed */
 const LOGO_H1 = '<h1 class="logo" aria-label="Palate"><svg class="mark" viewBox="0 0 1048 300" aria-hidden="true"><use href="#pl-logo"/></svg></h1>';
 const BOOT_HTML = '<div class="boot" role="status" aria-label="Loading Palate"><svg class="b-pol" viewBox="0 0 48 58" aria-hidden="true"><use href="#pl-polaroid"/></svg><svg class="b-word" viewBox="0 0 304 100" aria-hidden="true"><use href="#pl-word"/></svg></div>';
 /* Light / dark: 'system' follows the device. Saved per device. */
@@ -7045,9 +7047,30 @@ addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredInstall=
 addEventListener('appinstalled',()=>{ deferredInstall=null; if(me){ refreshPromo(); } });
 const tipOff = k => { try{ return !!localStorage.getItem('palate-tip-'+k); }catch(e){ return false; } };
 function tipHide(k){ try{ localStorage.setItem('palate-tip-'+k,String(Date.now())); }catch(e){} }
+/* ---------- Re-rank prompts: taste changes, so a shelf you have not touched for about six months gets a gentle "still true?" ---------- */
+const RERANK_MS = 182*864e5, SNOOZE_MS = 30*864e5;
+const rrMemo = () => (state.custom && state.custom._rr) || {};
+function rerankDue(){
+  if(prefs().rerank===false || !me || ui.view!=='me' || ui.year!==CURRENT) return null;
+  const now=Date.now(), memo=rrMemo(); let best=null;
+  for(const c of shelfList(CURRENT)){
+    const ranked=RANKED[c]; if(!ranked) continue;                  /* no date known: never nag */
+    const m=memo[c]||{}, last=Math.max(ranked,m.still||0);
+    if(now-last<RERANK_MS || (m.snooze&&now<m.snooze)) continue;
+    if(!best || last<best.last) best={c,last};
+  }
+  return best;
+}
+function monthsAgo(t){ const m=Math.floor((Date.now()-t)/(30.44*864e5)); return m>=12?(m>=24?Math.floor(m/12)+' years':'a year'):m+' months'; }
+function rerankCard(){
+  const d=rerankDue(); if(!d) return '';
+  return `<div class="slim rerank"><span class="slim-t"><b>Still true? ${esc(CAT[d.c].name)}</b><small>You last changed it ${esc(monthsAgo(d.last))} ago</small></span><button class="slim-x" data-act="rr-later" data-cat="${d.c}" aria-label="Ask me later">✕</button><div class="rr-act"><button class="pill soft sm" data-act="rr-keep" data-cat="${d.c}">Yes, still true</button><button class="pill sm" data-act="rr-go" data-cat="${d.c}">Re-rank it</button></div></div>`;
+}
+function rrSet(c,patch){ state.custom._rr={...rrMemo(),[c]:{...(rrMemo()[c]||{}),...patch}}; save(); }
 function promoCard(){
   if(!me || ui.view!=='me' || ui.year!==CURRENT || !shelfList(CURRENT).length) return '';
   const x=k=>`<button class="slim-x" data-act="tip-x" data-k="${k}" aria-label="Dismiss">✕</button>`;
+  const rrc=rerankCard(); if(rrc) return rrc;
   const m=new Date().getMonth();
   if((m===11||m===0&&new Date().getDate()<=15) && !tipOff('wrap'+CURRENT))
     return `<div class="slim wrapnudge"><span class="slim-t"><b>Your ${CURRENT} is ready</b><small>Tap through your year and share it</small></span><button class="pill sm" data-act="wrap-play">Play</button>${x('wrap'+CURRENT)}</div>`;
@@ -7494,6 +7517,7 @@ function openAccount(sub){
   <h3 class="set-h">Feel</h3><div class="set-group">
     <div class="set-row"><span class="set-t">Appearance</span><div class="seg" role="group" aria-label="Appearance">${[['system','Auto'],['light','Light'],['dark','Dark']].map(([v,l])=>`<button data-act="theme" data-v="${v}" aria-pressed="${themePref()===v}">${l}</button>`).join('')}</div></div>
     ${swRow('Vibration on taps','A light tap when you move around and save','data-pref="haptics"',prefs().haptics!==false)}
+    ${swRow('Re-rank reminders','Asks if a shelf is still true after about six months','data-pref="rerank"',prefs().rerank!==false)}
   </div>
   <h3 class="set-h">Privacy</h3><div class="set-group">
     <label class="set-row"><span class="set-t">New shelves start as</span><select id="def-vis" class="set-sel" aria-label="New shelves start as">${Object.entries(VIS).map(([k,l])=>`<option value="${k}"${k===dv?' selected':''}>${l}</option>`).join('')}</select></label>
@@ -7808,7 +7832,7 @@ async function enter(user){
     const soft = q => q.then(r=>r,()=>({error:true}));
     const [pr,sh,ph,us,im,ci]=await Promise.all([
       sb.from('profiles').select('*').eq('id',me.id).maybeSingle(),
-      sb.from('shelves').select('cat,years,vis,pos').eq('user_id',me.id).order('pos'),
+      sb.from('shelves').select('cat,years,vis,pos,years_updated_at').eq('user_id',me.id).order('pos').then(r=>r.error?sb.from('shelves').select('cat,years,vis,pos').eq('user_id',me.id).order('pos'):r),
       sb.from('item_photos').select('cat,name,url,h,s').eq('user_id',me.id),
       sb.from('user_settings').select('custom').eq('user_id',me.id).maybeSingle(),
       soft(sb.from('item_images').select('cat,name,url,h,s,src').range(0,4999)),
@@ -7818,7 +7842,7 @@ async function enter(user){
     if(!prof){ const name=((user.user_metadata&&user.user_metadata.name)||(user.email||'friend').split('@')[0]).slice(0,40); const ins=await sb.from('profiles').insert({id:me.id,name}).select().single(); if(ins.error) throw ins.error; prof=ins.data; }
     me.name=prof.name; me.username=prof.username||null; me.invite=prof.invite_code; me.avatar=prof.avatar||0; state={name:prof.name,shelves:{},order:[],vis:{},photos:{},custom:{}};
     if(sh.error) throw sh.error; if(ph.error) throw ph.error; if(us.error) throw us.error;
-    for(const r of sh.data||[]){ if(!CAT[r.cat]) continue; state.shelves[r.cat]={years:r.years||{}}; state.order.push(r.cat); if(r.vis!=='friends') state.vis[r.cat]=r.vis; }
+    RANKED={}; for(const r of sh.data||[]){ if(!CAT[r.cat]) continue; state.shelves[r.cat]={years:r.years||{}}; state.order.push(r.cat); if(r.vis!=='friends') state.vis[r.cat]=r.vis; if(r.years_updated_at){ const t=Date.parse(r.years_updated_at); if(t) RANKED[r.cat]=t; } }
     for(const p of ph.data||[]) state.photos[pkey(p.cat,p.name)]={src:p.url,h:p.h||0,s:p.s||30};
     state.custom=(us.data&&us.data.custom)||{};
     synced.shelves={}; for(const c of state.order){ const r=shelfRow(c); synced.shelves[c]=JSON.stringify([r.years,r.vis,r.pos]); }
@@ -9704,6 +9728,7 @@ function saveEditor(next){
   const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c), firstEver=!state.order.length; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
   if(!state.order.includes(c)) state.order=[...state.order, c];
+  RANKED[c]=Date.now(); if(state.custom._rr&&state.custom._rr[c]) delete state.custom._rr[c];
   save(); if(isNew&&firstEver&&!vs&&!next){ setTimeout(afterFirstShelf,400); } else setTimeout(()=>loadUnlocks(true),2600); ui.year=CURRENT; ui.view='me'; if(ui.tab!=='me'||ui.profile||ui.compare) navTo({tab:'me'},{quiet:true}); else render();
   if(next){ openEditor(next, true); toast(`Saved ${CAT[c].name}`); } else { closeSheet(); if(vs&&vs.cat===c){ toast('Saved'); setTimeout(()=>openVsResult(vs.id,c),250); } else if(!maybeShowMatch()){ toast('Saved'); setTimeout(()=>showInsights(c),900); } }
 }
@@ -10109,6 +10134,9 @@ document.addEventListener('click',e=>{
     case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
     case 'rx': react(el); break;
     case 'qr': openQr(); break;
+    case 'rr-keep': rrSet(el.dataset.cat,{still:Date.now(),snooze:0}); haptic('success'); render(); toast(`Kept. We'll check again in about six months`); break;
+    case 'rr-later': rrSet(el.dataset.cat,{snooze:Date.now()+SNOOZE_MS}); render(); toast("OK, we'll ask again in a month"); break;
+    case 'rr-go': openEditor(el.dataset.cat); break;
     case 'wrap-play': openWrap(); break;
     case 'wrap-close': closeWrap(); break;
     case 'wrap-next': wrapStep(1); break;
@@ -10159,6 +10187,7 @@ document.addEventListener('change',e=>{
   if(t.id==='def-vis'){ setPref('defVis',t.value); toast('New shelves start as: '+VIS[t.value]); return; }
   if(t.dataset && t.dataset.np){ saveNotifyPref(t.dataset.np,t.checked); haptic(); return; }
   if(t.dataset && t.dataset.pref==='haptics'){ setPref('haptics',t.checked); haptic(); return; }
+  if(t.dataset && t.dataset.pref==='rerank'){ setPref('rerank',t.checked); haptic(); render(); return; }
   if(t.dataset && t.dataset.vis){ state.vis[t.dataset.vis]=t.value; save(); render(); toast(`${CAT[t.dataset.vis].name}: ${VIS[t.value]}`); if(sheetKind==='detail') openDetail(...detailArgs); }
 });
 document.addEventListener('keydown',e=>{
