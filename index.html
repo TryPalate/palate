@@ -170,6 +170,9 @@ button.set-row:active{transform:none;background:var(--line)}
 .hr-card b{font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.2}.hr-card span{font-size:13px;color:var(--muted)}
 .sz-hr{--w:120px;--ht:120px;border-radius:16px}.sz-hr.sh-round{border-radius:50%}.sz-hr.sh-poster{--w:96px;--ht:138px}.sz-hr.sh-wide{--w:140px;--ht:96px}
 @keyframes hr-in{from{opacity:0;transform:scale(.96)}}
+.res-wait,.res-none{display:flex;align-items:center;gap:10px;padding:12px 8px;color:var(--muted);font-size:14px;list-style:none}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--faint);border-top-color:var(--text);animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 .find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 .bottom-nav{display:none}
 @media (max-width:760px){
@@ -8797,9 +8800,132 @@ async function ytOembed(id){
   }
   return null;
 }
+/* ---------- Search that knows what kind of thing it is looking for ----------
+   For topics without a specialist source, Wikidata does the autocomplete (it matches the start of names and their aliases,
+   and puts famous things first). Every result must fit the shelf: people shelves only take people, and everything else
+   never takes a person. A second quick lookup reads what each result is (human, band, car model...) and its free photo. */
+const PEOPLE_SHELVES = new Set(['artists','celebrities','actors','influencers','athletes','comedians','painters','authors','philosophers','scientists']);
+const HUMAN_DESC = /\((born |c\. |\d{3,4}\s*[–-]|died )|\b(born|actor|actress|singer|rapper|musician|politician|footballer|player|writer|author|novelist|poet|youtuber|streamer|influencer|businessman|businesswoman|entrepreneur|journalist|model|comedian|athlete|boxer|wrestler|racing driver|director|producer|engineer|designer|scientist|philosopher|painter|artist|chef|presenter|personality|activist|executive|socialite)\b/i;
+const BAND_DESC = /\b(band|group|duo|trio|quartet|ensemble|boy band|girl group|orchestra|collective|choir)\b/i;
+const NEVER = /wikimedia|disambiguation|family name|surname|given name|male given|female given|scientific article|scholarly article|wikinews|category|template|list of|^song by|^single by|^album by|^\d{4} song|^\d{4} single|^\d{4} album|television episode|episode of/i;
+const RULES = {
+  artists:{person:true,band:true,desc:/singer|rapper|musician|songwriter|record producer|producer|\bdj\b|disc jockey|composer|vocalist|guitarist|drummer|pianist|bassist|band|group|duo|trio|idol|performer|entertainer|music/i},
+  celebrities:{person:true}, influencers:{person:true,prefer:/youtuber|streamer|influencer|tiktok|internet|content creator|vlogger|twitch|podcaster|social media|blogger|personality/i},
+  actors:{person:true,desc:/actor|actress|performer|entertainer|comedian|filmmaker|director|presenter|voice/i},
+  athletes:{person:true,desc:/player|footballer|athlete|boxer|driver|sprinter|swimmer|golfer|tennis|basketball|racer|wrestler|runner|gymnast|skater|cyclist|fighter|cricketer|quarterback|rugby|skier|jockey|sport|olympi|martial|mma|ufc|coach|pitcher|goalkeeper|striker|hockey/i},
+  comedians:{person:true,desc:/comedian|comic|humorist|stand-up|satirist|comedy|entertainer|actor|actress/i},
+  painters:{person:true,desc:/painter|artist|sculptor|photographer|illustrator|designer|architect|cartoonist|printmaker|muralist/i},
+  authors:{person:true,desc:/writer|author|novelist|poet|playwright|essayist|screenwriter|journalist|historian|lyricist/i},
+  philosophers:{person:true,desc:/philosopher|theologian|thinker|logician|ethicist|scholar|sage|economist/i},
+  scientists:{person:true,desc:/scientist|physicist|chemist|biologist|mathematician|astronomer|inventor|engineer|economist|psychologist|naturalist|geneticist|computer|physician|researcher|astrophysicist|neuroscientist|geologist|botanist|zoologist|primatologist/i},
+  characters:{desc:/fictional|character|protagonist|mascot|anime|manga|comic|cartoon|video game/i},
+  superheroes:{desc:/superhero|super hero|fictional|character|comic|marvel|dc/i}, villains:{desc:/villain|antagonist|fictional|character|comic|supervillain/i},
+  countries:{desc:/\bcountry\b|sovereign state|nation|kingdom|republic|island country|principality|emirate/i, not:/state of the united states|province|region of|county|city|town/i},
+  cities:{desc:/city|town|capital|municipality|metropolis|borough|commune|village|urban area|megacity|human settlement|seaside resort/i, not:/football|club|band|film|song|album|team|newspaper|university/i},
+  themeparks:{desc:/theme park|amusement park|water park|park/i}, universities:{desc:/university|college|institute|school|academy/i},
+  wonders:{desc:/landmark|monument|tower|bridge|temple|palace|castle|cathedral|church|mosque|statue|building|skyscraper|ruins|archaeological|wonder|mountain|waterfall|canyon|stadium|museum|wall|pyramid|heritage|site|reef|lake|volcano|national park/i},
+  cars:{desc:/automobile|car model|\bcars?\b|vehicle|sedan|saloon|suv|coupe|coupé|hatchback|supercar|sports car|pickup|truck|convertible|roadster|minivan|crossover|grand tourer|hypercar|car manufacturer|automaker/i},
+  motorcycles:{desc:/motorcycle|scooter|motorbike|moped|sportbike|cruiser/i},
+  aircraft:{desc:/aircraft|airliner|fighter|bomber|helicopter|jet|airplane|aeroplane|plane|airship|drone|spaceplane/i},
+  airlines:{desc:/airline|air carrier|carrier/i},
+  brands:{desc:/company|brand|manufacturer|retailer|corporation|fashion house|label|business|conglomerate|chain|enterprise|clothing|apparel|luxury/i},
+  fastfood:{desc:/fast.?food|restaurant chain|restaurant|food chain|chain|pizzeria|coffeehouse|franchise/i}, restaurants:{desc:/restaurant|chain|bistro|steakhouse|diner|eatery|pizzeria/i},
+  cafes:{desc:/coffee|café|cafe|bakery|tea|coffeehouse|chain/i},
+  clubs:{desc:/football club|soccer club|association football|sports club|football team/i}, teams:{desc:/team|franchise|club/i}, sports:{desc:/sport|game|discipline|martial art|athletics/i},
+  snacks:{desc:/snack|chips|crisps|candy|confection|chocolate|cookie|biscuit|cracker|brand|food|popcorn|pretzel|bar|gummy|sweet/i},
+  drinks:{desc:/drink|beverage|soda|soft drink|juice|tea|coffee|brand|water|milk|cola|lemonade|smoothie/i},
+  cuisines:{desc:/cuisine|culinary|food|cooking/i}, desserts:{desc:/dessert|cake|pastry|pudding|sweet|confection|ice cream|pie|cookie|tart|custard|food/i},
+  icecream:{desc:/ice cream|flavou?r|frozen dessert|gelato|sorbet/i}, breakfast:{desc:/breakfast|dish|food|cereal|pancake|egg|bread|toast|waffle|porridge|pastry/i},
+  cereal:{desc:/cereal/i}, fruits:{desc:/fruit|berry|citrus|species of plant|cultivar|melon|plant/i},
+  pizza:{desc:/topping|cheese|sausage|vegetable|meat|ingredient|food|mushroom|fruit|pepper|ham|salami|olive|onion|herb/i},
+  sauces:{desc:/sauce|condiment|dressing|dip|relish|paste|salsa|ketchup|mayonnaise|mustard/i},
+  cocktails:{desc:/cocktail|drink|mixed drink/i}, spirits:{desc:/spirit|liquor|whisk(e)?y|vodka|gin|rum|tequila|beer|brewery|lager|ale|wine|liqueur|brand|brandy|cognac|sake|stout|cider/i},
+  cheese:{desc:/cheese/i}, pasta:{desc:/pasta|noodle|dumpling/i},
+  tech:{desc:/smartphone|computer|laptop|tablet|console|device|gadget|headphones|earbuds|camera|watch|electronics|product line|operating system|wearable|speaker|television|drone|processor|graphics card|phone/i},
+  apps:{desc:/application|\bapp\b|software|service|platform|website|social network|messaging|video sharing|streaming|search engine/i},
+  watches:{desc:/watch|wristwatch|watchmaker|chronograph|horolog/i}, fragrances:{desc:/perfume|fragrance|cologne|eau de/i},
+  sneakers:{desc:/shoe|sneaker|footwear|trainer|basketball shoe|running shoe|boot/i},
+  civilizations:{desc:/civili[sz]ation|empire|kingdom|dynasty|ancient|culture|people|period|caliphate|republic|city.?state|state/i},
+  mythology:{desc:/god|goddess|deity|myth|titan|hero|spirit|monster|demigod|legend|creature/i},
+  weapons:{desc:/weapon|firearm|rifle|pistol|gun|sword|missile|tank|bomb|knife|bow|cannon|grenade|machine gun|carbine|revolver|shotgun|blade|spear|axe/i},
+  dinosaurs:{desc:/dinosaur|genus|theropod|sauropod|ceratopsian|pterosaur|reptile|fossil|ornithopod|hadrosaur/i},
+  catbreeds:{desc:/cat breed|breed of cat|breed/i}, dogs:{desc:/dog breed|breed of dog|breed/i},
+  flowers:{desc:/flower|plant|genus|species|cultivar|lily|rose|orchid/i}, animals:{desc:/species|animal|mammal|bird|fish|reptile|insect|genus|breed|amphibian|family of|order of|shark|whale|cat|dog/i},
+  instruments:{desc:/instrument/i}, languages:{desc:/language|dialect|sign language/i}, proglangs:{desc:/programming language|scripting language|markup language|language/i},
+  hobbies:{desc:/hobby|activity|sport|game|craft|art|pastime|collecting|recreation/i}, subjects:{desc:/discipline|subject|field|study|science|branch of|mathematics|art|language|history/i},
+  holidays:{desc:/holiday|festival|observance|celebration|\bday\b|feast|new year/i}, seasons:{desc:/season/i},
+  kdramas:{desc:/television series|drama|tv series|web series/i, prefer:/south korean|korean/i}, musicals:{desc:/musical/i}, podcasts:{desc:/podcast/i},
+  boardgames:{desc:/board game|card game|tabletop|game|role-playing/i}, mobilegames:{desc:/video game|mobile game|game/i},
+  games:{desc:/video game|game series|game franchise|mobile game|online game|roblox|esports|franchise/i}
+};
+const PERSON_TYPE='Q5', BAND_TYPES=new Set(['Q215380','Q5741069','Q641066','Q216337','Q2088357','Q9212979','Q56816954','Q281643','Q105756498']);
+/* Does a search result fit this shelf? Uses the description first; the item's types (when we have them) have the last word. */
+function fitsShelf(c, desc, types){
+  const r=RULES[c]; if(!r) return true;
+  const d=String(desc||'');
+  if(NEVER.test(d)) return false;
+  if(r.not && r.not.test(d)) return false;
+  if(types){
+    const human=types.has(PERSON_TYPE), band=[...types].some(t=>BAND_TYPES.has(t));
+    if(r.person) return human || (r.band && band) ? (!r.desc || !d || r.desc.test(d) || band) : false;
+    if(human) return false;
+  } else {
+    const looksHuman=HUMAN_DESC.test(d);
+    if(r.person) return (looksHuman || (r.band && BAND_DESC.test(d))) && (!r.desc || r.desc.test(d));
+    if(looksHuman && !(r.desc && r.desc.test(d) && !/\((born|\d{3,4}\s*[–-])/.test(d))) return false;
+  }
+  return !r.desc || r.desc.test(d);
+}
+const commonsThumb = (file,w=320) => 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(String(file).replace(/^.*Special:FilePath\//,'').replace(/^File:/,'').replace(/%20/g,' '))+'?width='+w;
+async function timed(url, ms, opts){
+  const ac=typeof AbortController!=='undefined'?new AbortController():null, t=setTimeout(()=>ac&&ac.abort(),ms);
+  try{ const r=await fetch(url,{...(opts||{}),signal:ac&&ac.signal}); if(!r.ok) throw new Error('http '+r.status); return await r.json(); } finally{ clearTimeout(t); }
+}
+/* What each item is (human, band, car model...) plus its free photo or logo, for up to 20 items in one request. */
+async function wdFacts(ids){
+  if(!ids.length) return {};
+  const q=`SELECT ?i ?t ?img ?logo WHERE { VALUES ?i { ${ids.map(x=>'wd:'+x).join(' ')} } OPTIONAL { ?i wdt:P31 ?t } OPTIONAL { ?i wdt:P18 ?img } OPTIONAL { ?i wdt:P154 ?logo } }`;
+  const j=await timed('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(q),3500,{headers:{Accept:'application/sparql-results+json'}});
+  const out={};
+  for(const b of (j.results&&j.results.bindings)||[]){
+    const id=b.i.value.split('/').pop(), o=(out[id] ||= {types:new Set(),img:'',logo:''});
+    if(b.t) o.types.add(b.t.value.split('/').pop());
+    if(b.img && !o.img) o.img=b.img.value; if(b.logo && !o.logo) o.logo=b.logo.value;
+  }
+  return out;
+}
+async function wdSearch(c,q,alive){
+  await gate('wd-live',60); if(alive && !alive()) throw new Error('stale');
+  const j=await timed('https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&language=en&uselang=en&type=item&limit=25&search='+encodeURIComponent(q),4000);
+  if(alive && !alive()) throw new Error('stale');
+  const seen=new Set();
+  let cands=(j.search||[]).filter(x=>x.label && fitsShelf(c,x.description,null)).filter(x=>{ const k=normT(x.label); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,12);
+  let facts={}; try{ facts=await wdFacts(cands.map(x=>x.id)); }catch(e){}
+  if(alive && !alive()) throw new Error('stale');
+  const r=RULES[c]||{};
+  cands=cands.filter(x=>{ const f=facts[x.id]; return !f || !f.types.size || fitsShelf(c,x.description,f.types); });
+  if(r.prefer) cands.sort((a,b)=>(r.prefer.test(b.description||'')?1:0)-(r.prefer.test(a.description||'')?1:0));
+  return cands.slice(0,8).map(x=>{ const f=facts[x.id]||{}, file=(LOGO_CATS.has(c)&&f.logo)||f.img||f.logo||'';
+    const okImg=file && !(PERSON_CATS.has(c)&&/\.svg$/i.test(file));
+    return {n:x.label, s:capFirst(String(x.description||'').replace(/\s*\((born|\d{3,4}\s*[–-])[^)]*\)\s*$/,'')).slice(0,60), img:okImg?commonsThumb(file,240):'', full:okImg?commonsThumb(file,640):'', src:'wikidata', qid:x.id}; });
+}
+/* Before adding something that is not in the lists: if Wikidata knows that exact name and it clearly is something else
+   (a US state on a celebrities shelf, a person on a cars shelf), say so instead of adding it. */
+async function shelfMismatch(c,n){
+  if(!RULES[c] || CAT[c].custom) return null;
+  try{
+    const j=await timed('https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&language=en&uselang=en&type=item&limit=7&search='+encodeURIComponent(n),3500);
+    const exact=(j.search||[]).filter(x=>normT(x.label)===normT(n) || (x.match&&normT(x.match.text)===normT(n)));
+    if(!exact.length) return null;
+    let facts={}; try{ facts=await wdFacts(exact.map(x=>x.id)); }catch(e){}
+    if(exact.some(x=>{ const f=facts[x.id]; return fitsShelf(c,x.description,f&&f.types.size?f.types:null); })) return null;
+    return exact[0].description||'something else';
+  }catch(e){ return null; }
+}
 const LIVE = new Map();
 const yr = d => (String(d||'').match(/(19|20)\d\d/)||[''])[0];
-async function liveSearch1(c,q,cty){
+async function liveSearch1(c,q,cty,alive){
+  const stale=()=>{ if(alive && !alive()) throw new Error('stale'); };
   const cfg=IMG_SRC[c]||{}, out=[];
   if(c==='youtube'){
     const id=ytIdOf(q)||(/^[\w-]{11}$/.test(q.trim())&&/\d|[A-Z]/.test(q.trim())&&!/\s/.test(q.trim())?q.trim():'');
@@ -8828,7 +8954,7 @@ async function liveSearch1(c,q,cty){
       const old=best.get(key); if(!old||pen<old.pen) best.set(key,row); }
     for(const r of best.values()){ delete r.pen; out.push(r); if(out.length>=8) break; }
   } else if(cfg.i){
-    const t=cfg.i; await gate('itunes-live',1200);
+    const t=cfg.i; await gate('itunes-live',1200); stale();
     const qs=t==='movie'?{media:'movie',entity:'movie'}:t==='tv'?{media:'tvShow',entity:'tvSeason'}:{media:'software',entity:'software'};
     const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({...qs,term:q,limit:'10',country:cty||'us'}),true);
     const seen=new Set();
@@ -8839,7 +8965,7 @@ async function liveSearch1(c,q,cty){
       out.push({n:name,s:sub,img:u.replace(/\/\d+x\d+bb\./,'/100x100bb.').replace(/^http:/,'https:'),full:u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),src:'apple'});
     }
   } else if(cfg.a){
-    await gate('anilist',800);
+    await gate('anilist-live',400); stale();
     const r=await fetch('https://graphql.anilist.co',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
       body:JSON.stringify({query:'query($s:String,$t:MediaType){Page(perPage:8){media(search:$s,type:$t,sort:SEARCH_MATCH){title{romaji english}seasonYear startDate{year}coverImage{medium large}studios(isMain:true){nodes{name}}}}}',variables:{s:q,t:cfg.a}})});
     if(!r.ok) throw new Error('http '+r.status);
@@ -8847,17 +8973,13 @@ async function liveSearch1(c,q,cty){
       const st=(m.studios&&m.studios.nodes[0]||{}).name||''; const y=m.seasonYear||(m.startDate&&m.startDate.year)||'';
       out.push({n,s:[st,y].filter(Boolean).join(' · '),img:m.coverImage.medium||m.coverImage.large,full:m.coverImage.large,src:'anilist'}); }
   } else if(cfg.o){
-    await gate('openlib',350);
+    await gate('openlib-live',200); stale();
     const j=await getJSON('https://openlibrary.org/search.json?limit=10&fields=title,author_name,cover_i&q='+encodeURIComponent(q));
     const seen=new Set();
     for(const d of (j.docs||[])){ if(!d.cover_i||seen.has(normT(d.title))) continue; seen.add(normT(d.title));
       out.push({n:d.title,s:(d.author_name||[])[0]||'',img:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-S.jpg',full:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg',src:'openlibrary'}); }
   } else {
-    await gate('wiki',120);
-    const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=prefixsearch&gpslimit=10&gpsnamespace=0&prop=pageimages|description&piprop=thumbnail&pithumbsize=300&pilicense=any&gpssearch='+encodeURIComponent(q));
-    const ok=DESC_OK[c]||IMG_DESC[c], pages=Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99));
-    for(const pg of pages){ if(!pg.thumbnail||badImg(c,pg.thumbnail.source)||/disambiguation|^list of/i.test((pg.description||'')+pg.title)) continue; if(ok && !ok.test(pg.description||'')) continue;
-      out.push({n:pg.title.replace(/\s*\([^)]*\)\s*$/,''),s:String(pg.description||'').replace(/^./,m=>m.toUpperCase()).slice(0,48),img:pg.thumbnail.source,full:pg.thumbnail.source,src:'wikipedia'}); }
+    out.push(...await wdSearch(c,q,alive));
   }
   return out.slice(0,8);
 }
@@ -8956,6 +9078,16 @@ async function fillDetails(c,n){
   if(r.img && !photo(c,n)) adoptImage(c,n,r.img,r.src||'live').catch(()=>{});
   shareItem(c,n,r.s);
   return r;
+}
+/* Something not in the lists: first make sure it is not clearly something else (Arizona on a celebrities shelf). */
+async function addCustomChecked(c,n,btn){
+  if(CAT[c].custom || c==='youtube' || !RULES[c]){ addCustom(c,n); return; }
+  if(btn.dataset.busy) return; btn.dataset.busy='1'; const b=btn.querySelector('b'), was=b?b.textContent:'';
+  if(b) b.textContent=`Checking “${n}”…`;
+  const bad=await shelfMismatch(c,n);
+  delete btn.dataset.busy; if(!ed || ed.cat!==c || ed.query.trim()!==n){ return; }
+  if(bad){ if(b) b.textContent=was; haptic('warn'); toast(`“${n}” is listed as ${String(bad).replace(/^./,m=>m.toLowerCase())}, so it doesn't fit ${CAT[c].name}`); return; }
+  addCustom(c,n);
 }
 function addCustom(c,n){
   const it={n,s:''}; if(!CAT[c].custom) (state.custom[c] ||= []).push(it); (CATALOG[c] ||= []).push(it); save(); addItem(it);
@@ -9062,8 +9194,8 @@ async function sendFeedback(){
     closeSheet(); toast(miss?'Thanks, we will add it':'Thank you, this helps'); if(miss) curated=false; }
   catch(e){ console.warn(e); toast('Could not send that. Try again in a minute.'); if(btn) btn.disabled=false; }
 }
-async function liveSearch(c,q){
-  const lang=LANG_OF(q); if(!lang) return liveSearch1(c,q);
+async function liveSearch(c,q,alive){
+  const lang=LANG_OF(q); if(!lang) return liveSearch1(c,q,'',alive);
   let tr=[]; try{ tr=await nativeWiki(q,lang); }catch(e){}
   const strip=t=>String(t||'').replace(/\s*\([^)]*\)\s*$/,'');
   const ens=[]; for(const x of tr){ const e=strip(x.en); if(e && !ens.some(y=>normT(y.en)===normT(e)) && ens.length<2) ens.push({en:e,nat:x.nat}); }
@@ -9072,7 +9204,7 @@ async function liveSearch(c,q){
   ens.forEach((e,i)=>{ for(const it of lists[i+1]){ if(normT(it.n)===normT(e.en)) add({...it,s:[e.nat,it.s].filter(Boolean).join(' · ')}); } });   /* exact English match, with the native name attached */
   lists[0].forEach(add);
   ens.forEach((e,i)=>lists[i+1].forEach(add));
-  tr.forEach(x=>{ if(x.img && !badImg(c,x.img) && (!DESC_OK[c]||DESC_OK[c].test(x.desc))) add({n:strip(x.en)||x.nat,s:[x.nat,x.desc.replace(/^./,m=>m.toUpperCase()).slice(0,40)].filter(Boolean).join(' · '),img:x.img,full:x.img,src:'wikipedia'}); });
+  tr.forEach(x=>{ if(x.img && !badImg(c,x.img) && (!DESC_OK[c]||DESC_OK[c].test(x.desc)) && fitsShelf(c,x.desc,null)) add({n:strip(x.en)||x.nat,s:[x.nat,x.desc.replace(/^./,m=>m.toUpperCase()).slice(0,40)].filter(Boolean).join(' · '),img:x.img,full:x.img,src:'wikipedia'}); });
   return out.slice(0,8);
 }
 /* After you pick something, look up its native-language name so it shows both ("BLACKPINK · 블랙핑크"). */
@@ -9093,15 +9225,17 @@ async function findNative(c,n,sub){
   }
   return null;
 }
-let liveT=null;
+let liveT=null, liveSeq=0;
 function queueLive(){
-  clearTimeout(liveT); if(CAT[ed.cat]&&CAT[ed.cat].custom){ ed.live=[]; ed.liveQ=''; return; } const q=ed.query.trim(), c=ed.cat; if(q.length<2 && !isNat(q)){ ed.live=[]; ed.liveQ=''; return; }
-  const key=c+'|'+q.toLowerCase(); if(LIVE.has(key)){ ed.live=LIVE.get(key); ed.liveQ=q; return; }
+  clearTimeout(liveT); const my=++liveSeq;
+  if(CAT[ed.cat]&&CAT[ed.cat].custom){ ed.live=[]; ed.liveQ=''; ed.pending=''; return; } const q=ed.query.trim(), c=ed.cat; if(q.length<2 && !isNat(q)){ ed.live=[]; ed.liveQ=''; ed.pending=''; return; }
+  const key=c+'|'+q.toLowerCase(); if(LIVE.has(key)){ ed.live=LIVE.get(key); ed.liveQ=q; ed.pending=''; return; }
+  ed.pending=q;
   liveT=setTimeout(async()=>{
-    let list=[]; try{ list=await liveSearch(c,q); }catch(e){ if(window.PALATE_DEBUG) console.warn('live search failed',e); }
-    LIVE.set(key,list);
-    if(ed && ed.cat===c && ed.query.trim()===q){ ed.live=list; ed.liveQ=q; const ul=$('#ed-results'); if(ul) ul.innerHTML=results(); }
-  },350);
+    let list=null; try{ list=await liveSearch(c,q,()=>my===liveSeq); }catch(e){ if(String(e&&e.message)==='stale') return; if(window.PALATE_DEBUG) console.warn('live search failed',e); }
+    if(list) LIVE.set(key,list);
+    if(ed && ed.cat===c && ed.query.trim()===q){ ed.live=list||[]; ed.liveQ=q; ed.pending=''; ed.liveFailed=!list; const ul=$('#ed-results'); if(ul) ul.innerHTML=results(); }
+  },220);
 }
 let rfRunning=0; const rfQ=[];
 function refineResults(){
@@ -9117,7 +9251,7 @@ function rfPump(){
 function results(){
   const raw=ed.query.trim(), q=raw.toLowerCase();
   const have=new Set(ed.slots.filter(Boolean).map(s=>s.n.toLowerCase()));
-  const all=CAT[ed.cat]&&CAT[ed.cat].custom ? peopleItems().concat(CATALOG[ed.cat]||[]) : (CATALOG[ed.cat]||[]);
+  const all=CAT[ed.cat]&&CAT[ed.cat].custom ? peopleItems().concat(CATALOG[ed.cat]||[]) : (CATALOG[ed.cat]||[]).filter(it=>!misfit(ed.cat,it));
   if(!q){
     /* Suggestions for when you're blanking: friends' picks first, then what's popular */
     const fr={};
@@ -9133,22 +9267,48 @@ function results(){
     return html;
   }
   const live=(ed.liveQ===raw?ed.live:[]);
+  const tk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
+  const qq=tk(q), toks=qq.split(' ').filter(Boolean);
+  const score=it=>matchScore(tk(it.n),tk(it.s),qq,toks);
+  const veh=VEH_CATS.has(ed.cat), seen=new Set(), rows=[];
+  all.forEach((it,i)=>{ if(have.has(it.n.toLowerCase())) return; const sc=score(it); if(sc==null) return; const k=normT(it.n); if(seen.has(k)) return; seen.add(k); rows.push({it,sc,o:i,loc:1}); });
   const liveBy=new Map(live.map(x=>[normT(x.n),x]));
-  const tk=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
-  const toks=tk(q).split(' ').filter(Boolean);
-  const hay=it=>tk(it.n+' '+it.s), nm=it=>tk(it.n);
-  const m=all.filter(it=>!have.has(it.n.toLowerCase()) && (it.n.toLowerCase().includes(q)||it.s.toLowerCase().includes(q)||(toks.length>1&&toks.every(t=>hay(it).includes(t)))));
-  const rank=it=>{ const n=nm(it), nl=it.n.toLowerCase(); return nl===q?0 : nl.startsWith(q)?1 : toks.every(t=>n.split(' ').some(w=>w.startsWith(t)))?2 : 3; };
-  const veh=VEH_CATS.has(ed.cat), idx=new Map(all.map((it,i)=>[it,i]));
-  m.sort((a,b)=>rank(a)-rank(b) || (veh?a.n.length-b.n.length:0) || idx.get(a)-idx.get(b));
-  const local=m.slice(0,veh?(live.length?8:12):(live.length?5:7)).map(it=>{ const t=liveBy.get(normT(it.n)); return t?{...it,img:t.img,full:t.full,src:t.src}:it; });
-  const lset=new Set(local.map(it=>normT(it.n)));
-  const extra=live.filter(x=>!lset.has(normT(x.n)) && !have.has(x.n.toLowerCase())).slice(0,6);
-  ed.res=[...local,...extra];
+  rows.forEach(r=>{ const t=liveBy.get(normT(r.it.n)); if(t&&t.img&&!(photo(ed.cat,r.it.n))) r.it={...r.it,img:t.img,full:t.full,src:t.src}; });
+  live.forEach((x,i)=>{ const k=normT(x.n); if(seen.has(k)||have.has(x.n.toLowerCase())) return; seen.add(k); const sc=score(x); rows.push({it:x,sc:sc==null?4.5:sc,o:i,loc:0}); });
+  rows.sort((a,b)=>a.sc-b.sc || b.loc-a.loc || (veh&&a.loc&&b.loc?a.it.n.length-b.it.n.length:0) || a.o-b.o);
+  ed.res=rows.slice(0,veh?10:8).map(r=>r.it);
   setTimeout(refineResults,0);
   const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
-  return ed.res.map((it,k)=>resBtn(it,k,q)).join('')
-    + (exact?'':`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>${CAT[ed.cat]&&CAT[ed.cat].custom?'Add it as you wrote it':'Not listed yet · we will look up the details'}</span></div><span class="add">Add</span></button></li>`);
+  const waiting=ed.pending===raw;
+  const custom=CAT[ed.cat]&&CAT[ed.cat].custom;
+  let html=ed.res.map((it,k)=>resBtn(it,k,q)).join('');
+  if(waiting) html+=`<li class="res-wait" aria-live="polite"><span class="spin" aria-hidden="true"></span>Searching ${esc(CAT[ed.cat].name.toLowerCase())}…</li>`;
+  else if(!ed.res.length) html+=`<li class="res-none">${ed.liveFailed?"Couldn't reach the search right now. Check your connection.":`Nothing in ${esc(CAT[ed.cat].name.toLowerCase())} matches “${esc(raw)}” yet. Check the spelling, or add it below.`}</li>`;
+  if(!exact && !waiting) html+=`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>${custom?'Add it as you wrote it':'Not listed yet · we will check it fits and look up the details'}</span></div><span class="add">Add</span></button></li>`;
+  return html;
+}
+/* Things friends added before these checks existed can be on the wrong shelf (a state under celebrities).
+   Items that ship with the app are trusted; added ones are hidden when their description clearly says they are something else. */
+const NOT_PERSON = /\b(state of|country in|city in|town in|province|county|company|brand|corporation|film|album|song|single|television series|tv series|video game|automobile|car model|sports team|football club|river|mountain|island|species|genus|dish|food|drink|restaurant)\b/i;
+function misfit(c,it){
+  if(!RULES[c] || STATIC.has(c+'|'+it.n.toLowerCase())) return false;
+  const d=String(it.s||''); if(!d || /^added by you$/i.test(d)) return false;
+  if(NEVER.test(d)) return true;
+  if(RULES[c].person) return NOT_PERSON.test(d) && !HUMAN_DESC.test(d);
+  return /\((born |\d{3,4}\s*[–-])/.test(d);
+}
+/* How well a name matches what you typed: 0 exact, 1 starts with it, 2 every word starts right, 3 inside the name,
+   4 in the subtitle, 5 a small typo. null means it does not match. */
+function lev1(a,b,max){ if(Math.abs(a.length-b.length)>max) return max+1; let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){ const cur=[i]; let best=i; for(let j=1;j<=b.length;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); if(cur[j]<best) best=cur[j]; } if(best>max) return max+1; prev=cur; } return prev[b.length]; }
+function matchScore(n,sub,qq,toks){
+  if(!qq) return null; if(n===qq) return 0; if(n.startsWith(qq)) return 1;
+  const words=n.split(' ');
+  if(toks.every(t=>words.some(w=>w.startsWith(t)))) return 2;
+  if(qq.length>=3 && n.replace(/ /g,'').includes(qq.replace(/ /g,''))) return 3;
+  if(qq.length>=3 && sub){ const sw=sub.split(' '); if(toks.every(t=>sw.some(w=>w.startsWith(t))||words.some(w=>w.startsWith(t)))) return 4; }
+  if(toks.every(t=>t.length>=4 && words.some(w=>lev1(w.slice(0,t.length),t,t.length>=7?2:1)<=(t.length>=7?2:1)))) return 5;
+  return null;
 }
 function slotRow(i){
   const it=ed.slots[i], label=i<5?String(i+1):'·';
@@ -9656,7 +9816,7 @@ document.addEventListener('click',e=>{
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
-    case 'custom': { const n=ed.query.trim(); if(!n) break; addCustom(ed.cat,n); break; }
+    case 'custom': { const n=ed.query.trim(); if(!n) break; addCustomChecked(ed.cat,n,el); break; }
     case 'rm': { const i=+el.dataset.i, it=ed.slots[i]; if(!it) break; const before=ed.slots.map(x=>x&&{...x}), cat=ed.cat; ed.slots[i]=null; compact(); renderEditor();
       toast(`Removed ${it.n}`,{label:'Undo',fn:()=>{ if(ed && ed.cat===cat){ ed.slots=before; renderEditor(); } }}); break; }
     case 'save': saveEditor(); break;
