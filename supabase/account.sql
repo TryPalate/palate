@@ -1,5 +1,5 @@
 -- ACCOUNT: usernames, editing your name, notification switches, and a safer profiles table.
--- Run once in Supabase > SQL Editor. Safe to run again. Needs push.sql and growth.sql first.
+-- Run once in Supabase > SQL Editor. Safe to run again. Needs schema.sql and push.sql first.
 
 -- 1. Usernames. Lowercase letters, numbers, dot and underscore, 3 to 20 characters. Two people can never have the same one
 --    (Frank and frank count as the same). People without one yet simply have none until they pick one in Settings.
@@ -49,6 +49,9 @@ begin
   return (select json_build_object('name', p.name, 'username', p.username) from public.profiles p where p.id = uid);
 exception when unique_violation then raise exception 'That username is taken';
 end $$;
+
+-- Profile picture choice (also made by friends_alpha.sql; added here too in case that file did not run).
+alter table public.profiles add column if not exists avatar smallint not null default 0 check (avatar between 0 and 2);
 
 -- Find someone by their exact username (no browsing, no partial matches).
 create or replace function public.find_person(p_username text) returns table (id uuid, name text, avatar smallint, username text, is_friend boolean)
