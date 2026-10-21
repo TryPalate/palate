@@ -19,7 +19,7 @@ All are safe to run again. Run each one whole in Supabase > SQL Editor.
 
 1. `schema.sql`, `catalog.sql`, `images.sql`, `images2.sql`, `images4.sql`, `images5.sql`
 2. `push.sql`, `alpha.sql`, `friends_alpha.sql`, `badges.sql`, `invites.sql`, `unlocks.sql`, `growth.sql`, `hardening.sql`, `delete_account.sql`
-3. New: `account.sql` (usernames, settings, notification switches), then `reactions.sql`, then `progression.sql` (new unlocks and the weekly topic)
+3. New: `account.sql` (usernames, settings, notification switches), then `reactions.sql`, then `progression.sql` (new unlocks and the weekly topic), then `guess.sql` (guess a friend's #1 in the weekly topic)
 
 The app works before the new files are run; their features simply stay hidden until then.
 

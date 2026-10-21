@@ -152,6 +152,14 @@ button.set-row:active{transform:none;background:var(--line)}
 :root[data-theme="light"] .wk-foot b{background:rgb(0 0 0 / .07)}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .wk-foot b{background:rgb(0 0 0 / .07)}}
 .wk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px 20px;margin-bottom:6px}
+.wk-lockbox{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px;border-radius:16px;background:var(--raise)}
+.wk-lockbox span:not(.av){font-size:14px;color:var(--muted)}.wk-lockbox .swap{padding:2px 0 0!important;width:auto!important;text-align:left}
+.gs-who{display:flex;align-items:center;gap:12px;margin:2px 0 14px;color:var(--muted);font-size:14.5px}.gs-who .av{width:38px;height:38px;font-size:14px}
+.gs-grid{display:grid;gap:8px}
+.gs-opt{display:grid;grid-template-columns:44px minmax(0,1fr);gap:2px 12px;align-items:center;text-align:left;width:100%;padding:8px 12px 8px 8px;border:0;border-radius:16px;background:var(--raise);color:var(--text);font:inherit;cursor:pointer}
+.gs-opt .art{grid-row:span 2}.gs-opt b{font-size:16px}.gs-opt small{color:var(--muted);font-size:13px;grid-column:2}
+.gs-opt.right{box-shadow:inset 0 0 0 2px var(--good)}.gs-opt.wrong{box-shadow:inset 0 0 0 2px #E5484D}.gs-opt.dim{opacity:.45}.gs-opt:disabled{cursor:default}
+.gs-msg{margin:12px 2px 0;font-size:15px;color:var(--muted)}.gs-msg b{color:var(--text)}.gs-msg.ok b{color:var(--good)}
 .wk-ans h3{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 2px}
 .mini li.both b{color:var(--accent)}
 /* Unlock meter */
@@ -7419,7 +7427,7 @@ function openUnlocks(){
   <p class="muted" style="font-size:13px;margin:12px 0 0;text-align:center">Supporters get every shelf at once. Coming in the beta.</p><div style="height:14px"></div>`,'unlocks');
 }
 function openUnlocks3(){
-  const per=UNL.perPick||3, ways=[['Open Palate on a new day','+1'],['Answer the weekly topic','+2'],['A friend joins with your link and makes a shelf','+5']];
+  const per=UNL.perPick||3, ways=[['Open Palate on a new day','+1'],['Answer the weekly topic','+2'],['Guess a friend\u2019s #1 in the weekly topic (up to 2 a week)','+1'],['A friend joins with your link and makes a shelf','+5']];
   sheet(`<div class="sheet-head"><div><h2>Open more shelves</h2><p>${UNL.supporter?'You have everything open':UNL.picksLeft>0?UNL.picksLeft+' pick'+(UNL.picksLeft===1?'':'s')+' ready to use':'Every '+per+' points opens one shelf you choose'}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
   ${UNL.picksLeft>0&&!UNL.supporter?`<button class="pill" style="width:100%;margin-bottom:16px" data-act="choose-pick">Use a pick</button>`:''}
   <div class="unl-meter"><div><b>Next pick</b><span>${UNL.toNext} point${UNL.toNext===1?'':'s'} to go</span></div>${meter()}</div>
@@ -8463,15 +8471,20 @@ function capsule(y){
     : `<span class="cap-r">${art(r.a.n,r.c,'sm')}<b>${esc(r.a.n)}</b><i>→</i>${art(r.b.n,r.c,'sm')}<b>${esc(r.b.n)}</b></span>`}</li>`).join('')}</ul></div>`;
 }
 /* ---------- The weekly topic: everyone ranks the same thing, and friends' answers stay hidden until you answer ---------- */
-let WK=null, WKF=[];                     /* this week's topic, and friends' answers once you have answered */
+let WK=null, WKF=[], WKG=new Map(), GUESS_OK=true;                     /* this week's topic, and friends' answers once you have answered */
 async function loadWeekly(){
   try{ const r=await sb.rpc('weekly_state'); if(r.error||!r.data||!CAT[r.data.base_cat]){ WK=null; return; } WK=r.data; await loadWeeklyFriends(); }
   catch(e){ WK=null; }
 }
 async function loadWeeklyFriends(){
-  WKF=[]; if(!WK||!WK.answered) return;
+  WKF=[]; WKG=new Map(); if(!WK||!WK.answered) return;
   try{ const r=await sb.from('weekly_answers').select('user_id,top,updated_at').eq('week',WK.week).neq('user_id',me.id); if(!r.error) WKF=(r.data||[]).map(a=>({f:FRIENDS.find(x=>x.id===a.user_id),top:a.top||[],t:a.updated_at})).filter(a=>a.f); }catch(e){}
+  try{ const g=await sb.from('weekly_guesses').select('friend,correct,skipped').eq('week',WK.week); if(g.error) throw g.error; GUESS_OK=true; for(const x of g.data||[]) WKG.set(x.friend,x); }
+  catch(e){ GUESS_OK=!/weekly_guesses|relation|schema/i.test(String(e&&e.message||'')) ? GUESS_OK : false; if(!GUESS_OK) WKG=new Map(); }
 }
+/* A friend's answer is shown once you have guessed their #1 (or chosen "just show me"). With one pick there is nothing to guess. */
+const guessable = a => GUESS_OK && a.top.length>=2;
+const unguessed = () => WKF.filter(a=>guessable(a) && !WKG.has(a.f.id));
 const wkEnds = () => { if(!WK) return ''; const d=Math.max(0,Math.ceil((new Date(WK.ends+'T00:00:00Z')-Date.now())/864e5)); return d<=1?'ends tonight':d+' days left'; };
 function weeklyCard(){
   if(!WK) return '';
@@ -8482,19 +8495,55 @@ function weeklyCard(){
     <div class="wk-tag">This week<span>${esc(wkEnds())}</span></div>
     <h2>${esc(WK.title)}</h2>${WK.prompt?`<p class="wk-p">${esc(WK.prompt)}</p>`:''}
     ${WK.answered
-      ? `<div class="wk-mine">${mine.slice(0,5).map(it=>`<span title="${esc(it.n)}">${art(it.n,base,'sm')}</span>`).join('')}</div><div class="wk-foot"><span>${n?`${n} friend${n===1?'':'s'} answered`:'No friends have answered yet'}</span><b>${n?'See their picks':'See yours'}</b></div>`
+      ? `<div class="wk-mine">${mine.slice(0,5).map(it=>`<span title="${esc(it.n)}">${art(it.n,base,'sm')}</span>`).join('')}</div><div class="wk-foot"><span>${unguessed().length?`Guess ${unguessed().length===1?first(unguessed()[0].f)+'\u2019s':'your friends\u2019'} #1`:n?`${n} friend${n===1?'':'s'} answered`:'No friends have answered yet'}</span><b>${unguessed().length?'Guess':n?'See their picks':'See yours'}</b></div>`
       : `<div class="wk-foot"><span>${n?`${n} friend${n===1?' has':'s have'} answered. Answer to see theirs.`:'Be the first of your friends.'}</span><b>Answer</b></div>`}
   </article>`;
 }
 function openWeekly(){
   if(!WK) return; if(!WK.answered){ openWeeklyEditor(); return; }
   const base=WK.base_cat, mine=WK.mine||[], mset=new Set(mine.map(x=>x.n));
+  const lockedBlock=a=>`<div class="wk-ans wk-lock"><h3>${esc(first(a.f))}</h3><div class="wk-lockbox">${av(a.f)}<span>Guess ${esc(first(a.f))}'s #1 to see their picks</span><button class="pill sm" data-act="guess-start" data-f="${a.f.id}">Guess</button><button class="swap" data-act="guess-skip" data-f="${a.f.id}">Just show me</button></div></div>`;
   const block=(who,top,mine1)=>`<div class="wk-ans"><h3>${who}</h3><ol class="mini">${top.slice(0,5).map((it,i)=>`<li class="${!mine1&&mset.has(it.n)?'both':''}"><span class="rk">${i+1}</span>${art(it.n,base,'sm')}<b>${esc(it.n)}</b></li>`).join('')}</ol></div>`;
   sheet(`<div class="sheet-head"><div><h2>${esc(WK.title)}</h2><p>This week · ${esc(wkEnds())}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
-    <div class="wk-grid">${block('You',mine,true)}${WKF.map(a=>block(esc(first(a.f)),a.top,false)).join('')}</div>
+    <div class="wk-grid">${block('You',mine,true)}${WKF.map(a=>(guessable(a)&&!WKG.has(a.f.id))?lockedBlock(a):block(esc(first(a.f)),a.top,false)).join('')}</div>
     ${WKF.length?'':`<p class="muted" style="margin:6px 0 0">None of your friends have answered yet. Their picks show up here as soon as they do.</p>`}
     <div class="sheet-foot"><button class="pill ghost" data-act="weekly-answer">Change my answer</button><div class="foot-right"><button class="pill soft" data-act="unl-invite">Invite a friend</button></div></div>`,'weekly');
 }
+/* ---------- Guess their #1: pick which of a friend's weekly answers they put first ---------- */
+let GS=null;   /* {queue:[friendIds], f, opts, result} */
+function shuffled(list,seed){ const a=list.slice(); let h=hash(seed); for(let i=a.length-1;i>0;i--){ h=Math.imul(h^(h>>>15),2246822519)>>>0; const j=h%(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function openGuess(queue){
+  queue=(queue||unguessed().map(a=>a.f.id)).filter(id=>{ const a=WKF.find(x=>x.f.id===id); return a&&guessable(a)&&!WKG.has(id); });
+  if(!queue.length){ GS=null; openWeekly(); return; }
+  const id=queue[0], a=WKF.find(x=>x.f.id===id);
+  GS={queue,f:a.f,a,opts:shuffled(a.top,id+WK.week),result:null,busy:false};
+  renderGuess();
+}
+function renderGuess(){
+  const g=GS, base=WK.base_cat, left=g.queue.length;
+  const card=(it,i)=>{ const r=g.result, cls=r?(it.n.toLowerCase()===String(r.answer).toLowerCase()?' right':(r.guess&&it.n.toLowerCase()===r.guess.toLowerCase()?' wrong':' dim')):''; return `<button class="gs-opt${cls}" data-act="guess-pick" data-i="${i}" ${r?'disabled':''}>${art(it.n,base,'sm')}<b>${esc(it.n)}</b>${it.s?`<small>${esc(it.s)}</small>`:''}</button>`; };
+  const res=g.result;
+  const msg=!res?'':res.correct?(res.awarded?`<p class="gs-msg ok"><b>Yes!</b> +1 point toward your next shelf pick</p>`:`<p class="gs-msg ok"><b>Yes!</b> You know ${esc(first(g.f))} well. (Points are capped at 2 a week.)</p>`):`<p class="gs-msg"><b>It was ${esc(res.answer)}.</b> Next time.</p>`;
+  sheet(`<div class="sheet-head"><div><h2>Guess ${esc(first(g.f))}'s #1</h2><p>${esc(WK.title)}${left>1?` · ${left} friends to guess`:''}</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <div class="gs-who">${av(g.f)}<span>Which of these did ${esc(first(g.f))} put first?</span></div>
+    <div class="gs-grid">${g.opts.map(card).join('')}</div>${msg}
+    <div class="sheet-foot">${res?'<span></span>':`<button class="pill ghost" data-act="guess-skip" data-f="${g.f.id}">Just show me</button>`}<div class="foot-right">${res?`<button class="pill" data-act="guess-next">${left>1?'Next friend':'See everyone’s picks'}</button>`:''}</div></div>`,'guess',true);
+}
+async function guessPick(i){
+  const g=GS; if(!g||g.busy||g.result) return; const it=g.opts[i]; if(!it) return; g.busy=true; haptic();
+  const r=await sb.rpc('guess_weekly',{p_friend:g.f.id,p_item:it.n});
+  if(r.error){ g.busy=false; if(/guess_weekly|function/i.test(r.error.message)){ GUESS_OK=false; toast('Run supabase/guess.sql in Supabase first'); openWeekly(); } else toast(r.error.message); return; }
+  const d=r.data; WKG.set(g.f.id,{friend:g.f.id,correct:!!d.correct,skipped:false});
+  g.result={...d,guess:it.n}; g.busy=false; haptic(d.correct?'success':'warn'); renderGuess();
+  if(d.awarded) loadUnlocks(true);
+}
+async function guessSkip(fid){
+  const r=await sb.rpc('guess_weekly',{p_friend:fid,p_item:null});
+  if(r.error){ if(/guess_weekly|function/i.test(r.error.message)) GUESS_OK=false; else { toast(r.error.message); return; } }
+  else WKG.set(fid,{friend:fid,correct:false,skipped:true});
+  if(GS&&GS.queue[0]===fid){ GS.queue=GS.queue.slice(1); openGuess(GS.queue); } else openWeekly();
+}
+function guessNext(){ const q=GS?GS.queue.slice(1):[]; GS=null; if(q.length) openGuess(q); else openWeekly(); }
 function openWeeklyEditor(){
   if(!WK) return; const base=WK.base_cat, slots=Array(7).fill(null);
   (WK.mine||[]).slice(0,5).forEach((it,i)=>slots[i]={...it});
@@ -8510,6 +8559,7 @@ async function saveWeekly(){
   if(r.error){ if(b) b.disabled=false; toast(/weekly_answer|function/i.test(r.error.message)?'Run supabase/progression.sql in Supabase first':r.error.message); return; }
   WK=r.data; await loadWeeklyFriends(); render();
   if(isFirst){ setTimeout(()=>loadUnlocks(true),1500); }
+  if(isFirst && unguessed().length){ openGuess(); return; }
   openWeekly(); if(isFirst) toast(WKF.length?`Here's what ${WKF.length===1?first(WKF[0].f)+' picked':'your friends picked'}`:'Saved. Friends’ picks show up here when they answer');
 }
 function meDyn(){
@@ -10147,6 +10197,10 @@ document.addEventListener('click',e=>{
     case 'qr-share': qrShare(); break;
     case 'copy-invite-qr': track('invite_copy'); copyText(inviteLink(),'Link copied'); break;
     case 'weekly': openWeekly(); break;
+    case 'guess-start': openGuess([el.dataset.f]); break;
+    case 'guess-skip': guessSkip(el.dataset.f); break;
+    case 'guess-pick': guessPick(+el.dataset.i); break;
+    case 'guess-next': guessNext(); break;
     case 'hr-start': startHelpRank(); break;
     case 'hr-rm': ed.hr.pool.splice(+el.dataset.i,1); renderEditor(); break;
     case 'hr-go': hrBegin(); break;
