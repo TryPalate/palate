@@ -385,7 +385,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .art.photo::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(150deg, hsl(var(--ah,220) var(--art-s) calc(var(--art-l) + 8%)), hsl(calc(var(--ah,220) + 28) var(--art-s) calc(var(--art-l) - 14%)));opacity:1;transition:opacity .45s ease}
 .art.photo.ld::before{opacity:0}.art.photo.now::before{transition:none}
 .art.photo::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .07);pointer-events:none}
-.art.photo.pp:not(.sh-round){background-position:50% 25%}
+.art.photo.pp:not(.sh-round){background-position:50% 22%}
 .sz-alt{--w:72px;--ht:72px;border-radius:12px}.sz-alt.sh-poster{--w:56px;--ht:80px}.sz-alt.sh-wide{--w:84px;--ht:60px}
 .alt-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))!important}
 .art b{font-weight:700;font-size:calc(var(--ht) * .32);letter-spacing:-.022em;text-transform:uppercase}
@@ -7567,7 +7567,8 @@ function aboutHtml(){
   <h3 class="set-h">Where pictures and facts come from</h3>
   <ul class="credits">
     <li><b>Wikipedia and Wikimedia Commons</b><span>Photos of people, places and things. Each belongs to its photographer and is shared under its own licence, often Creative Commons.</span></li>
-    <li><b>Wikidata</b><span>Years, creators and countries.</span></li>
+    <li><b>Wikidata</b><span>Names, years, creators and countries, and some photos.</span></li>
+    <li><b>Fandom wikis</b><span>Pictures of fictional characters, from each franchise's own wiki. Characters and artwork belong to their creators.</span></li>
     <li><b>Apple</b><span>Album, song, film, TV and app artwork, through the iTunes Search API.</span></li>
     <li><b>Deezer</b><span>Artist photos and album covers.</span></li>
     <li><b>AniList</b><span>Anime, manga and character art.</span></li>
@@ -7895,7 +7896,7 @@ const cssUrl = u => String(u).replace(/'/g,'%27').replace(/[()"\\\s]/g, ch=>enco
 const IMG_OK = new Set();
 function photoSpan(cat, url, size, label, h){
   const shape=CAT[cat]?.shape||'square', u=dispSrc(cat,url);
-  return `<span class="art photo${IMG_OK.has(u)?' ld':''}${PERSON_CATS.has(cat)?' pp':''} sh-${shape} sz-${size}" style="--ah:${h==null?hue(label||''):Math.round(h)};background-image:url('${cssUrl(u)}')" data-src="${esc(u)}" role="img" aria-label="${esc(label||'')}"></span>`;
+  return `<span class="art photo${IMG_OK.has(u)?' ld':''}${FACE_CATS.has(cat)?' pp':''} sh-${shape} sz-${size}" style="--ah:${h==null?hue(label||''):Math.round(h)};background-image:url('${cssUrl(u)}')" data-src="${esc(u)}" role="img" aria-label="${esc(label||'')}"></span>`;
 }
 function watchImg(el){
   const u=el.dataset.src; if(!u || el.dataset.w) return; el.dataset.w='1';
@@ -8004,7 +8005,8 @@ const LOGO_NAME = /logo|icon|symbol|emblem|crest|badge|wordmark|seal|roundel/i;
 const WHITE_CATS = new Set(['cars','motorcycles','watches','fragrances','weapons','aircraft','tech','sneakers']);
 const badImg = (c,u) => (PERSON_CATS.has(c) && /logo|wordmark|\.svg|symbol|signature|autograph|emblem/i.test(u||'')) || (WHITE_CATS.has(c) && /logo|wordmark|\.svg|emblem|badge|interior|dashboard|cockpit|engine|steering|wheel|cutaway|diagram|rendering|concept|race|racing|rally|crash|museum/i.test(decodeURIComponent(u||'').split('/').pop()));
 /* Faces: Wikipedia portraits are often wide shots, so those are re-cropped around the most prominent part of the picture. */
-const dispSrc = (c,u) => (LOGO_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=300&h=300&fit=contain&cbg=white&output=jpg&url='+encodeURIComponent(u)
+const dispSrc = (c,u) => (FACE_CATS.has(c) && !PERSON_CATS.has(c) && /^https:\/\/(static|vignette)\.wikia\.nocookie\.net\//.test(u||'')) ? 'https://wsrv.nl/?w=400&h=400&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(u)
+  : (LOGO_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=300&h=300&fit=contain&cbg=white&output=jpg&url='+encodeURIComponent(u)
   : (WHITE_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?'+((CAT[c]&&CAT[c].shape==='wide')?'w=440&h=300':'w=400&h=400')+'&fit=contain&cbg=white&output=jpg&url='+encodeURIComponent(u) : (PERSON_CATS.has(c) && /^https:\/\/upload\.wikimedia\.org\//.test(u||'')) ? 'https://wsrv.nl/?w=400&h=400&fit=cover&a=attention&output=jpg&url='+encodeURIComponent(u) : u;
 const normT = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/&/g,' and ').replace(/[^\p{L}\p{N}\p{M}]+/gu,' ').trim().replace(/^the /,'');
 /* Names in other scripts: Korean, Chinese, Japanese, Arabic, Hindi, Thai, Russian... The English name is the main one; the native name rides along in the subtitle. */
@@ -8106,7 +8108,7 @@ async function altCandidates(c,n,sub,onUpdate){
   const hasName=f=>tokens.every(t=>normT(String(f).replace(/^File:/i,'')).includes(t));
   const pageP=findWikiPage(c,n,sub).catch(()=>null);
   const jobs=[];
-  const ORDER=['Current','Apple Music','Apple','Deezer','AniList','Film poster','PokéAPI','Open Library','Roblox','Logo','Wikidata','Wikipedia','Roblox wiki','Wikipedia page','Wikimedia Commons'];
+  const ORDER=['Current','Fandom','Apple Music','Apple','Deezer','AniList','Film poster','PokéAPI','Open Library','Roblox','Logo','Wikidata','Wikipedia','Roblox wiki','Wikipedia page','Wikimedia Commons'];
   const rank=x=>{ const i=ORDER.indexOf(x.source); return i<0?ORDER.length:i; };
   const snap=()=>out.map((x,i)=>({x,i})).sort((a,b)=>a.x.tier-b.x.tier||rank(a.x)-rank(b.x)||a.i-b.i).map(o=>o.x).slice(0,24);
   const job=(fn)=>jobs.push((async()=>{ try{ await fn(); }catch(e){} if(onUpdate) onUpdate(snap()); })());
@@ -8117,6 +8119,7 @@ async function altCandidates(c,n,sub,onUpdate){
   if(cfg.i&&c!=='albums'&&c!=='songs') job(async()=>{ const u=await itunesImage(c,n,sub); if(u) add(u,u,'Apple',n); });
   if(c==='artists') job(async()=>{ const u=await deezerImage(c,n,sub); if(u) add(u,u,'Deezer',n); });
   if(cfg.o) job(async()=>{ const u=await openLibImage(c,n,sub); if(u) add(u,u,'Open Library',n); });
+  if(CHAR_CATS.has(c)) job(async()=>{ const f=cleanFranchise(sub); if(!f) return; for(const x of await fandomPictures(n,f)) add(x.url,x.url,'Fandom',x.label,1); });
   if(c==='characters'||c==='villains'||c==='superheroes') job(async()=>{ for(const ch of await anilistCharacters(n)){ const names=[ch.name.full,ch.name.native,...(ch.name.alternative||[])].filter(Boolean).map(normT); if(ch.image&&ch.image.large&&names.includes(want)) add(ch.image.large,ch.image.large,'AniList',ch.name.full); } });
   if(c==='superheroes'||c==='villains') job(async()=>{ const film=HERO_FILM_N[want]; if(film){ const p=await filmPosters(film); if(p) add(p.img,p.full,'Film poster',p.film); } });
   if(c==='games') { job(async()=>{ (await robloxCandidates(n)).filter(x=>normT(x.label.split(' · ')[0])===want).forEach(x=>add(x.img,x.full,'Roblox',x.label)); });
@@ -8375,7 +8378,7 @@ async function findImage(c,n,subHint){
   if(c==='youtube' && YT_ID[n]) return {url:ytThumb(YT_ID[n]),src:'youtube',failed:false};
   if(CAT[c]&&CAT[c].custom) return {url:null,src:'',failed:true};
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
-  const order=[['music',musicImage],['logo',logoImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
+  const order=[['music',musicImage],['logo',logoImage],['fandom-char',fandomCharImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage],['wikidata',wikidataImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
   for(const [name,fn] of order){
     if((c==='albums'||c==='songs') && artistOf(sub) && /^wikipedia/.test(name)) continue;   /* Wikipedia pages for songs are too easy to mix up with other songs of the same name */
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
@@ -8384,6 +8387,16 @@ async function findImage(c,n,subHint){
   }
   if(!url && BASEOF[c+'|'+n]) return findImage(c,BASEOF[c+'|'+n],subHint);   /* a trim without its own picture borrows its model's */
   return {url,src,failed};
+}
+/* Wikidata's own picture for a thing: one more place to look when Wikipedia has none. Only an exact name that fits the shelf counts. */
+async function wikidataImage(c,n,sub){
+  if(!RULES[c]||CAT[c].custom||c==='albums'||c==='songs') return null;
+  await gate('wd-live',60);
+  const j=await timed('https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&language=en&uselang=en&type=item&limit=6&search='+encodeURIComponent(n),4000);
+  const exact=(j.search||[]).filter(x=>normT(x.label)===normT(n)&&fitsShelf(c,x.description,null)); if(!exact.length) return null;
+  const facts=await wdFacts(exact.map(x=>x.id)).catch(()=>({}));
+  for(const x of exact){ const f=facts[x.id]; if(f&&f.types.size&&!fitsShelf(c,x.description,f.types)) continue; const file=(LOGO_CATS.has(c)&&f.logo)||(f&&f.img); if(file&&!(PERSON_CATS.has(c)&&/\.svg$/i.test(file))) return commonsThumb(file,480); }
+  return null;
 }
 async function resolveOne(c,n,subHint){
   const k=pkey(c,n); if(AUTO.map[k]||state.photos[k]||shared[k]) return;
@@ -9196,8 +9209,12 @@ const RULES = {
   holidays:{desc:/holiday|festival|observance|celebration|\bday\b|feast|new year/i}, seasons:{desc:/season/i},
   kdramas:{desc:/television series|drama|tv series|web series/i, prefer:/south korean|korean/i}, musicals:{desc:/musical/i}, podcasts:{desc:/podcast/i},
   boardgames:{desc:/board game|card game|tabletop|game|role-playing/i}, mobilegames:{desc:/video game|mobile game|game/i},
-  games:{desc:/video game|game series|game franchise|mobile game|online game|roblox|esports|franchise/i}
+  games:{desc:/video game|game series|game franchise|mobile game|online game|roblox|esports|franchise/i},
+  movies:{desc:/\b(film|movie|motion picture|feature)\b/i}, tv:{desc:/television|tv series|sitcom|miniseries|web series|animated series|drama series|reality|sketch|anthology series/i},
+  anime:{desc:/anime|animated (television )?series|animated film|original video animation|ova/i}, manga:{desc:/manga|webtoon|manhwa|manhua|light novel|comic|graphic novel/i},
+  books:{desc:/novel|book|memoir|autobiography|non-?fiction|fantasy|story collection|poetry|play|treatise|essay|biography|trilogy|series of/i}
 };
+const EXTRA_WIKI = new Set(['movies','tv','anime','manga','books']);
 const PERSON_TYPE='Q5', BAND_TYPES=new Set(['Q215380','Q5741069','Q641066','Q216337','Q2088357','Q9212979','Q56816954','Q281643','Q105756498']);
 /* Does a search result fit this shelf? Uses the description first; the item's types (when we have them) have the last word. */
 function fitsShelf(c, desc, types){
@@ -9224,13 +9241,13 @@ async function timed(url, ms, opts){
 /* What each item is (human, band, car model...) plus its free photo or logo, for up to 20 items in one request. */
 async function wdFacts(ids){
   if(!ids.length) return {};
-  const q=`SELECT ?i ?t ?img ?logo WHERE { VALUES ?i { ${ids.map(x=>'wd:'+x).join(' ')} } OPTIONAL { ?i wdt:P31 ?t } OPTIONAL { ?i wdt:P18 ?img } OPTIONAL { ?i wdt:P154 ?logo } }`;
+  const q=`SELECT ?i ?t ?img ?logo ?sl WHERE { VALUES ?i { ${ids.map(x=>'wd:'+x).join(' ')} } OPTIONAL { ?i wdt:P31 ?t } OPTIONAL { ?i wdt:P18 ?img } OPTIONAL { ?i wdt:P154 ?logo } OPTIONAL { ?i wikibase:sitelinks ?sl } }`;
   const j=await timed('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(q),3500,{headers:{Accept:'application/sparql-results+json'}});
   const out={};
   for(const b of (j.results&&j.results.bindings)||[]){
     const id=b.i.value.split('/').pop(), o=(out[id] ||= {types:new Set(),img:'',logo:''});
     if(b.t) o.types.add(b.t.value.split('/').pop());
-    if(b.img && !o.img) o.img=b.img.value; if(b.logo && !o.logo) o.logo=b.logo.value;
+    if(b.img && !o.img) o.img=b.img.value; if(b.logo && !o.logo) o.logo=b.logo.value; if(b.sl) o.sl=Math.max(o.sl||0,+b.sl.value||0);
   }
   return out;
 }
@@ -9247,7 +9264,8 @@ async function wdSearch(c,q,alive){
   if(r.prefer) cands.sort((a,b)=>(r.prefer.test(b.description||'')?1:0)-(r.prefer.test(a.description||'')?1:0));
   return cands.slice(0,8).map(x=>{ const f=facts[x.id]||{}, file=(LOGO_CATS.has(c)&&f.logo)||f.img||f.logo||'';
     const okImg=file && !(PERSON_CATS.has(c)&&/\.svg$/i.test(file));
-    return {n:x.label, s:capFirst(String(x.description||'').replace(/\s*\((born|\d{3,4}\s*[–-])[^)]*\)\s*$/,'')).slice(0,60), img:okImg?commonsThumb(file,240):'', full:okImg?commonsThumb(file,640):'', src:'wikidata', qid:x.id}; });
+    return {n:x.label, s:capFirst(String(x.description||'').replace(/\s*\((born|\d{3,4}\s*[–-])[^)]*\)\s*$/,'')).slice(0,60), img:okImg?commonsThumb(file,240):'', full:okImg?commonsThumb(file,640):'', src:'wikidata', qid:x.id, tier:2,
+      alt:x.match&&x.match.type==='alias'&&x.match.text?[x.match.text]:[], pop:Math.min(1,Math.log10(1+(f.sl||0))/2.7)}; });
 }
 /* Before adding something that is not in the lists: if Wikidata knows that exact name and it clearly is something else
    (a US state on a celebrities shelf, a person on a cars shelf), say so instead of adding it. */
@@ -9262,11 +9280,229 @@ async function shelfMismatch(c,n){
     return exact[0].description||'something else';
   }catch(e){ return null; }
 }
+/* ---------- Search v3: several sources per subject, series-aware character search, pictures from a character's own fandom ---------- */
+const CHAR_CATS = new Set(['characters','villains','superheroes']);
+const FACE_CATS = new Set([...PERSON_CATS,'characters','villains','superheroes']);
+const STOPW = new Set(['the','a','an','of','from','in','and','x','vs','with']);
+const qTokens = q => normT(q).split(' ').filter(t=>t&&!STOPW.has(t));
+/* Edit distance where swapping two neighbouring letters counts as one slip (chintasu / chinatsu). */
+function osa(a,b,max){
+  if(Math.abs(a.length-b.length)>max) return max+1;
+  const d=[]; for(let i=0;i<=a.length;i++){ d[i]=[i]; } for(let j=0;j<=b.length;j++) d[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++){
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+    if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);
+  }
+  return d[a.length][b.length];
+}
+const slip = t => t.length>=7?2:t.length>=4?1:0;
+/* Does this typed word match one of these words: exactly, as the start of one, or with a small typo? */
+const tokHit = (t,words) => words.some(w=>w===t||w.startsWith(t)||(t.length>=4&&(osa(w,t,slip(t))<=slip(t)||osa(w.slice(0,t.length),t,slip(t))<=slip(t))));
+const wordsOf = s => normT(s).split(' ').filter(Boolean);
+/* What fraction of the typed words are found in these words? */
+const cover = (toks,words) => toks.length?toks.filter(t=>tokHit(t,words)).length/toks.length:0;
+
+/* ----- Fandom: the wiki for a character's own franchise ----- */
+const FANDOM_KEY='palate-fwikis3', FW_YES=30*864e5, FW_NO=6*36e5;
+const FANDOM_WIKIS = {
+  'jujutsu kaisen':['jujutsu-kaisen'],'attack on titan':['attackontitan'],'one piece':['onepiece'],'naruto':['naruto'],'dragon ball':['dragonball'],'bleach':['bleach'],
+  'my hero academia':['bokunoheroacademia'],'demon slayer':['kimetsu-no-yaiba'],'chainsaw man':['chainsaw-man'],'spy x family':['spy-x-family'],'death note':['deathnote'],
+  'fullmetal alchemist':['fma'],'hunter x hunter':['hunterxhunter'],'one punch man':['onepunchman'],'tokyo ghoul':['tokyoghoul'],'sword art online':['swordartonline'],
+  'neon genesis evangelion':['evangelion'],'cowboy bebop':['cowboybebop'],'haikyuu':['haikyuu'],'fairy tail':['fairytail'],'black clover':['blackclover'],'dr stone':['dr-stone'],
+  'vinland saga':['vinlandsaga'],'mob psycho 100':['mob-psycho-100'],'re zero':['rezero'],'konosuba':['konosuba'],'gintama':['gintama'],'blue box':['blue-box','ao-no-hako'],
+  'marvel':['marvel'],'dc':['dc'],'marvel cinematic universe':['marvelcinematicuniverse'],'harry potter':['harrypotter'],'star wars':['starwars'],'lord of the rings':['lotr'],
+  'game of thrones':['gameofthrones'],'breaking bad':['breakingbad'],'the office':['theoffice'],'pokemon':['pokemon'],'avatar the last airbender':['avatar'],'the simpsons':['simpsons'],
+  'spongebob squarepants':['spongebob'],'disney':['disney'],'genshin impact':['genshin-impact'],'league of legends':['leagueoflegends'],'minecraft':['minecraft'],'fortnite':['fortnite'],
+  'the witcher':['witcher'],'red dead redemption 2':['reddead'],'red dead redemption':['reddead'],'grand theft auto':['gta'],'the legend of zelda':['zelda'],'super mario':['mario'],
+  'sonic the hedgehog':['sonic'],'stranger things':['strangerthings'],'the walking dead':['walkingdead'],'doctor who':['tardis'],'friends':['friends'],'spider verse':['marvel'],
+  'the last of us':['thelastofus'],'elden ring':['eldenring'],'persona 5':['megamitensei'],'overwatch':['overwatch'],'valorant':['valorant'],'undertale':['undertale'],
+  'steven universe':['steven-universe'],'adventure time':['adventuretimewithfinnandjake'],'rick and morty':['rickandmorty'],'south park':['southpark'],'family guy':['familyguy'],
+  'the mandalorian':['starwars'],'the batman':['dc'],'batman':['dc'],'superman':['dc'],'spider man':['marvel'],'iron man':['marvel'],'avengers':['marvel']
+};
+const FRANCHISE_ALIAS = {jjk:'jujutsu kaisen',aot:'attack on titan',snk:'attack on titan',mha:'my hero academia',bnha:'my hero academia',dbz:'dragon ball',dbs:'dragon ball',hxh:'hunter x hunter',fma:'fullmetal alchemist',fmab:'fullmetal alchemist',
+  sao:'sword art online',csm:'chainsaw man',kny:'demon slayer',lotr:'lord of the rings',got:'game of thrones',mcu:'marvel cinematic universe',hp:'harry potter',opm:'one punch man',tlou:'the last of us',botw:'the legend of zelda',lol:'league of legends',gta:'grand theft auto',rdr2:'red dead redemption 2',atla:'avatar the last airbender',sxf:'spy x family'};
+let FWC={}; try{ FWC=JSON.parse(localStorage.getItem(FANDOM_KEY)||'{}'); }catch(e){}
+const fwSave = () => { try{ localStorage.setItem(FANDOM_KEY,JSON.stringify(FWC)); }catch(e){} };
+const dbg = (...a) => { if(window.PALATE_DEBUG) console.log('[search]',...a); };
+function wikiSlugs(f){
+  const key=normT(f), w=key.split(' ').filter(Boolean), nt=w.filter(x=>x!=='the'), known=FANDOM_WIKIS[key]||[];
+  return [...new Set([...known,w.join('-'),w.join(''),nt.join('-'),nt.join('')])].filter(x=>/^[a-z0-9-]{2,40}$/.test(x)).slice(0,5);
+}
+/* Find the Fandom wiki for a franchise: known ones first, then the likely web addresses; each is checked before use and remembered. */
+async function fandomWiki(franchise){
+  const key=normT(franchise); if(!key) return null;
+  const hit=FWC[key]; if(hit && Date.now()-hit.t<(hit.d?FW_YES:FW_NO)) return hit.d||null;
+  const known=FANDOM_WIKIS[key]||[];
+  for(const sub of wikiSlugs(franchise)){
+    try{
+      await gate('fandom',120);
+      const j=await timed(`https://${sub}.fandom.com/api.php?action=query&meta=siteinfo&siprop=general&format=json&origin=*`,3000);
+      const g=j&&j.query&&j.query.general; if(!g) continue;
+      const ok=known.includes(sub)||cover(wordsOf(franchise).filter(t=>!STOPW.has(t)),wordsOf(g.sitename||''))>=.5;
+      if(ok){ FWC[key]={d:sub+'.fandom.com',t:Date.now(),n:g.sitename||''}; fwSave(); dbg('fandom wiki',franchise,'->',sub); return FWC[key].d; }
+    }catch(e){}
+  }
+  FWC[key]={d:'',t:Date.now()}; fwSave(); return null;
+}
+const cleanFranchise = sub => { const a=segs(sub).map(x=>x.replace(/\([^)]*\)/g,'').replace(/^(character|fictional character|protagonist|villain|hero|antagonist)\s+(in|from|of)\s+(the\s+)?(manga|anime|film|movie|tv series|television series|video game|comic|series)?\s*/i,'').trim()).filter(x=>x&&!/^(19|20)\d\d$/.test(x)&&!isNat(x));
+  return a[0]||''; };
+const badFandomTitle = t => /[\/:]|^list of|gallery|category|disambiguation|\(episode\)|\(chapter\)|\(film\)|\(song\)|soundtrack/i.test(t);
+/* A character's page on its franchise wiki, with the page's main picture. */
+async function fandomCharacter(name,franchise,alive){
+  const wiki=await fandomWiki(franchise); if(!wiki) return null; if(alive&&!alive()) throw new Error('stale');
+  const base='https://'+wiki+'/api.php?format=json&origin=*&action=query';
+  const want=wordsOf(name);
+  const pick=pages=>{ let best=null;
+    for(const pg of pages){ if(!pg.title||badFandomTitle(pg.title)) continue; const tw=wordsOf(pg.title.replace(/\([^)]*\)/g,'')); const cv=cover(want,tw); if(cv<1) continue;
+      const exact=tw.join(' ')===want.join(' '), sc=(exact?0:1)+(pg.thumbnail?0:.5)+(pg.index||0)*.01; if(!best||sc<best.sc) best={sc,pg}; }
+    return best&&best.pg; };
+  await gate('fandom',120);
+  let j=await timed(base+'&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=500&titles='+encodeURIComponent(name),4000).catch(()=>null);
+  let pg=j&&j.query&&pick(Object.values(j.query.pages||{}).filter(p=>!('missing' in p)));
+  if(!pg||!pg.thumbnail){
+    if(alive&&!alive()) throw new Error('stale'); await gate('fandom',120);
+    j=await timed(base+'&generator=search&gsrnamespace=0&gsrlimit=8&gsrsearch='+encodeURIComponent(name)+'&prop=pageimages&piprop=thumbnail&pithumbsize=500',4000).catch(()=>null);
+    pg=j&&j.query&&pick(Object.values(j.query.pages||{}));
+  }
+  if(pg&&!pg.thumbnail){   /* some wikis keep thumbnails in their own API */
+    try{ const d=await timed('https://'+wiki+'/api/v1/Articles/Details?abstract=0&width=500&height=500&titles='+encodeURIComponent(pg.title),3500); const it=d&&d.items&&Object.values(d.items)[0]; if(it&&it.thumbnail) pg.thumbnail={source:it.thumbnail}; }catch(e){}
+  }
+  if(!pg||!pg.thumbnail||!pg.thumbnail.source) return null;
+  return {title:pg.title.replace(/\s*\([^)]*\)\s*$/,''),url:pg.thumbnail.source,wiki,src:'fandom'};
+}
+/* Several pictures from a character's page, for the "Wrong photo?" chooser. */
+async function fandomPictures(name,franchise){
+  const wiki=await fandomWiki(franchise); if(!wiki) return [];
+  const pg=await fandomCharacter(name,franchise).catch(()=>null); if(!pg) return [];
+  await gate('fandom',120);
+  const j=await timed('https://'+wiki+'/api.php?format=json&origin=*&action=query&generator=images&gimlimit=40&titles='+encodeURIComponent(pg.title)+'&prop=imageinfo&iiprop=url|size&iiurlwidth=400',4000).catch(()=>null);
+  const want=wordsOf(name), out=[];
+  for(const p of Object.values((j&&j.query&&j.query.pages)||{})){ const ii=p.imageinfo&&p.imageinfo[0]; if(!ii) continue; const t=p.title||'';
+    if(!/\.(jpe?g|png|webp)$/i.test(t)||/icon|logo|symbol|flag|infobox|stub|navbox|button|badge|wordmark|banner/i.test(t)) continue; if((ii.width||0)<200||(ii.height||0)<200) continue;
+    out.push({url:ii.thumburl||ii.url,label:t.replace(/^File:/i,''),rank:(cover(want,wordsOf(t))>=.5?0:1)}); }
+  out.sort((a,b)=>a.rank-b.rank); return out.slice(0,8);
+}
+async function fandomCharImage(c,n,sub){
+  if(!CHAR_CATS.has(c)) return null; const f=cleanFranchise(sub); if(!f) return null;
+  const r=await fandomCharacter(n,f); return r?r.url:null;
+}
+/* Which franchise does a search mention? ("luffy one piece", "jjk gojo", "peter parker marvel") */
+function franchiseIn(toks){
+  const keys=Object.keys(FANDOM_WIKIS);
+  const text=' '+toks.join(' ')+' '; let best=null;
+  for(const k of keys){ const i=text.indexOf(' '+k+' '); if(i>=0 && (!best||k.length>best.k.length)) best={k,rest:(text.slice(0,i)+' '+text.slice(i+k.length+1)).trim().split(' ').filter(Boolean)}; }
+  for(const t of toks){ const k=FRANCHISE_ALIAS[t]; if(k && (!best||k.length>best.k.length)) best={k,rest:toks.filter(x=>x!==t)}; }
+  return best;
+}
+
+/* ----- AniList: characters of anime and manga, found by name, or by name plus the series they are in ----- */
+const AL_CHAR='id name{full native alternative} image{large medium} favourites media(perPage:2,sort:POPULARITY_DESC){nodes{title{romaji english}}}';
+function splitsOf(toks){
+  const n=toks.length, out=[], push=(i,j)=>{ const m=toks.slice(i,j), ch=toks.slice(0,i).concat(toks.slice(j)); if(m.length&&ch.length) out.push({m:m.join(' '),ch}); };
+  for(const k of [2,1,3]) if(n-k>=1) push(n-k,n);
+  for(const k of [1,2]) if(n-k>=1) push(0,k);
+  return out.slice(0,5);
+}
+async function anilistChars(q,alive){
+  const toks=qTokens(q); if(!toks.length) return [];
+  await gate('anilist-live',400); if(alive&&!alive()) throw new Error('stale');
+  const splits=toks.length>=2?splitsOf(toks):[];
+  const vars={c:q}; splits.forEach((s,i)=>{ vars['m'+i]=s.m; });
+  const decl='$c:String'+splits.map((s,i)=>',$m'+i+':String').join('');
+  const body=`query(${decl}){ c:Page(perPage:6){characters(search:$c,sort:SEARCH_MATCH){${AL_CHAR}}} ${splits.map((s,i)=>`m${i}:Page(perPage:3){media(search:$m${i},sort:SEARCH_MATCH){title{romaji english} synonyms characters(perPage:25,sort:FAVOURITES_DESC){nodes{${AL_CHAR}}}}}`).join(' ')} }`;
+  const r=await timed('https://graphql.anilist.co',4500,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({query:body,variables:vars})});
+  if(alive&&!alive()) throw new Error('stale');
+  const data=r.data||{}, out=[];
+  const asItem=(ch,series,extra)=>{ const nm=ch.name&&ch.name.full; if(!nm) return null; const img=ch.image&&(ch.image.large||ch.image.medium); const med=series||((ch.media&&ch.media.nodes&&ch.media.nodes[0])?(ch.media.nodes[0].title.english||ch.media.nodes[0].title.romaji):'');
+    return {n:nm,s:med,img:img&&!/default/.test(img)?img:'',full:img&&!/default/.test(img)?img:'',alt:[...(ch.name.alternative||[]),ch.name.native].filter(Boolean),src:'anilist',pop:Math.min(1,Math.log10(1+(ch.favourites||0))/4.5),...extra}; };
+  for(const ch of ((data.c||{}).characters)||[]){ const it=asItem(ch,'',{}); if(it){ const cv=cover(toks,wordsOf([it.n,...it.alt].join(' '))); if(cv>=.5) out.push({...it,tier:cv>=1?1:3}); } }
+  splits.forEach((sp,i)=>{
+    for(const m of (((data['m'+i]||{}).media)||[])){
+      const titles=[m.title.romaji,m.title.english,...(m.synonyms||[])].filter(Boolean), tw=wordsOf(titles.join(' ')), tcv=cover(sp.m.split(' '),tw);
+      if(tcv<(sp.m.split(' ').length>1?1:.99)) continue;           /* the series words must really be this series */
+      const series=m.title.english||m.title.romaji;
+      for(const ch of ((m.characters||{}).nodes)||[]){ const it=asItem(ch,series,{}); if(!it) continue; const cv=cover(sp.ch,wordsOf([it.n,...it.alt].join(' '))); if(cv>=1) out.push({...it,tier:0}); }
+    }
+  });
+  return out;
+}
+/* Characters of a franchise Fandom covers (Marvel, Star Wars, games...): search that wiki for the name part of the query. */
+async function fandomSearchChars(q,alive){
+  const toks=qTokens(q), fr=franchiseIn(toks); if(!fr||!fr.rest.length) return [];
+  const wiki=await fandomWiki(fr.k); if(!wiki) return []; if(alive&&!alive()) throw new Error('stale');
+  await gate('fandom',120);
+  const j=await timed('https://'+wiki+'/api.php?format=json&origin=*&action=query&generator=search&gsrnamespace=0&gsrlimit=8&gsrsearch='+encodeURIComponent(fr.rest.join(' '))+'&prop=pageimages&piprop=thumbnail&pithumbsize=500',4000);
+  const out=[]; const disp=fr.k.replace(/\b\w/g,m=>m.toUpperCase());
+  for(const pg of Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99))){
+    if(!pg.title||badFandomTitle(pg.title)) continue; const name=pg.title.replace(/\s*\([^)]*\)\s*$/,''); if(cover(fr.rest,wordsOf(name))<1) continue;
+    out.push({n:name,s:disp,img:pg.thumbnail?pg.thumbnail.source:'',full:pg.thumbnail?pg.thumbnail.source:'',src:'fandom',tier:0,pop:.3});
+  }
+  return out;
+}
+async function charSearch(c,q,alive){
+  const jobs=[anilistChars(q,alive),fandomSearchChars(q,alive),wdSearch(c,q,alive)];
+  const res=await Promise.allSettled(jobs); if(alive&&!alive()) throw new Error('stale');
+  const lists=res.map((r,i)=>{ if(r.status==='fulfilled') return r.value; if(String(r.reason&&r.reason.message)==='stale') throw r.reason; dbg('char source failed',['anilist','fandom','wikidata'][i],r.reason&&r.reason.message); return []; });
+  return lists.flat();
+}
+/* ----- Wikipedia: full-text search catches things named by related words ("tom holland spiderman") ----- */
+async function wikiTextSearch(c,q,alive,fuzzy){
+  await gate('wiki',120); if(alive&&!alive()) throw new Error('stale');
+  const term=fuzzy?qTokens(q).map(t=>t.length>=5?t+'~':t).join(' '):q;
+  const j=await timed('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=0&gsrlimit=10&gsrsearch='+encodeURIComponent(term)+'&prop=pageimages|description&piprop=thumbnail&pithumbsize=320&pilicense=any',4000);
+  if(alive&&!alive()) throw new Error('stale');
+  const toks=qTokens(q), out=[];
+  for(const pg of Object.values((j.query&&j.query.pages)||{}).sort((a,b)=>(a.index||99)-(b.index||99))){
+    const desc=pg.description||''; if(!pg.title||/disambiguation|^list of|^index of/i.test(pg.title+' '+desc)) continue; if(!fitsShelf(c,desc,null)) continue;
+    const name=pg.title.replace(/\s*\([^)]*\)\s*$/,''); if(cover(toks,wordsOf(name+' '+desc))<.67) continue;
+    if(pg.thumbnail&&badImg(c,pg.thumbnail.source)) { pg.thumbnail=null; }
+    out.push({n:name,s:capFirst(desc).replace(/\s*\((born|\d{3,4}\s*[–-])[^)]*\)\s*$/,'').slice(0,60),img:pg.thumbnail?pg.thumbnail.source:'',full:pg.thumbnail?pg.thumbnail.source:'',src:'wikipedia',tier:2,pop:.2});
+  }
+  return out;
+}
+/* Everything for a topic without a specialist source: Wikidata (names and aliases) plus Wikipedia (related words), together. */
+async function generalSearch(c,q,alive){
+  const res=await Promise.allSettled([wdSearch(c,q,alive),wikiTextSearch(c,q,alive,false)]);
+  if(alive&&!alive()) throw new Error('stale');
+  let out=res.flatMap((r,i)=>{ if(r.status==='fulfilled') return r.value; if(String(r.reason&&r.reason.message)==='stale') throw r.reason; dbg('source failed',['wikidata','wikipedia'][i],r.reason&&r.reason.message); return []; });
+  if(out.length<3 && qTokens(q).some(t=>t.length>=5)){   /* nothing close: allow a typo */
+    try{ out=out.concat(await wikiTextSearch(c,q,alive,true)); }catch(e){ if(String(e&&e.message)==='stale') throw e; }
+  }
+  return out;
+}
+/* Apple Music: the second opinion for albums and songs. */
+async function itunesMusicSearch(c,q,cty,alive){
+  await gate('itunes-live',1200); if(alive&&!alive()) throw new Error('stale');
+  const song=c==='songs';
+  const j=await getJSON('https://itunes.apple.com/search?'+new URLSearchParams({media:'music',entity:song?'song':'album',term:q,limit:'12',country:cty||'us'}),true);
+  const out=[], seen=new Set();
+  for(const r of (j.results||[])){
+    const name=(song?r.trackName:r.collectionName)||''; const u=r.artworkUrl100; if(!name||!u) continue;
+    const title=name.replace(/\s*[\(\[](deluxe|expanded|remaster|anniversary|bonus|explicit)[^\)\]]*[\)\]]\s*$/i,'').replace(/\s*-\s*(single|ep)$/i,'').trim(); const key=normT(title)+'|'+normT(r.artistName);
+    if(seen.has(key)||MUSIC_BAD.test(name+' '+(r.collectionName||'')+' '+r.artistName)) continue; seen.add(key);
+    out.push({n:title,s:[r.artistName,yr(r.releaseDate)].filter(Boolean).join(' · '),img:u.replace(/\/\d+x\d+bb\./,'/200x200bb.').replace(/^http:/,'https:'),full:u.replace(/\/\d+x\d+bb\./,'/600x600bb.').replace(/^http:/,'https:'),src:'apple',tier:1,pop:.25});
+  }
+  return out;
+}
+/* Results from different sources for the same thing become one result with the best picture and the most useful line. */
+const SRC_RANK = {fandom:0,pokeapi:0,youtube:0,anilist:1,apple:1,deezer:1,openlibrary:1,wikidata:2,wikipedia:3};
+function mergeLive(list,c){
+  const m=new Map(), music=c==='albums'||c==='songs';
+  for(const x of list){ if(!x||!x.n) continue; const k=normT(x.n)+(music?'|'+normT(artistOf(x.s)):''); if(!normT(x.n)) continue; const o=m.get(k);
+    if(!o){ m.set(k,{...x,alt:[...(x.alt||[])]}); continue; }
+    const better=(SRC_RANK[x.src]??5)<(SRC_RANK[o.src]??5);
+    if(x.img && (!o.img || better)){ o.img=x.img; o.full=x.full||x.img; o.src=better?x.src:o.src; }
+    if(x.s && (!o.s || /^(artist|#\d+|added by you)$/i.test(o.s) || (x.s.length>o.s.length && better))) o.s=x.s;
+    o.alt=[...new Set([...o.alt,...(x.alt||[])])]; o.pop=Math.max(o.pop||0,x.pop||0); o.tier=Math.min(o.tier??9,x.tier??9); }
+  return [...m.values()];
+}
 const LIVE = new Map();
 const yr = d => (String(d||'').match(/(19|20)\d\d/)||[''])[0];
 async function liveSearch1(c,q,cty,alive){
   const stale=()=>{ if(alive && !alive()) throw new Error('stale'); };
   const cfg=IMG_SRC[c]||{}, out=[];
+  /* titles are also looked up on Wikipedia in parallel, which understands related words ("nolan batman") */
+  const extra=EXTRA_WIKI.has(c) ? wikiTextSearch(c,q,alive).catch(e=>{ if(String(e&&e.message)==='stale') throw e; dbg('wikipedia failed',e&&e.message); return []; }) : null;
   if(c==='youtube'){
     const id=ytIdOf(q)||(/^[\w-]{11}$/.test(q.trim())&&/\d|[A-Z]/.test(q.trim())&&!/\s/.test(q.trim())?q.trim():'');
     if(id){ const j=await ytOembed(id); if(j){ YT_ID[j.title]=id; out.push({n:j.title,s:j.author_name||'YouTube',img:ytThumb(id),full:ytThumb(id),src:'youtube'}); } }
@@ -9283,16 +9519,21 @@ async function liveSearch1(c,q,cty,alive){
     const hits=all.filter(p=>p.slug.includes(ql)).sort((a,b)=>(b.slug.startsWith(ql))-(a.slug.startsWith(ql))||a.id-b.id).slice(0,8);
     for(const p of hits) out.push({n:pokeName(p.slug),s:'#'+p.id,img:pokeArt(p.id),full:pokeArt(p.id),src:'pokeapi'});
   } else if(c==='artists'){
-    const list=await deezer('artist',q,8);
-    for(const r of list) if(DZ_OK(r.picture_big)) out.push({n:r.name,s:'Artist',img:r.picture_medium||r.picture_big,full:r.picture_big,src:'deezer'});
+    const [dz,wdl]=await Promise.allSettled([deezer('artist',q,8),wdSearch('artists',q,alive)]);
+    if(alive&&!alive()) throw new Error('stale');
+    if(dz.status==='fulfilled') for(const r of dz.value) if(DZ_OK(r.picture_big)) out.push({n:r.name,s:'Artist',img:r.picture_medium||r.picture_big,full:r.picture_big,src:'deezer',tier:1,pop:Math.min(1,Math.log10(1+(r.nb_fan||0))/7)});
+    if(wdl.status==='fulfilled') out.push(...wdl.value); else dbg('wikidata for artists failed',wdl.reason&&wdl.reason.message);
+    if(dz.status==='rejected' && wdl.status==='rejected') throw dz.reason;
   } else if(c==='albums'||c==='songs'){
-    const list=await deezer(c==='albums'?'album':'track',q,25), best=new Map();
+    const apple=itunesMusicSearch(c,q,cty,alive).catch(e=>{ if(String(e&&e.message)==='stale') throw e; dbg('apple music failed',e&&e.message); return []; });
+    const list=await deezer(c==='albums'?'album':'track',q,25).catch(e=>{ dbg('deezer failed',e&&e.message); return []; }), best=new Map();
     for(const r of list){ const al=c==='albums'?r:(r.album||{}); if(!DZ_OK(al.cover_big)) continue;
       const title=r.title_short||r.title, who=(r.artist&&r.artist.name)||'', key=normT(title)+'|'+normT(who);
       const pen=versionPenalty(title,al.title,al.record_type||r.record_type)-Math.min(5,(r.rank||0)/200000);   /* same song listed many times: keep the original album's cover */
       const row={n:title,s:who,img:al.cover_medium||al.cover_big,full:al.cover_big,src:'deezer',pen};
       const old=best.get(key); if(!old||pen<old.pen) best.set(key,row); }
-    for(const r of best.values()){ delete r.pen; out.push(r); if(out.length>=8) break; }
+    for(const r of best.values()){ delete r.pen; r.tier=1; out.push(r); if(out.length>=10) break; }
+    out.push(...await apple);
   } else if(cfg.i){
     const t=cfg.i; await gate('itunes-live',1200); stale();
     const qs=t==='movie'?{media:'movie',entity:'movie'}:t==='tv'?{media:'tvShow',entity:'tvSeason'}:{media:'software',entity:'software'};
@@ -9318,10 +9559,13 @@ async function liveSearch1(c,q,cty,alive){
     const seen=new Set();
     for(const d of (j.docs||[])){ if(!d.cover_i||seen.has(normT(d.title))) continue; seen.add(normT(d.title));
       out.push({n:d.title,s:(d.author_name||[])[0]||'',img:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-S.jpg',full:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg',src:'openlibrary'}); }
+  } else if(CHAR_CATS.has(c)){
+    out.push(...await charSearch(c,q,alive));
   } else {
-    out.push(...await wdSearch(c,q,alive));
+    out.push(...await generalSearch(c,q,alive));
   }
-  return out.slice(0,8);
+  if(extra) out.push(...await extra);
+  return mergeLive(out,c).slice(0,12);
 }
 /* Searching in another script (한국어, 中文, 日本語...): find the English title through that language's Wikipedia, then search the normal databases with both. */
 async function nativeWiki(q,lang){
@@ -9579,8 +9823,11 @@ function queueLive(){
 }
 let rfRunning=0; const rfQ=[];
 function refineResults(){
-  if(!ed) return; const c=ed.cat;
-  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); rfQ.push([c,it,k]); }
+  if(!ed) return; const c=ed.cat, shown=new Set((ed.res||[]).map(it=>rfKey(c,it)));
+  for(let i=rfQ.length-1;i>=0;i--){ if(!shown.has(rfQ[i][2])){ REFINED.delete(rfQ[i][2]); rfQ.splice(i,1); } }   /* what you are looking at now goes first; old results are dropped */
+  const fresh=[];
+  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); fresh.push([c,it,k]); }
+  rfQ.unshift(...fresh);
   rfPump();
 }
 function rfPump(){
@@ -9609,13 +9856,15 @@ function results(){
   const live=(ed.liveQ===raw?ed.live:[]);
   const tk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
   const qq=tk(q), toks=qq.split(' ').filter(Boolean);
-  const score=it=>matchScore(tk(it.n),tk(it.s),qq,toks);
+  const score=it=>matchScore(tk(it.n),tk(it.s),qq,toks,(it.alt||[]).map(tk));
+  const music=ed.cat==='albums'||ed.cat==='songs', keyOf=it=>normT(it.n)+(music?'|'+normT(artistOf(it.s)):'');
   const veh=VEH_CATS.has(ed.cat), seen=new Set(), rows=[];
-  all.forEach((it,i)=>{ if(have.has(it.n.toLowerCase())) return; const sc=score(it); if(sc==null) return; const k=normT(it.n); if(seen.has(k)) return; seen.add(k); rows.push({it,sc,o:i,loc:1}); });
-  const liveBy=new Map(live.map(x=>[normT(x.n),x]));
-  rows.forEach(r=>{ const t=liveBy.get(normT(r.it.n)); if(t&&t.img&&!(photo(ed.cat,r.it.n))) r.it={...r.it,img:t.img,full:t.full,src:t.src}; });
-  live.forEach((x,i)=>{ const k=normT(x.n); if(seen.has(k)||have.has(x.n.toLowerCase())) return; seen.add(k); const sc=score(x); rows.push({it:x,sc:sc==null?4.5:sc,o:i,loc:0}); });
-  rows.sort((a,b)=>a.sc-b.sc || b.loc-a.loc || (veh&&a.loc&&b.loc?a.it.n.length-b.it.n.length:0) || a.o-b.o);
+  all.forEach((it,i)=>{ if(have.has(it.n.toLowerCase())) return; const sc=score(it); if(sc==null) return; const k=keyOf(it); if(seen.has(k)) return; seen.add(k); rows.push({it,sc,o:i,loc:1}); });
+  const liveBy=new Map(live.map(x=>[keyOf(x),x]));
+  rows.forEach(r=>{ const t=liveBy.get(keyOf(r.it)); if(t){ const add={}; if(t.img&&!(photo(ed.cat,r.it.n))){ add.img=t.img; add.full=t.full; add.src=t.src; } if(t.alt&&t.alt.length) add.alt=t.alt; if(t.pop) add.pop=t.pop; r.it={...r.it,...add}; } });
+  live.forEach((x,i)=>{ const k=keyOf(x); if(seen.has(k)||have.has(x.n.toLowerCase())) return; seen.add(k); const sc=score(x); rows.push({it:x,sc:sc==null?4.5:sc,o:i,loc:0}); });
+  const tierOf=r=>r.it.tier??5, popOf=r=>r.it.pop||0;
+  rows.sort((a,b)=>Math.floor(a.sc*2)/2-Math.floor(b.sc*2)/2 || a.sc-b.sc || b.loc-a.loc || (veh&&a.loc&&b.loc?a.it.n.length-b.it.n.length:0) || (a.loc||b.loc?0:tierOf(a)-tierOf(b)) || popOf(b)-popOf(a) || a.o-b.o);
   ed.res=rows.slice(0,veh?10:8).map(r=>r.it);
   setTimeout(refineResults,0);
   const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
@@ -9641,12 +9890,17 @@ function misfit(c,it){
    4 in the subtitle, 5 a small typo. null means it does not match. */
 function lev1(a,b,max){ if(Math.abs(a.length-b.length)>max) return max+1; let prev=Array.from({length:b.length+1},(_,i)=>i);
   for(let i=1;i<=a.length;i++){ const cur=[i]; let best=i; for(let j=1;j<=b.length;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); if(cur[j]<best) best=cur[j]; } if(best>max) return max+1; prev=cur; } return prev[b.length]; }
-function matchScore(n,sub,qq,toks){
-  if(!qq) return null; if(n===qq) return 0; if(n.startsWith(qq)) return 1;
-  const words=n.split(' ');
+function matchScore(n,sub,qq,toks,alts){
+  if(!qq) return null; if(n===qq) return 0;
+  const al=alts||[]; if(al.includes(qq)) return .5; if(n.startsWith(qq)) return 1; if(al.some(a=>a.startsWith(qq))) return 1.5;
+  const words=n.split(' '), nameish=[...words,...al.flatMap(a=>a.split(' '))];
   if(toks.every(t=>words.some(w=>w.startsWith(t)))) return 2;
+  if(toks.every(t=>tokHit(t,nameish))) return 2.4;                                   /* every word, allowing a typo or an alias */
   if(qq.length>=3 && n.replace(/ /g,'').includes(qq.replace(/ /g,''))) return 3;
-  if(qq.length>=3 && sub){ const sw=sub.split(' '); if(toks.every(t=>sw.some(w=>w.startsWith(t))||words.some(w=>w.startsWith(t)))) return 4; }
+  const subw=sub?sub.split(' '):[];
+  if(subw.length && toks.every(t=>tokHit(t,nameish)||tokHit(t,subw))){               /* related words: a bit of the name and the series */
+    const inName=toks.filter(t=>tokHit(t,nameish)).length; return inName>=Math.ceil(toks.length/2)?2.8:3.2; }
+  if(qq.length>=3 && sub && toks.every(t=>subw.some(w=>w.startsWith(t))||words.some(w=>w.startsWith(t)))) return 4;
   if(toks.every(t=>t.length>=4 && words.some(w=>lev1(w.slice(0,t.length),t,t.length>=7?2:1)<=(t.length>=7?2:1)))) return 5;
   return null;
 }
@@ -10266,6 +10520,7 @@ document.addEventListener('input',e=>{
 });
 
 document.addEventListener('submit',e=>{ if(e.target.id==='auth-form'){ e.preventDefault(); submitAuth(); } else if(e.target.id==='rec-form'){ e.preventDefault(); submitRecovery(); } });
+try{ if(new URLSearchParams(location.search).has('debug')) (window.__p ||= {}).dbg={REFINED,LIVE,FWC,matchScore,osa,tokHit,splitsOf,franchiseIn,qTokens,mergeLive,fitsShelf,cleanFranchise,wikiSlugs,get ed(){ return ed; }}; }catch(e){}
 (async function boot(){
   try{ if(new URLSearchParams(location.search).has('debug')) window.PALATE_DEBUG=true; }catch(e){}
   captureJoin();
