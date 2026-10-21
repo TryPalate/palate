@@ -187,6 +187,13 @@ button.set-row:active{transform:none;background:var(--line)}
 .res-wait,.res-none{display:flex;align-items:center;gap:10px;padding:12px 8px;color:var(--muted);font-size:14px;list-style:none}
 .spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--faint);border-top-color:var(--text);animation:spin .8s linear infinite;flex:none}
 @keyframes spin{to{transform:rotate(360deg)}}
+.qr-btn{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;padding:12px 14px;border:0;border-radius:14px;background:var(--raise);color:var(--text);text-align:left;font:inherit;cursor:pointer}
+.qr-btn b{display:block;font-size:15px}.qr-btn small{display:block;font-size:12.5px;color:var(--muted)}
+.qr-ic{width:34px;height:34px;border-radius:9px;flex:none;background:
+  conic-gradient(from 90deg at 3px 3px,transparent 25%,var(--text) 0) 0 0/11px 11px,var(--card);opacity:.9}
+.qr-stage{display:grid;place-items:center;padding:10px 0 6px}
+.qr-stage canvas{width:min(78vw,300px);height:auto;aspect-ratio:1;border-radius:18px;background:#fff;box-shadow:0 10px 30px -12px rgb(0 0 0 / .45)}
+.qr-note{text-align:center;font-size:13.5px;margin:10px 8px 0}
 .find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 /* Tap areas: small controls keep their look, but the area that answers a tap grows to about 44px */
 .alpha-tag,.pill.sm,.bdg-chip,.card-share,.gear,.logo,.seg button,.set-back,.linkish,.pill.ghost,.tab,.x,.ib,.hr-chip button,.rx-b,.chip,.pk{position:relative}
@@ -7511,6 +7518,7 @@ function aboutHtml(){
     <li><b>Open Library</b><span>Book covers.</span></li>
     <li><b>YouTube</b><span>Video thumbnails and titles.</span></li>
     <li><b>PokéAPI</b><span>Pokémon artwork.</span></li>
+    <li><b>QR codes</b><span>Made with qrcode-generator by Kazuhiko Arase (MIT licence). “QR Code” is a registered trademark of Denso Wave.</span></li>
   </ul>
   <p class="set-note">Names, logos and artwork belong to their owners. Palate isn't affiliated with or endorsed by them. Photos you upload stay yours. Something wrong or yours that should come down? Use Send feedback.</p>
   <div class="set-group"><button class="set-row" data-act="feedback"><span class="set-t">Send feedback</span><span class="chev" aria-hidden="true"></span></button></div>
@@ -7614,6 +7622,56 @@ async function deleteAccount(){
 const inviteLink = cat => location.origin + location.pathname.replace(/index\.html$/,'') + '?join=' + (me?me.invite:'') + (cat&&CAT[cat]?'&c='+encodeURIComponent(cat):'');
 
 /* Sign in / sign up screens */
+/* ---------- QR invites: a code anyone can scan with their phone camera to join you; also a poster to save and share ---------- */
+let qrLib=null;
+function loadQr(){
+  if(window.qrcode) return Promise.resolve(window.qrcode);
+  return qrLib || (qrLib=new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src=new URL('vendor/qrcode.js',location.href).href; sc.onload=()=>window.qrcode?res(window.qrcode):rej(new Error('qr')); sc.onerror=()=>{ qrLib=null; rej(new Error('qr load')); }; document.head.appendChild(sc); }));
+}
+function qrModules(lib,text){ const q=lib(0,'M'); q.addData(text); q.make(); return q; }
+/* Draws the code black on white with a 4-module quiet zone, which is what phone cameras need. */
+function drawQr(ctx,q,x,y,size,round=false){
+  const n=q.getModuleCount(), quiet=4, unit=Math.floor(size/(n+quiet*2)), px=unit*(n+quiet*2), ox=x+Math.round((size-px)/2), oy=y+Math.round((size-px)/2);
+  ctx.fillStyle='#fff'; ctx.fillRect(x,y,size,size); ctx.fillStyle='#0A0A0D';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(q.isDark(r,c)) ctx.fillRect(ox+(c+quiet)*unit,oy+(r+quiet)*unit,unit,unit);
+}
+async function makeQrPoster(){
+  const lib=await loadQr(), link=inviteLink(), q=qrModules(lib,link);
+  const W=1080,H=1350, cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
+  const font=getComputedStyle(document.body).fontFamily||'system-ui,sans-serif';
+  try{ await document.fonts.ready; }catch(e){}
+  const gp=gradParts((me&&me.id)||state.name,me&&me.avatar), h1=Math.abs(hash(state.name))%360;
+  drawStoryBg(x,h1,(h1+70)%360,W,H);
+  x.fillStyle='#fff'; x.font=`800 64px ${font}`; x.textAlign='center'; x.fillText('palate',W/2,150);
+  x.fillStyle='rgba(255,255,255,.7)'; x.font=`600 34px ${font}`; x.fillText('Your taste, ranked. Just for your friends.',W/2,206);
+  const box=700, bx=(W-box)/2, by=300;
+  x.save(); x.shadowColor='rgba(0,0,0,.45)'; x.shadowBlur=70; x.shadowOffsetY=24; rr(x,bx-34,by-34,box+68,box+68,52); x.fillStyle='#fff'; x.fill(); x.restore();
+  drawQr(x,q,bx,by,box);
+  x.fillStyle='#fff'; x.font=`800 58px ${font}`; x.fillText(fitText(x,`Join ${first({name:state.name})} on Palate`,W-160),W/2,by+box+150);
+  x.fillStyle='rgba(255,255,255,.72)'; x.font=`500 34px ${font}`; x.fillText('Point your phone camera at the code',W/2,by+box+206);
+  x.fillStyle='rgba(255,255,255,.45)'; x.font=`600 28px ${font}`; x.fillText(fitText(x,link.replace(/^https?:\/\//,'').replace(/\?.*$/,''),W-160),W/2,H-70); x.textAlign='left';
+  return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
+}
+let qrState=null;
+async function openQr(){
+  track('qr_open');
+  sheet(`<div class="sheet-head"><div><h2>Invite with a code</h2><p>Anyone who scans it joins you as a friend</p></div><button class="x" data-act="close" aria-label="Close">✕</button></div>
+    <div class="qr-stage" id="qr-stage"><canvas id="qr-cv" width="560" height="560" aria-label="QR code that opens your Palate invite"></canvas></div>
+    <p class="muted qr-note">Open the camera on a phone and point it here. The code stops working if you make a new invite link.</p>
+    <div class="sheet-foot"><button class="pill ghost" data-act="copy-invite-qr">Copy link</button><div class="foot-right"><button class="pill soft" data-act="qr-save" id="qr-save" disabled>Save poster</button><button class="pill" data-act="qr-share" id="qr-share" disabled>Share poster</button></div></div>`,'qr');
+  qrState={blob:null};
+  try{
+    const lib=await loadQr(), cv=$('#qr-cv'); if(!cv) return; drawQr(cv.getContext('2d'),qrModules(lib,inviteLink()),0,0,560);
+    makeQrPoster().then(b=>{ if(!qrState) return; qrState.blob=b; ['qr-save','qr-share'].forEach(id=>{ const e=$('#'+id); if(e) e.disabled=!b; }); });
+  }catch(e){ const st=$('#qr-stage'); if(st) st.innerHTML='<p class="muted" style="padding:30px 10px;text-align:center">Couldn\'t make the code. Check your connection and try again.</p>'; }
+}
+function qrFile(){ return new File([qrState.blob],'palate-invite.png',{type:'image/png'}); }
+async function qrShare(){
+  if(!qrState||!qrState.blob) return; const f=qrFile(), text=`Join me on Palate: ${inviteLink()}`;
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text}); track('qr_share'); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  qrSave(); try{ navigator.clipboard.writeText(text); }catch(e){} toast('Saved, and the link is copied.');
+}
+function qrSave(){ if(!qrState||!qrState.blob) return; track('qr_save'); const u=URL.createObjectURL(qrState.blob), a=document.createElement('a'); a.href=u; a.download='palate-invite.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); }
 let authMode='in';
 /* An invite link can carry a topic: ?join=CODE&c=albums. We keep it (also across an email-confirmation detour) for up to 3 days. */
 const JOIN_KEY='palate-join';
@@ -8451,6 +8509,7 @@ function invitePanel(){
   return `<div class="panel invite find"><h2>Find by username</h2><div class="link-row"><input id="find-in" placeholder="@username" autocapitalize="none" spellcheck="false" aria-label="Their username"><button class="pill soft sm" data-act="find-go">Find</button></div><div id="find-out"></div></div><div style="height:12px"></div>
   <div class="panel invite"><h2>Invite a friend</h2><p class="muted">Anyone with this link can add you as a friend, so only send it to people you trust.</p>
     <div class="link-row"><input readonly value="${esc(inviteLink())}" aria-label="Your invite link" onfocus="this.select()"><button class="pill sm" data-act="copy-invite">Copy</button></div>
+    <button class="qr-btn" data-act="qr"><span class="qr-ic" aria-hidden="true"></span><span><b>Show QR code</b><small>Let a friend scan it with their camera</small></span></button>
     <button class="swap" data-act="new-invite">Make a new link</button></div>`;
 }
 function viewFriends(){
@@ -9897,6 +9956,10 @@ document.addEventListener('click',e=>{
     case 'push-on': enablePush().then(ok=>{ refreshPromo(); if(sheetKind==='account') openAccount(); if(ok){ haptic('success'); toast('Notifications are on'); } }); break;
     case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
     case 'rx': react(el); break;
+    case 'qr': openQr(); break;
+    case 'qr-save': qrSave(); break;
+    case 'qr-share': qrShare(); break;
+    case 'copy-invite-qr': track('invite_copy'); copyText(inviteLink(),'Link copied'); break;
     case 'weekly': openWeekly(); break;
     case 'hr-start': startHelpRank(); break;
     case 'hr-rm': ed.hr.pool.splice(+el.dataset.i,1); renderEditor(); break;
