@@ -194,6 +194,27 @@ button.set-row:active{transform:none;background:var(--line)}
 .qr-stage{display:grid;place-items:center;padding:10px 0 6px}
 .qr-stage canvas{width:min(78vw,300px);height:auto;aspect-ratio:1;border-radius:18px;background:#fff;box-shadow:0 10px 30px -12px rgb(0 0 0 / .45)}
 .qr-note{text-align:center;font-size:13.5px;margin:10px 8px 0}
+.wrap-hero{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;border:0;color:var(--text);cursor:pointer;margin-bottom:14px;padding:22px 22px 20px;border-radius:24px;min-height:210px;overflow:hidden;
+  background:var(--grain),radial-gradient(120% 90% at 100% 0%,hsl(var(--h) 55% 34%),transparent 72%),radial-gradient(100% 80% at 0% 100%,hsl(calc(var(--h) + 60) 50% 26%),transparent 75%),var(--card)}
+:root[data-theme="light"] .wrap-hero{background:var(--grain),radial-gradient(120% 90% at 100% 0%,hsl(var(--h) 70% 86%),transparent 72%),radial-gradient(100% 80% at 0% 100%,hsl(calc(var(--h) + 60) 60% 90%),transparent 75%),var(--card)}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .wrap-hero{background:var(--grain),radial-gradient(120% 90% at 100% 0%,hsl(var(--h) 70% 86%),transparent 72%),radial-gradient(100% 80% at 0% 100%,hsl(calc(var(--h) + 60) 60% 90%),transparent 75%),var(--card)}}
+.wh-k{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.wrap-hero b{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-top:6px}
+.wh-s{font-size:14.5px;color:var(--muted);max-width:30ch}
+.wh-go{margin-top:auto;align-self:flex-end;background:var(--text);color:var(--bg);font-weight:700;font-size:15px;padding:10px 20px;border-radius:999px}
+#wrap-root{position:fixed;inset:0;z-index:210;background:#000}
+.wr-view{position:absolute;inset:0;height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(30px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.wr-bars{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:14px;right:64px;display:flex;gap:4px;z-index:3}
+.wr-bars i{flex:1;height:3px;border-radius:2px;background:rgb(255 255 255 / .28);overflow:hidden}.wr-bars i b{display:block;height:100%;width:0;background:#fff}
+.wr-bars i.cur b{animation:none}
+.wr-stage{position:relative;flex:1;min-height:0;width:100%;display:grid;place-items:center}
+.wr-stage img{width:min(100%,calc((100dvh - 150px) * 9 / 16));height:auto;aspect-ratio:9/16;object-fit:cover;border-radius:22px;background:#111;box-shadow:0 20px 60px rgb(0 0 0 / .5);transition:opacity .2s}
+#wrap-root.busy .wr-stage img{opacity:.3}#wrap-root.busy .story-busy{opacity:1}
+.wr-tap{position:absolute;top:0;bottom:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wr-tap.l{left:0;width:32%}.wr-tap.r{right:0;width:68%}
+.wr-bar{display:flex;gap:8px}
+#wrap-root .wr-view{animation:story-in .4s var(--ease-out) both}
+#wrap-root.out{pointer-events:none}#wrap-root.out .wr-view{animation:fade-out .24s ease forwards}
 .find #find-out:not(:empty){margin-top:8px}.find .person{border-top:0}
 /* Tap areas: small controls keep their look, but the area that answers a tap grows to about 44px */
 .alpha-tag,.pill.sm,.bdg-chip,.card-share,.gear,.logo,.seg button,.set-back,.linkish,.pill.ghost,.tab,.x,.ib,.hr-chip button,.rx-b,.chip,.pk{position:relative}
@@ -7027,6 +7048,9 @@ function tipHide(k){ try{ localStorage.setItem('palate-tip-'+k,String(Date.now()
 function promoCard(){
   if(!me || ui.view!=='me' || ui.year!==CURRENT || !shelfList(CURRENT).length) return '';
   const x=k=>`<button class="slim-x" data-act="tip-x" data-k="${k}" aria-label="Dismiss">✕</button>`;
+  const m=new Date().getMonth();
+  if((m===11||m===0&&new Date().getDate()<=15) && !tipOff('wrap'+CURRENT))
+    return `<div class="slim wrapnudge"><span class="slim-t"><b>Your ${CURRENT} is ready</b><small>Tap through your year and share it</small></span><button class="pill sm" data-act="wrap-play">Play</button>${x('wrap'+CURRENT)}</div>`;
   if(!isStandalone() && !tipOff('install') && (deferredInstall || IS_IOS))
     return `<div class="slim"><span class="slim-t"><b>Add to home screen</b><small>Opens in one tap</small></span><button class="pill sm" data-act="install">${IS_IOS?'Show me':'Install'}</button>${x('install')}</div>`;
   if(canPush() && !pushOn && !tipOff('notify') && Notification.permission==='default' && FRIENDS.length)
@@ -8561,6 +8585,130 @@ function recapData(){
   const best = FRIENDS.map(f=>({f,...compat(f)})).sort((a,b)=>b.pct-a.pct)[0];
   return {list,constant,shake,newTops,best};
 }
+/* ---------- Your 2026: a tap-through recap made from your own shelves. Each slide is a picture you can share. ---------- */
+const WRAP = {open:false, i:0, slides:[], urls:[], blobs:[], busy:{}};
+try{ if(new URLSearchParams(location.search).has('debug')) (window.__p ||= {}).WRAP=WRAP; }catch(e){}
+function wrapSlides(){
+  const Y=CURRENT, d=recapData(), list=d.list; if(!list.length) return [];
+  const picks=list.reduce((n,c)=>n+eff(c,Y).snap.top.length,0), out=[];
+  const tops=list.slice(0,6).map(c=>({c,it:eff(c,Y).snap.top[0]}));
+  out.push({k:'cover',tops,picks});
+  const days=UNL.days|0;
+  out.push({k:'numbers',rows:[[list.length,list.length===1?'shelf':'shelves'],[picks,'picks you ranked'],...(days>1?[[days,'days you opened Palate']]:[]),...(FRIENDS.length?[[FRIENDS.length,FRIENDS.length===1?'friend':'friends']]:[])]});
+  out.push({k:'tops',tops});
+  if(d.constant) out.push({k:'constant',c:d.constant.c,item:d.constant.item,start:d.constant.start});
+  if(d.newTops.length) out.push({k:'newtops',list:d.newTops.slice(0,5)});
+  if(d.shake) out.push({k:'shake',c:d.shake.c,fresh:d.shake.fresh.slice(0,5)});
+  if(d.best && d.best.per.length) out.push({k:'friend',f:d.best.f,pct:d.best.pct,n:d.best.per.reduce((n,p)=>n+p.shared.length,0)});
+  const by=new Map(); for(const x of RX.got){ if(!CAT[x.cat]||!FRIENDS.some(f=>f.id===x.reactor)) continue; const k=x.cat+'|'+x.item, o=by.get(k)||{c:x.cat,n:x.item,count:0,kinds:{}}; o.count++; o.kinds[x.kind]=(o.kinds[x.kind]||0)+1; by.set(k,o); }
+  const hot=[...by.values()].sort((a,b)=>b.count-a.count)[0]; if(hot) out.push({k:'reacted',...hot});
+  if(UNL.v3 && UNL.weekly>0) out.push({k:'weekly',n:UNL.weekly});
+  out.push({k:'outro'});
+  return out;
+}
+async function makeWrapSlide(d){
+  curFont=getComputedStyle(document.body).fontFamily||'system-ui,sans-serif'; const font=curFont;
+  try{ await document.fonts.ready; }catch(e){}
+  const Y=CURRENT, cv=document.createElement('canvas'); cv.width=SW; cv.height=SH; const x=cv.getContext('2d');
+  const ph=(c,n)=>{ const p=photo(c,n); return p?p.h:hue(n); };
+  const hueOf=d.tops&&d.tops[0]?ph(d.tops[0].c,d.tops[0].it.n):d.item?ph(d.c,d.item.n):d.c&&d.fresh?ph(d.c,d.fresh[0].n):d.list&&d.list[0]?ph(d.list[0].c,d.list[0].now.n):d.n&&d.c?ph(d.c,d.n):hash('wrap'+Y)%360;
+  const h1=hueOf, h2=(h1+70)%360; drawStoryBg(x,h1,h2); drawHeader(x,Y,font);
+  const title=(t,y=410)=>{ x.fillStyle='#fff'; x.textAlign='left'; let fs=92; do{ x.font=`800 ${fs}px ${font}`; fs-=4; }while(x.measureText(t).width>SW-180&&fs>56); x.fillText(fitText(x,t,SW-180),90,y); };
+  const sub=(t,y)=>{ x.fillStyle='rgba(255,255,255,.58)'; x.font=`700 50px ${font}`; x.textAlign='left'; x.fillText(fitText(x,t,SW-180),90,y); };
+  const foot=()=>{ x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,footLine(),SW-160),SW/2,1770); x.textAlign='left'; };
+  const centerArt=async(c,name,H,y)=>{ const im=await storyImg(c,photo(c,name)); const shp=CAT[c].shape; drawArt(x,im,name,c,SW/2,y,shp,H); return {im,shp}; };
+  switch(d.k){
+    case 'cover':{
+      x.textAlign='left'; x.fillStyle='rgba(255,255,255,.7)'; x.font=`700 54px ${font}`; x.fillText('Your',90,560);
+      let fs=400; do{ x.font=`800 ${fs}px ${font}`; fs-=10; }while(x.measureText(String(Y)).width>SW-150&&fs>200); x.fillStyle='#fff'; x.fillText(String(Y),78,900);
+      x.fillStyle='rgba(255,255,255,.8)'; x.font=`600 50px ${font}`; x.fillText(`${d.tops.length>=1?d.picks+' picks':''} ${d.tops.length?'· '+state.name:''}`.trim(),90,990);
+      const arts=d.tops.slice(0,3), H=250, gap=40, ws=arts.map(t=>CAT[t.c].shape==='wide'?Math.round(H*1.5):CAT[t.c].shape==='poster'?Math.round(H*.67):H), total=ws.reduce((a,b)=>a+b,0)+gap*(arts.length-1);
+      let cx=(SW-total)/2; for(let i=0;i<arts.length;i++){ const t=arts[i], im=await storyImg(t.c,photo(t.c,t.it.n)); drawArt(x,im,t.it.n,t.c,cx+ws[i]/2,1180,CAT[t.c].shape,H); cx+=ws[i]+gap; }
+      break; }
+    case 'numbers':{
+      title('The year in numbers'); const rows=d.rows, rh=Math.min(300,Math.floor(1100/rows.length));
+      rows.forEach(([n,l],i)=>{ const y=600+i*rh; x.fillStyle='#fff'; x.font=`800 190px ${font}`; x.fillText(String(n),90,y+150); const w=x.measureText(String(n)).width; x.fillStyle='rgba(255,255,255,.68)'; x.font=`600 56px ${font}`; x.fillText(fitText(x,l,SW-w-250),90+w+36,y+140); });
+      break; }
+    case 'tops':{
+      title('Your number ones'); sub(`${Y}`,480);
+      const rows=d.tops.map(t=>({n:t.it.n,s:CAT[t.c].name,c:t.c,shape:CAT[t.c].shape,rank:0,p:photo(t.c,t.it.n)}));
+      await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); })); drawRows(x,rows,font,false,560,1090); break; }
+    case 'constant':{
+      title(CAT[d.c].name,410); sub('Still #1',480); const {shp}=await centerArt(d.c,d.item.n,CAT[d.c].shape==='wide'?400:CAT[d.c].shape==='poster'?640:620,620);
+      x.textAlign='center'; x.fillStyle='#fff'; x.font=`800 84px ${font}`; wrapLines(x,d.item.n,SW-180,2).forEach((l,i)=>x.fillText(l,SW/2,1400+i*92));
+      x.fillStyle='rgba(255,255,255,.62)'; x.font=`600 46px ${font}`; x.fillText(`#1 since ${d.start}`,SW/2,1400+wrapLines(x,d.item.n,SW-180,2).length*92+30); x.textAlign='left'; break; }
+    case 'newtops':{
+      title('New at #1'); const rows=d.list.map(n=>({n:n.now.n,s:`${CAT[n.c].name} · over ${n.was.n}`,c:n.c,shape:CAT[n.c].shape,rank:0,p:photo(n.c,n.now.n)}));
+      await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); })); drawRows(x,rows,font,false,560,1090); break; }
+    case 'shake':{
+      title(`New in ${CAT[d.c].name.toLowerCase()}`); const rows=d.fresh.map(it=>({n:it.n,s:it.s,c:d.c,shape:CAT[d.c].shape,rank:0,p:photo(d.c,it.n)}));
+      await Promise.all(rows.map(async r=>{ r.im=await storyImg(r.c,r.p); })); drawRows(x,rows,font,false,560,1090); break; }
+    case 'friend':{
+      title('Closest taste',410); const gp=gradParts(d.f.id||d.f.name,d.f.avatar), g=x.createLinearGradient(SW/2-230,560,SW/2+230,1020); g.addColorStop(0,gp.cols[0]); g.addColorStop(1,gp.cols[1]);
+      x.fillStyle=g; x.beginPath(); x.arc(SW/2,790,230,0,Math.PI*2); x.fill(); x.textAlign='center'; x.fillStyle='#fff'; x.font=`800 170px ${font}`; x.fillText(d.f.name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase(),SW/2,850);
+      x.font=`800 96px ${font}`; x.fillText(fitText(x,first(d.f),SW-180),SW/2,1210); x.fillStyle='rgba(255,255,255,.88)'; x.font=`800 210px ${font}`; x.fillText(d.pct+'%',SW/2,1440);
+      x.fillStyle='rgba(255,255,255,.6)'; x.font=`600 46px ${font}`; x.fillText(`${d.n} shared pick${d.n===1?'':'s'}`,SW/2,1520); x.textAlign='left'; break; }
+    case 'reacted':{
+      title(CAT[d.c].name,410); sub('Your most talked-about pick',480); await centerArt(d.c,d.n,CAT[d.c].shape==='wide'?400:CAT[d.c].shape==='poster'?640:620,620);
+      x.textAlign='center'; x.fillStyle='#fff'; x.font=`800 80px ${font}`; wrapLines(x,d.n,SW-180,2).forEach((l,i)=>x.fillText(l,SW/2,1400+i*88));
+      const kinds=Object.entries(d.kinds).map(([k,v])=>`${RXL[k]} ×${v}`).join('   '); x.fillStyle='rgba(255,255,255,.66)'; x.font=`600 44px ${font}`; x.fillText(kinds,SW/2,1400+wrapLines(x,d.n,SW-180,2).length*88+34); x.textAlign='left'; break; }
+    case 'weekly':{
+      title('Weekly topics'); x.fillStyle='#fff'; x.font=`800 420px ${font}`; x.textAlign='center'; x.fillText(String(d.n),SW/2,1010);
+      x.fillStyle='rgba(255,255,255,.7)'; x.font=`600 60px ${font}`; x.fillText(d.n===1?'topic answered':'topics answered',SW/2,1110); x.textAlign='left'; break; }
+    case 'outro':{
+      x.textAlign='center'; x.fillStyle='#fff'; x.font=`800 120px ${font}`; x.fillText('Here’s to',SW/2,520); x.fillText(String(Y+1),SW/2,660);
+      try{ const lib=await loadQr(); x.save(); x.shadowColor='rgba(0,0,0,.45)'; x.shadowBlur=60; x.shadowOffsetY=20; rr(x,SW/2-290,760,580,580,44); x.fillStyle='#fff'; x.fill(); x.restore(); drawQr(x,qrModules(lib,inviteLink()),SW/2-260,790,520); }catch(e){}
+      x.fillStyle='#fff'; x.font=`700 54px ${font}`; x.fillText('Scan to join me on Palate',SW/2,1450); x.textAlign='left'; break; }
+  }
+  foot();
+  return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
+}
+async function wrapEnsure(i){
+  if(!WRAP.slides[i]) return null;
+  if(WRAP.blobs[i]||WRAP.busy[i]) return WRAP.busy[i]||null;
+  WRAP.busy[i]=(async()=>{ try{ const b=await makeWrapSlide(WRAP.slides[i]); WRAP.blobs[i]=b; WRAP.urls[i]=URL.createObjectURL(b); }catch(e){ console.error(e); } delete WRAP.busy[i]; })();
+  return WRAP.busy[i];
+}
+async function openWrap(){
+  const slides=wrapSlides(); if(!slides.length){ toast('Add a few shelves first'); return; }
+  track('wrap_open'); closeSheet();
+  Object.assign(WRAP,{open:true,i:0,slides,urls:[],blobs:[],busy:{}});
+  let box=$('#wrap-root'); if(!box){ box=document.createElement('div'); box.id='wrap-root'; document.body.appendChild(box); }
+  document.body.style.overflow='hidden';
+  box.className='busy';
+  box.innerHTML=`<div class="wr-view" role="dialog" aria-modal="true" aria-label="Your ${CURRENT}">
+    <div class="wr-bars" aria-hidden="true">${slides.map(()=>'<i><b></b></i>').join('')}</div>
+    <button class="story-x" data-act="wrap-close" aria-label="Close">✕</button>
+    <div class="wr-stage"><img id="wr-img" alt=""><div class="story-busy">Making your recap…</div>
+      <button class="wr-tap l" data-act="wrap-prev" aria-label="Previous"></button><button class="wr-tap r" data-act="wrap-next" aria-label="Next"></button></div>
+    <div class="wr-bar"><button class="pill" data-act="wrap-share">Share this</button><button class="pill soft" data-act="wrap-save">Save image</button></div></div>`;
+  wrapShow(0); syncHistory();
+}
+async function wrapShow(i){
+  if(!WRAP.open) return; i=Math.max(0,Math.min(WRAP.slides.length-1,i)); WRAP.i=i;
+  const box=$('#wrap-root'); if(!box) return;
+  box.querySelectorAll('.wr-bars i b').forEach((b,k)=>{ b.style.width=k<i?'100%':k===i?'100%':'0'; b.parentElement.classList.toggle('cur',k===i); });
+  const img=$('#wr-img'); const have=WRAP.urls[i];
+  if(have){ img.src=have; box.classList.remove('busy'); } else { box.classList.add('busy'); await wrapEnsure(i); if(!WRAP.open||WRAP.i!==i) return; if(WRAP.urls[i]){ img.src=WRAP.urls[i]; } box.classList.remove('busy'); }
+  wrapEnsure(i+1);
+}
+function wrapStep(d){
+  const n=WRAP.i+d; if(n>=WRAP.slides.length){ closeWrap(); return; } if(n<0) return; haptic(); wrapShow(n);
+}
+function closeWrap(fromBack){
+  const box=$('#wrap-root'); const was=WRAP.open; WRAP.open=false;
+  WRAP.urls.forEach(u=>{ try{ URL.revokeObjectURL(u); }catch(e){} }); WRAP.urls=[]; WRAP.blobs=[];
+  if(box){ if(reduceMotion()) box.remove(); else { box.id=''; box.classList.add('out'); setTimeout(()=>box.remove(),300); } }
+  if(!$('#sheet-root').firstChild) document.body.style.overflow=''; if(was) syncHistory();
+}
+function wrapFile(){ return new File([WRAP.blobs[WRAP.i]],`palate-${CURRENT}-${WRAP.i+1}.png`,{type:'image/png'}); }
+async function wrapShare(){
+  const b=WRAP.blobs[WRAP.i]; if(!b) return; const f=wrapFile(), text=`My Palate ${CURRENT}\n${inviteLink()}`;
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text}); track('wrap_share'); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  wrapSave(); try{ navigator.clipboard.writeText(text); }catch(e){} toast('Saved, and the message is copied.');
+}
+function wrapSave(){ const u=WRAP.urls[WRAP.i]; if(!u) return; track('wrap_save'); const a=document.createElement('a'); a.href=u; a.download=wrapFile().name; document.body.appendChild(a); a.click(); a.remove(); }
+document.addEventListener('keydown',e=>{ if(!WRAP.open) return; if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); wrapStep(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); wrapStep(-1); } else if(e.key==='Escape'){ e.stopPropagation(); closeWrap(); } },true);
 function story(style,title,body){ return `<article class="card story" style="${style}"><div class="tag">palate ${yy(CURRENT)}<span>${esc(state.name)}</span></div>${title?`<h2>${title}</h2>`:''}${body}</article>`; }
 function viewRecap(){
   const d=recapData(), Y=CURRENT;
@@ -8573,7 +8721,9 @@ function viewRecap(){
   if(d.shake) cards.push(story(tint(d.shake.c,d.shake.fresh[0].n),`New in ${esc(CAT[d.shake.c].name.toLowerCase())}`,rowsOf(d.shake.fresh.map(it=>({n:it.n,c:d.shake.c,s:it.s})))));
   if(d.best) cards.push(story(`--h:${d.best.f.hue}`,'',`<div class="feature"><span class="av" style="--h:${d.best.f.hue};width:120px;height:120px;font-size:40px">${esc(d.best.f.name.split(' ').map(p=>p[0]).join(''))}</span><b>${esc(d.best.f.name)}</b><span>Closest taste · ${d.best.pct}% in common</span></div>`));
   if(!cards.length) return `<section class="head"><h1>${Y} Recap</h1></section><p class="empty-note">Add a few shelves and your recap shows up here.</p>`;
-  return `<section class="head"><h1>${Y} Recap</h1></section>
+  const dec=new Date().getMonth()===11;
+  const hero=`<button class="wrap-hero" style="${tint(tops[0].c,tops[0].it.n)}" data-act="wrap-play"><span class="wh-k">${dec?'Ready for you':'So far this year'}</span><b>Your ${Y}</b><span class="wh-s">${d.list.length} shel${d.list.length===1?'f':'ves'} · tap through, then share any slide</span><span class="wh-go">Play</span></button>`;
+  return `<section class="head"><h1>${Y} Recap</h1></section>${hero}
   <div class="stories">${cards.join('')}</div>
   <div class="recap-foot"><button class="pill" data-act="copy-share">Copy my #1s</button>${d.best?`<button class="pill soft" data-act="compare" data-f="${d.best.f.id}">Compare with ${esc(first(d.best.f))}</button>`:''}</div>`;
 }
@@ -8638,6 +8788,7 @@ function exportMyData(){
 }
 /* ---------- Story pictures: 1080x1920 (Instagram story size), in the style of Apple Music Replay ---------- */
 const SW=1080, SH=1920;
+let curFont='system-ui,sans-serif';
 let sty=null;
 const notesPref = () => { try{ return localStorage.getItem('palate-story-notes')!=='0'; }catch(e){ return true; } };
 function fitText(ctx,t,max){ t=String(t||''); if(ctx.measureText(t).width<=max) return t; while(t.length>1 && ctx.measureText(t+'…').width>max) t=t.slice(0,-1); return t.trimEnd()+'…'; }
@@ -8660,7 +8811,7 @@ function drawArt(x,im,name,c,cx,ay,shape,H){
   if(im){ const ar=aw/H, ir=im.naturalWidth/im.naturalHeight; let sw,sh; if(ir>ar){ sh=im.naturalHeight; sw=sh*ar; } else { sw=im.naturalWidth; sh=sw/ar; }
     const face=PERSON_CATS.has(c)||c==='characters'; x.drawImage(im,(im.naturalWidth-sw)/2,face?(im.naturalHeight-sh)*.18:(im.naturalHeight-sh)/2,sw,sh,ax,ay,aw,H); }
   else { const g=x.createLinearGradient(ax,ay,ax+aw,ay+H); g.addColorStop(0,`hsl(${hue(name)} 50% 46%)`); g.addColorStop(1,`hsl(${(hue(name)+40)%360} 45% 30%)`); x.fillStyle=g; x.fillRect(ax,ay,aw,H);
-    x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 ${Math.round(H/3)}px ${sty.font}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(initials(name),ax+aw/2,ay+H/2+3); x.textAlign='left'; x.textBaseline='alphabetic'; }
+    x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 ${Math.round(H/3)}px ${(sty&&sty.font)||curFont}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(initials(name),ax+aw/2,ay+H/2+3); x.textAlign='left'; x.textBaseline='alphabetic'; }
   x.restore();
   x.save(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=2; x.beginPath(); if(shape==='round') x.arc(ax+aw/2,ay+H/2,aw/2-1,0,Math.PI*2); else rr(x,ax+1,ay+1,aw-2,H-2,shape==='poster'?18:26); x.stroke(); x.restore();
 }
@@ -8708,7 +8859,7 @@ function coverArt(x,im,name,c,ax,ay,w,h,r){
   if(im){ const ar=w/h, ir=im.naturalWidth/im.naturalHeight; let sw,sh; if(ir>ar){ sh=im.naturalHeight; sw=sh*ar; } else { sw=im.naturalWidth; sh=sw/ar; }
     const face=PERSON_CATS.has(c)||c==='characters'; x.drawImage(im,(im.naturalWidth-sw)/2,face?(im.naturalHeight-sh)*.18:(im.naturalHeight-sh)/2,sw,sh,ax,ay,w,h); }
   else { const g=x.createLinearGradient(ax,ay,ax+w,ay+h); g.addColorStop(0,`hsl(${hue(name)} 50% 46%)`); g.addColorStop(1,`hsl(${(hue(name)+40)%360} 45% 30%)`); x.fillStyle=g; x.fillRect(ax,ay,w,h);
-    x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 ${Math.round(Math.min(w,h)/3)}px ${sty.font}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(initials(name),ax+w/2,ay+h/2+3); x.textAlign='left'; x.textBaseline='alphabetic'; }
+    x.fillStyle='rgba(255,255,255,.92)'; x.font=`700 ${Math.round(Math.min(w,h)/3)}px ${(sty&&sty.font)||curFont}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(initials(name),ax+w/2,ay+h/2+3); x.textAlign='left'; x.textBaseline='alphabetic'; }
   x.restore();
   x.save(); x.strokeStyle='rgba(255,255,255,.14)'; x.lineWidth=2; rr(x,ax+1,ay+1,w-2,h-2,r); x.stroke(); x.restore();
 }
@@ -9738,7 +9889,7 @@ function rememberImages(){
 const TABS = ['me','friends','recap'];
 const NAV = {i:0, busy:false, want:false, edgeT:0, t:0, ready:false};
 const reduceMotion = () => { try{ return matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
-const overlayOpen = () => !!(sty || $('#sheet-root .scrim'));
+const overlayOpen = () => !!(sty || WRAP.open || $('#sheet-root .scrim'));
 function navStack(){
   const L=[{tab:'me',profile:null,compare:null}];
   if(ui.tab!=='me') L.push({tab:ui.tab,profile:null,compare:null});
@@ -9788,6 +9939,7 @@ addEventListener('popstate',e=>{
   NAV.i=s.i|0;
   if(!me || !document.body.classList.contains('in')) return;
   if(sty){ closeStory(true); syncHistory(); return; }
+  if(WRAP.open){ closeWrap(true); syncHistory(); return; }
   if($('#sheet-root .scrim')){ closeSheet(true); syncHistory(); return; }
   const native = Date.now()-NAV.edgeT<800;   /* Safari already animated its own edge swipe */
   navTo({tab:s.tab||'me',profile:s.profile,compare:s.compare},{fromPop:true,quiet:true,dir:native?0:undefined});
@@ -9957,6 +10109,12 @@ document.addEventListener('click',e=>{
     case 'push-off': disablePush().then(()=>{ if(sheetKind==='account') openAccount(); toast('Notifications are off'); }); break;
     case 'rx': react(el); break;
     case 'qr': openQr(); break;
+    case 'wrap-play': openWrap(); break;
+    case 'wrap-close': closeWrap(); break;
+    case 'wrap-next': wrapStep(1); break;
+    case 'wrap-prev': wrapStep(-1); break;
+    case 'wrap-share': wrapShare(); break;
+    case 'wrap-save': wrapSave(); break;
     case 'qr-save': qrSave(); break;
     case 'qr-share': qrShare(); break;
     case 'copy-invite-qr': track('invite_copy'); copyText(inviteLink(),'Link copied'); break;
