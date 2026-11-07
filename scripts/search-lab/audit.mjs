@@ -34,7 +34,7 @@ async function runQuery(page, cat, q) {
   const settled = await done(20000); await page.waitForTimeout(500);
   const t1 = Date.now() - t0;
   // give picture lookups time to land: wait until no result is still waiting for a picture, or 8s
-  const end = Date.now() + 8000; while (Date.now() < end) { const pend = await page.$$eval('#ed-results .res .art:not(.photo)', n => n.length); if (!pend) break; await page.waitForTimeout(400); }
+  const end = Date.now() + 12000; while (Date.now() < end) { const pend = await page.$$eval('#ed-results .res .art:not(.photo)', n => n.length); if (!pend) break; await page.waitForTimeout(400); }
   const rows = await page.$$eval('#ed-results li:not(.sec):not(.res-wait):not(.res-none)', lis => lis.map(li => ({ n: li.querySelector('.nm b')?.textContent || '', s: li.querySelector('.nm span')?.textContent || '', photo: !!li.querySelector('.art.photo.ld'), photoPending: !!li.querySelector('.art.photo:not(.ld):not(.ld-err)'), src: (li.querySelector('.art.photo')?.dataset.src || '').replace(/^https?:\/\/([^/]+).*/, '$1'), add: !!li.querySelector('[data-act=custom]') })));
   return { settled, ms: t1, rows };
 }

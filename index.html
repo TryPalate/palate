@@ -9925,6 +9925,23 @@ function queueLive(){
   },220);
 }
 let rfRunning=0; const rfQ=[];
+/* One Wikipedia request for the pictures of everything on screen: exact page titles only (redirects followed), and the page must describe the right kind of thing.
+   The slower per-item lookup (findImage) still runs for whatever this misses. */
+async function batchWikiImages(c,items){
+  const df=IMG_DESC[c]; if(!df&&!RULES[c]) return [];
+  const names=[...new Set(items.map(it=>it[1].n))].slice(0,20); if(!names.length) return [];
+  await gate('wiki',120);
+  const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&converttitles=1&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&titles='+encodeURIComponent(names.join('|')));
+  const q=j.query||{}, hop={}; [...(q.normalized||[]),...(q.converted||[]),...(q.redirects||[])].forEach(x=>{ hop[x.from]=x.to; });
+  const byTitle={}; Object.values(q.pages||{}).forEach(pg=>{ byTitle[pg.title]=pg; });
+  const out=[];
+  for(const it of items){ let t=it[1].n; for(let i=0;i<4&&hop[t];i++) t=hop[t]; const pg=byTitle[t];
+    if(!pg||!pg.thumbnail||badImg(c,pg.thumbnail.source)) continue;
+    const d=pg.description||''; if(df&&!df.test(d)) continue; if(RULES[c]&&!fitsShelf(c,d,null)) continue;
+    if(LOGO_CATS.has(c)&&!LOGO_NAME.test(decodeURIComponent(pg.thumbnail.source).split('/').pop())) continue;
+    out.push([it,pg.thumbnail.source]); }
+  return out;
+}
 function refineResults(){
   if(!ed) return; const c=ed.cat, shown=new Set((ed.res||[]).map(it=>rfKey(c,it)));
   for(let i=rfQ.length-1;i>=0;i--){ if(!shown.has(rfQ[i][2])){ REFINED.delete(rfQ[i][2]); rfQ.splice(i,1); } }   /* what you are looking at now goes first; old results are dropped */
@@ -9932,9 +9949,11 @@ function refineResults(){
   for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(it.src==='catalog'&&it.img)||it.src==='variant'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); fresh.push([c,it,k]); }
   rfQ.unshift(...fresh);
   rfPump();
+  if(fresh.length) batchWikiImages(c,fresh).then(hits=>{ hits.forEach(([f,url])=>{ const [,it,k]=f; if(REFINED.get(k)) return; REFINED.set(k,url);
+      if(ed&&ed.cat===c) document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a&&!a.classList.contains('photo')) a.outerHTML=photoSpan(c,url,'sm',it.n); } }); }); }).catch(()=>{});
 }
 function rfPump(){
-  while(rfRunning<3 && rfQ.length){ const [c,it,k]=rfQ.shift(); rfRunning++;
+  while(rfRunning<3 && rfQ.length){ const [c,it,k]=rfQ.shift(); if(REFINED.get(k)) continue; rfRunning++;
     findImage(c,it.n,it.s).then(r=>{ if(r&&r.url){ REFINED.set(k,r.url); if(ed&&ed.cat===c){ document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a) a.outerHTML=photoSpan(c,r.url,'sm',it.n); } }); } } })
       .catch(()=>{}).finally(()=>{ rfRunning--; rfPump(); }); }
 }
