@@ -14,6 +14,7 @@ const session = { access_token: 'a.b.c', token_type: 'bearer', expires_in: 3600,
 const J = (r, b, s = 200) => r.fulfill({ status: s, contentType: 'application/json', body: JSON.stringify(b) });
 async function newPage(browser) {
   const ctx = await browser.newContext({ viewport: { width: 420, height: 900 } }), page = await ctx.newPage();
+  if (process.env.DEBUG) { await page.addInitScript(() => { window.PALATE_DEBUG = true; }); page.on('console', m => { const t = m.text(); if (/^BATCH|image source failed/.test(t)) console.log('  ', t.slice(0, 1000)); }); }
   await page.route(/\/palate\/(\?.*)?$/, r => r.fulfill({ contentType: 'text/html', body: HTML }));
   await page.route('**/supabase-js@2.45.4/**', r => r.fulfill({ contentType: 'application/javascript', body: SDK }));
   await page.route('**/auth/v1/**', r => { const u = r.request().url(); if (/signup|token/.test(u)) return J(r, session); if (/\/user/.test(u)) return J(r, user); return J(r, {}); });
