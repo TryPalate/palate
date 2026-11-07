@@ -1,0 +1,32 @@
+name: search-lab
+# Workbench for the search overhaul: runs with open internet (the cloud sandbox can't reach most data sources),
+# writes its findings to the branch search-lab-out. Triggered by pushes to the search-lab branch.
+on:
+  push:
+    branches: [search-lab]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Run the job named in scripts/search-lab/JOB
+        run: |
+          mkdir -p out
+          JOB=$(cat scripts/search-lab/JOB | tr -d '[:space:]')
+          echo "job: $JOB"
+          bash -c "$(cat scripts/search-lab/$JOB.sh)" 2>&1 | tee out/$JOB.log || true
+      - name: Publish results
+        run: |
+          git config user.name "search-lab"; git config user.email "actions@users.noreply.github.com"
+          git checkout --orphan out-tmp
+          git rm -rf -q . 2>/dev/null || true
+          cp -r out/* . 2>/dev/null || true
+          rm -rf out node_modules
+          git add -A; git commit -q -m "search-lab results for ${GITHUB_SHA::7}" || true
+          git push -f origin HEAD:search-lab-out
