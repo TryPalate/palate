@@ -17,9 +17,11 @@
 <meta name="twitter:title" content="Palate: your taste, ranked">
 <meta name="twitter:description" content="Make a top 5 in anything, say why, and see how your taste matches your friends'.">
 <meta name="twitter:image" content="https://trypalate.github.io/palate/icons/og-image.png">
-<meta name="theme-color" content="#0A0A0D">
+<meta name="theme-color" content="#100E0C">
+<link rel="preload" href="fonts/geist-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <script>document.documentElement.classList.add('booting');addEventListener('DOMContentLoaded',function(){var d=document.documentElement,done=function(){if(!document.querySelector('.boot')){d.classList.remove('booting');return true}};try{new MutationObserver(function(m,o){if(done())o.disconnect()}).observe(document.getElementById('view')||document.body,{childList:true,subtree:true})}catch(e){}setTimeout(function(){d.classList.remove('booting')},15000)});</script>
-<script>try{var t=localStorage.getItem('palate-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m&&(t==='light'||(t!=='dark'&&matchMedia('(prefers-color-scheme: light)').matches)))m.content='#F1F1F4'}catch(e){}</script>
+<script>try{var t=localStorage.getItem('palate-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m&&(t==='light'||(t!=='dark'&&matchMedia('(prefers-color-scheme: light)').matches)))m.content='#F6F3EE'}catch(e){}</script>
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/favicon.ico" sizes="48x48">
 <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
@@ -31,24 +33,32 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 /* Layout: equal-size tinted cards, one per shelf, packed tight. Artwork and names carry the page; each card's tint comes from its #1 photo. Dark-first; every colour lives in these tokens. */
+/* Type: Geist for text, Instrument Serif for titles and ranks (same as the website). Self-hosted, OFL licensed. */
+@font-face{font-family:"Geist";src:url(fonts/geist-sans-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Geist";src:url(fonts/geist-sans-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Geist";src:url(fonts/geist-sans-latin-600-normal.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"Geist";src:url(fonts/geist-sans-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url(fonts/instrument-serif-latin-400-normal.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Instrument Serif";src:url(fonts/instrument-serif-latin-400-italic.woff2) format("woff2");font-weight:400;font-style:italic;font-display:swap}
 :root{
-  --bg:#0A0A0D; --card:#15151A; --raise:#22222A; --text:#F5F5F7; --muted:#8E8E98; --faint:#55555E; --line:rgb(255 255 255 / .08);
-  --accent:#FFB06B; --scrim:rgb(0 0 0 / .62); --good:#7BD88F;
+  --bg:#100E0C; --card:#1A1815; --raise:#26231F; --text:#F3EEE7; --muted:#A49C92; --faint:#5F5952; --line:rgb(255 246 235 / .08);
+  --accent:#EFA27A; --scrim:rgb(0 0 0 / .62); --good:#7BD88F;
   --tint-s:38%; --tint-l:24%; --art-s:40%; --art-l:44%; --polaroid:#F5F5F7; --gk:1; --edge:rgb(255 255 255 / .06);
   --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --font:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font:"Geist",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:"Instrument Serif","Iowan Old Style","Times New Roman",serif;
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#62626B; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
-    --accent:#A84C0F; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
+    --bg:#F6F3EE; --card:#FFFFFF; --raise:#EDE8E1; --text:#1C1915; --muted:#6E675E; --faint:#A9A196; --line:rgb(28 25 21 / .08);
+    --accent:#B65A33; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
     --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; --edge:rgb(0 0 0 / .05); color-scheme:light;
   }
 }
 :root[data-theme="light"]{
-  --bg:#F1F1F4; --card:#FFFFFF; --raise:#EEEEF2; --text:#111114; --muted:#62626B; --faint:#A8A8B0; --line:rgb(0 0 0 / .07);
-  --accent:#A84C0F; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
+  --bg:#F6F3EE; --card:#FFFFFF; --raise:#EDE8E1; --text:#1C1915; --muted:#6E675E; --faint:#A9A196; --line:rgb(28 25 21 / .08);
+  --accent:#B65A33; --scrim:rgb(10 10 14 / .4); --good:#1F8A3A;
   --tint-s:60%; --tint-l:91%; --art-s:40%; --art-l:52%; --polaroid:#FFFFFF; --gk:.55; --edge:rgb(0 0 0 / .05); color-scheme:light;
 }
 
@@ -256,7 +266,7 @@ button.set-row:active{transform:none;background:var(--line)}
 .profile{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;padding-block:6px 20px}
 .who{display:flex;align-items:center;gap:12px;min-width:0}
 .me-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;color:#fff;background:linear-gradient(140deg,hsl(28 70% 55%),hsl(345 55% 42%));flex:none}
-.who h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0;line-height:1.1}
+.who h1{font-family:var(--serif);font-size:34px;font-weight:400;letter-spacing:-.01em;margin:0;line-height:1.1}
 .who p{margin:1px 0 0;color:var(--muted);font-size:14px}
 .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .seg{display:inline-flex;background:var(--raise);border-radius:999px;padding:3px}
@@ -295,11 +305,11 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .card .rows .row:first-child .art.sh-poster{--w:54px;--ht:76px}
 .card .rows .row:first-child .art.sh-wide{--w:78px;--ht:56px}
 .card .rows .row:first-child .nm b{font-size:18px;font-weight:700;letter-spacing:-.02em;white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.18}
-.card .rows .row:first-child .rk{font-size:19px;color:var(--text)}
+.card .rows .row:first-child .rk{font-size:24px;color:var(--accent)}
 .card.tap{cursor:pointer;transition:transform .15s ease}
 .card.tap:hover{transform:translateY(-2px)}
 .card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;min-height:30px}
-.card-head h2{font-size:20px;font-weight:700;letter-spacing:-.022em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-head h2{font-family:var(--serif);font-size:25px;font-weight:400;letter-spacing:-.005em;line-height:1.05;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .meta{display:flex;align-items:center;gap:8px;flex:none;color:var(--muted);font-size:12.5px}
 .vis{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);background:rgb(0 0 0 / .18);padding:3px 8px;border-radius:999px}
 .vis svg{width:11px;height:11px}
@@ -365,7 +375,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .rows{list-style:none;margin:0;padding:0}
 .row{display:grid;grid-template-columns:18px 58px minmax(0,1fr) auto;gap:10px;align-items:center;height:64px}
 .row + .row{border-top:1px solid var(--line)}
-.rk{font-size:17px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center}
+.rk{font-family:var(--serif);font-style:italic;font-size:21px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums;text-align:center;line-height:1}
 .row .art,.row .art-btn{justify-self:center}
 .nm{min-width:0}
 .nm b{display:block;font-size:16px;font-weight:600;line-height:1.2;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -409,7 +419,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 
 /* Friends */
 .head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-block:6px 14px}
-.head h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0}
+.head h1{font-family:var(--serif);font-size:34px;font-weight:400;letter-spacing:-.01em;margin:0}
 .friends{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px;padding-bottom:40px;align-items:start}
 @media (max-width:820px){.friends{grid-template-columns:1fr}}
 .panel{background:var(--card);border-radius:20px;padding:6px 18px}
@@ -429,14 +439,14 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .pair{display:flex}
 .pair .me-av,.pair .av{width:50px;height:50px;border:3px solid var(--bg)}
 .pair > :last-child{margin-left:-14px}
-.cmp-top h1{font-size:26px;font-weight:700;letter-spacing:-.022em;margin:0;line-height:1.15}
+.cmp-top h1{font-family:var(--serif);font-size:32px;font-weight:400;letter-spacing:-.01em;margin:0;line-height:1.15}
 .cmp-top p{margin:2px 0 0;color:var(--muted)}
 .cmp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:12px;padding-bottom:16px}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .cols h3{font-size:13px;font-weight:600;color:var(--muted);margin:0 0 2px}
 .mini{list-style:none;margin:0;padding:0}
 .mini li{display:grid;grid-template-columns:14px 44px minmax(0,1fr);gap:8px;align-items:center;height:50px}
-.mini .rk{font-size:13px}
+.mini .rk{font-size:16px}
 .mini .art{justify-self:center}
 .mini b{font-size:14.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini li.off{opacity:.4}
@@ -462,7 +472,7 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
   .sheet{max-height:min(94dvh,calc(100dvh - env(safe-area-inset-top,0px) - 12px));border-radius:24px 24px 0 0;padding:16px max(16px, env(safe-area-inset-left,0px)) 0 max(16px, env(safe-area-inset-right,0px))}
 }
 .sheet-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
-.sheet-head h2{font-size:24px;font-weight:700;letter-spacing:-.022em;margin:0}
+.sheet-head h2{font-family:var(--serif);font-size:31px;font-weight:400;letter-spacing:-.01em;line-height:1.05;margin:0}
 .sheet-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .x{background:var(--raise);border:0;width:34px;height:34px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;flex:none;color:var(--muted)}
 .sheet-foot{position:sticky;bottom:0;background:var(--card);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding:12px 0 calc(14px + env(safe-area-inset-bottom,0px));margin-top:14px}
@@ -701,7 +711,7 @@ body:not(.in) header.top, body:not(.in) footer, body:not(.in) .bottom-nav{displa
 .bdg-ladder .locked{opacity:.35;filter:grayscale(1)}
 .pf-top{padding-block:6px 4px}
 .pf-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 0 18px}
-.pf-hero h1{font-size:30px;font-weight:700;letter-spacing:-.022em;margin:12px 0 0;line-height:1.1}
+.pf-hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.01em;margin:12px 0 0;line-height:1.1}
 .pf-rel{margin:4px 0 0;color:var(--muted);font-size:14.5px}
 .pf-hero .bdg-row{justify-content:center}
 .pf-match{display:flex;align-items:center;gap:16px;padding:16px 18px}
@@ -6981,7 +6991,7 @@ function applyTheme(){
   const t=themePref(), root=document.documentElement;
   if(t==='system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
   const light = t==='light' || (t==='system' && matchMedia('(prefers-color-scheme: light)').matches);
-  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content = light?'#F1F1F4':'#0A0A0D';
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.content = light?'#F6F3EE':'#100E0C';
 }
 function setTheme(t){ try{ if(t==='system') localStorage.removeItem(THEME_KEY); else localStorage.setItem(THEME_KEY,t); }catch(e){} applyTheme(); }
 try{ matchMedia('(prefers-color-scheme: light)').addEventListener('change',applyTheme); }catch(e){}
