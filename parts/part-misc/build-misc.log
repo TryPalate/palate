@@ -1,0 +1,21 @@
+cocktaildb 441
+obf perfumes 416
+epa models 5839
+hf scento/fragrance-index scento-fragrance-index.csv 28513 bytes 408 lines
+   header: metric,group,key,label,rank,perfume,house,country,period,share,index,is_scento_house,suppressed
+hf 10ml/perfume-sample-prices trial-formats-2026-10.csv 16151 bytes 106 lines
+   header: perfume,house,concentration,format,size_ml,units,total_ml,price_eur,eur_per_ml,store_country,note,evidence
+hf pelegelraz/perfumes-dataset no csv
+hf FragDBnet/fragrance-database fragrances.csv 69855 bytes 12 lines
+   header: pid|url|brand|name|year|gender|collection|main_photo|info_card|user_photoes|video_url|accords|notes_pyramid|perfumers|description|rating|reviews_count|appreciation|price_value|gender_votes|longevity|sillage|season|time_of_day|pros_cons|by_designer|in_collection|reminds_of|also_like|news_ids
+
+category        items  withPic   bytes
+cars             5741        0   321955
+cocktails         440      440    55356
+fragrances        404      373    56102
+teams              92        0     3071
+total bytes 436484
+  top cocktails: A1 | ABC | Ace | ACID | AT&T | Adam
+  top fragrances: Maison Francis Kurkdjian Baccarat Rouge 540 | S3 L'eau de cologne | Lattafa Khamrah - Eau de Parfum | Hugo Boss Dark Blue Man - Eau de Toilette | Mont saint Michel Eau de Cologne haute tradition | Evian Brumisateur
+  top cars: Dodge Charger | Toyota Corolla | Buick Regal | Nissan Maxima | Hyundai Sonata | BMW 740i
+  top teams: Atlanta Hawks | Boston Celtics | Brooklyn Nets | Charlotte Hornets | Chicago Bulls | Cleveland Cavaliers

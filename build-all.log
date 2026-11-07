@@ -1,0 +1,302 @@
+cocktaildb 441
+obf perfumes 416
+epa models 5839
+hf scento/fragrance-index scento-fragrance-index.csv 28513 bytes 408 lines
+   header: metric,group,key,label,rank,perfume,house,country,period,share,index,is_scento_house,suppressed
+hf 10ml/perfume-sample-prices trial-formats-2026-10.csv 16151 bytes 106 lines
+   header: perfume,house,concentration,format,size_ml,units,total_ml,price_eur,eur_per_ml,store_country,note,evidence
+hf pelegelraz/perfumes-dataset no csv
+hf FragDBnet/fragrance-database fragrances.csv 69855 bytes 12 lines
+   header: pid|url|brand|name|year|gender|collection|main_photo|info_card|user_photoes|video_url|accords|notes_pyramid|perfumers|description|rating|reviews_count|appreciation|price_value|gender_votes|longevity|sillage|season|time_of_day|pros_cons|by_designer|in_collection|reminds_of|also_like|news_ids
+
+category        items  withPic   bytes
+cars             5741        0   321955
+cocktails         440      440    55356
+fragrances        404      373    56102
+teams              92        0     3071
+total bytes 436484
+  top cocktails: A1 | ABC | Ace | ACID | AT&T | Adam
+  top fragrances: Maison Francis Kurkdjian Baccarat Rouge 540 | S3 L'eau de cologne | Lattafa Khamrah - Eau de Parfum | Hugo Boss Dark Blue Man - Eau de Toilette | Mont saint Michel Eau de Cologne haute tradition | Evian Brumisateur
+  top cars: Dodge Charger | Toyota Corolla | Buick Regal | Nissan Maxima | Hyundai Sonata | BMW 740i
+  top teams: Atlanta Hawks | Boston Celtics | Brooklyn Nets | Charlotte Hornets | Chicago Bulls | Cleveland Cavaliers
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfast-cerea
+off cereal 591
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=snacks&countrie
+off snacks 591
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sauces&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sauces&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sauces&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sauces&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sauces&countrie
+off sauces 596
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=pastas&countrie
+off pasta 585
+off cheese 580
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=ice-creams&coun
+off icecream 564
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=breakfasts&coun
+off fail breakfast breakfasts united-kingdom 1 Cannot read properties of undefined (reading 'products')
+off breakfast 295
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+off fail drinks sodas united-states 1 Cannot read properties of undefined (reading 'products')
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=sodas&countries
+off fail drinks sodas united-kingdom 3 Cannot read properties of undefined (reading 'products')
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=energy-drinks&c
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=energy-drinks&c
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=energy-drinks&c
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=energy-drinks&c
+off fail drinks energy-drinks united-states 1 Cannot read properties of undefined (reading 'products')
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=energy-drinks&c
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=iced-teas&count
+off fail drinks iced-teas united-kingdom 2 Cannot read properties of undefined (reading 'products')
+off drinks 699
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=beers&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=beers&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=beers&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+off fail spirits spirits united-states 1 Cannot read properties of undefined (reading 'products')
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=spirits&countri
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=whiskies&countr
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=whiskies&countr
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=whiskies&countr
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=whiskies&countr
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=vodkas&countrie
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=rums&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=rums&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=rums&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=rums&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=rums&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=tequilas&countr
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=gins&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=gins&countries_
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=wines&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=wines&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=wines&countries
+  retry 503 https://world.openfoodfacts.org/api/v2/search?categories_tags_en=wines&countries
+off spirits 1359
+
+category        items  withPic   bytes
+breakfast         265      265    37842
+cereal            522      522    73539
+cheese            522      522    73145
+drinks            609      609    82006
+icecream          540      540    75064
+pasta             540      540    73613
+sauces            490      490    67352
+snacks            545      545    76581
+spirits          1118     1118   145631
+total bytes 704773
+  top cereal: Crownfield Special Flakes Bran Flakes | Kirkland Signature Ancient Grains Probiotic Granola | Nature's Path Organic Heritage Flakes | Alpen Muesli | Kellogg's Corn Flakes | Cruesli cruesly mélange de noix
+  top snacks: Jaouda Perly | LU Prince | Gerblé Sésame | Tonik | wasa Fibres | Pasquier Pains au lait
+  top sauces: Star Mayonnaise recette originale | Ketchup star | H.J. Heinz B.V. Tomato Ketchup BIO | Maille Dijon Originale | Carrefour BIO Moutarde de Dijon | Chosen Foods Classic Mayo
+  top pasta: Barilla Pâtes linguine collezione | 2 x Capellini Nr. 1 | Samyang Buldak Ramen | Spaghetti grossi - No. 5 | Barilla Lasagne | De Cecco Fusilli no. 34
+  top cheese: Milky Food Professional Fromage Blanc Nature | Jaouda Jben | Original Cream cheese | La Hollandaise Cheddar | milky foof fromage herbes milky food | Caprice des Dieux
+  top icecream: Häagen-Dazs vanilla ice cream | Glace au Nutella | Ben & Jerry's Chocolate Fudge Brownie | Snickers Ice Cream New Recipe | LIDL Mini Mix Classic | Bon Gelati Eis Mandel 6er Pack
+  top breakfast: Nutella | Délicia Confiture de fraise | Delicia Confiture d'abricot | Bonne Maman Confiture Abricot INTENSE | Produit au maroc Peripella | Crownfield Special Flakes Bran Flakes
+  top drinks: Coca-Cola Original Taste | Coca-Cola sans sucres | COCA-COLA SERVICES SA/NV Coca-Cola Original | Coca-Cola Zero Sugar | COCA-COLA SERVICES SA/NV Coca-Cola Zero | Coca-Cola goût original
+  top spirits: Corona Extra | Jack Daniel's Whiskey | Absolut Vodka | Damm Lemon | Real Tesoro Cream Jerez Doble | Abdij van Orval Orval Trappist
+wd fragrances     perfume                    226 rows -> 226 kept
+wd watches        watch models               41 rows -> 41 kept
+wd tech           smartphone models          1063 rows -> 1063 kept
+wd tech           game consoles              3 rows -> 3 kept
+wd boardgames     board games                339 rows -> 339 kept
+wd boardgames     card games                 83 rows -> 83 kept
+wd games          video games                941 rows -> 941 kept
+wd fastfood       restaurant chains          253 rows -> 253 kept
+wd restaurants    restaurants                151 rows -> 151 kept
+wd cafes          coffeehouses               55 rows -> 55 kept
+wd brands         brands                     554 rows -> 554 kept
+wd airlines       airlines                   1085 rows -> 1085 kept
+wd universities   universities               1198 rows -> 1198 kept
+wd clubs          football clubs             2500 rows -> 2500 kept
+wd themeparks     theme parks                193 rows -> 193 kept
+wd wonders        world heritage sites       116 rows -> 116 kept
+wd wonders        tourist attractions        260 rows -> 260 kept
+wd civilizations  civilizations              70 rows -> 70 kept
+wd civilizations  empires                    14 rows -> 14 kept
+wd mythology      deities                    1500 rows -> 1500 kept
+wd mythology      mythical creatures         600 rows -> 600 kept
+wd hobbies        hobbies                    500 rows -> 500 kept
+  retry 502 https://query.wikidata.org/sparql
+wd subjects       academic disciplines       800 rows -> 800 kept
+wd holidays       holidays                   578 rows -> 578 kept
+wd instruments    instruments                69 rows -> 69 kept
+wd languages      languages                  184 rows -> 184 kept
+
+category        items  withPic   bytes
+airlines         1031      536    70372
+boardgames        361      263    24623
+brands            491      398    40240
+cafes              54       15     3890
+civilizations      75       40     7337
+clubs            2422      555   188763
+fastfood          218      135    16790
+fragrances        183       19     9653
+games             924      132    62972
+hobbies           404      292    42275
+holidays          340      289    35338
+instruments        54       45     5046
+languages         181       74    14665
+mythology        1100      950    97115
+restaurants       129       67     9595
+subjects          571      388    62387
+tech             1021      757    79290
+themeparks        176       25    12220
+universities      818      531    82872
+watches            35       24     2839
+wonders           319      318    34622
+total bytes 902904
+  top fragrances: Chanel No. 5 | Fame | Little Trees | Curious | Purr | Eau de Gaga
+  top watches: Prague Astronomical Clock | Casio F-91W | Glashütte Original | Pixel Watch | Rolex Submariner | Samsung Gear S3
+  top tech: iPhone 7 | iPhone | iPhone 3GS | Samsung Galaxy S4 | Samsung Galaxy S7 | Samsung Galaxy S III
+  top boardgames: chess | backgammon | checkers | Monopoly | contract bridge | Scrabble
+  top games: Minecraft | Grand Theft Auto V | Tetris | Grand Theft Auto: San Andreas | Roblox | Grand Theft Auto IV
+  top fastfood: McDonald's | Baskin-Robbins | Burger King | KFC | Pizza Hut | Jack in the Box
+  top restaurants: McDonald's | Baskin-Robbins | Burger King | KFC | Pizza Hut | Jack in the Box
+  top cafes: Starbucks | Costa Coffee | Café de la Régence | Café de Flore | Hotel Sacher Vienna | Circle K
+  top brands: Star Wars | Coca-Cola | Toyota | McDonald's | Volkswagen | Mercedes-Benz
+  top airlines: Lufthansa | Turkish Airlines | Air France | British Airways | VietJet Air | United Airlines
+  top universities: Harvard University | University of Oxford | University of Cambridge | Università degli Studi Niccolò Cusano | Massachusetts Institute of Technology | Stanford University
+  top clubs: FC Barcelona | Real Madrid Club de Fútbol | Manchester United F.C. | Liverpool F.C. | Juventus FC | AC Milan
+  top themeparks: Disneyland | Walt Disney World Resort | Europa-Park | Efteling | Tokyo Disneyland | Hong Kong Disneyland
+  top wonders: Lake Baikal | Machu Picchu | Eiffel Tower | Statue of Liberty | Aachen | Burj Khalifa
+  top civilizations: Ancient Egypt | Ancient Greece | Mesopotamia | Aztec | Maya civilization | Sumer
+  top mythology: God | Zeus | Shiva | Vishnu | Krishna | Athena
+  top hobbies: association football | chess | dance | basketball | painting | tennis
+  top subjects: mathematics | science | music | philosophy | astronomy | physics
+  top holidays: Christmas | September 29 | Easter | Halloween | Valentine's Day | Eid al-Adha
+  top instruments: Big Ben | double bass | lute | piccolo | Adobe Illustrator | acoustic guitar
+  top languages: English | French | Spanish | Russian | Arabic | Latin
+wd proglangs      programming languages      600 rows -> 600 kept
+wd dogs           dog breeds                 600 rows -> 600 kept
+wd catbreeds      cat breeds                 126 rows -> 126 kept
+wd dinosaurs      dinosaur genera            500 rows -> 500 kept
+wd fruits         fruits                     22 rows -> 22 kept
+wd desserts       desserts                   17 rows -> 17 kept
+wd pasta          pasta                      7 rows -> 7 kept
+wd cheese         cheeses                    127 rows -> 127 kept
+wd cocktails      cocktails                  101 rows -> 101 kept
+wd sauces         sauces                     0 rows -> 0 kept
+wd cuisines       cuisines                   45 rows -> 45 kept
+wd sports         sports                     98 rows -> 98 kept
+wd podcasts       podcasts                   12 rows -> 12 kept
+wd musicals       musicals                   0 rows -> 0 kept
+wd kdramas        K-dramas                   1200 rows -> 1200 kept
+wd comedians      comedians                  504 rows -> 504 kept
+  retry 504 https://query.wikidata.org/sparql
+wd painters       painters                   296 rows -> 296 kept
+wd philosophers   philosophers               782 rows -> 782 kept
+wd influencers    YouTubers                  948 rows -> 948 kept
+wd weapons        weapon models              55 rows -> 55 kept
+wd aircraft       aircraft models            1500 rows -> 1500 kept
+wd motorcycles    motorcycle models          1272 rows -> 1269 kept
+wd cars           car models                 4000 rows -> 4000 kept
+wd countries      countries                  201 rows -> 201 kept
+wd cities         cities                     2500 rows -> 2500 kept
+  retry 504 https://query.wikidata.org/sparql
+wd authors        writers                    2000 rows -> 2000 kept
+wd pizza          pizza types                0 rows -> 0 kept
+wd superheroes    superheroes                1 rows -> 1 kept
+
+category        items  withPic   bytes
+aircraft         1413     1395   140549
+authors          1921     1901   195713
+cars             3816     3797   315133
+catbreeds         101       95     7714
+cheese            112      104     9184
+cities           1873     1869   178777
+cocktails          95       93     8457
+comedians         476      462    43187
+countries         199      166    18487
+cuisines           18       18     1695
+desserts           15       15     1278
+dinosaurs         331      331    24643
+dogs              547      533    37937
+fruits             14       14     1205
+influencers       925      810    83924
+kdramas          1178       57    74983
+motorcycles      1221     1133    89034
+painters          282      280    28765
+pasta               5        5      371
+philosophers      769      752    81755
+podcasts           12        3      860
+proglangs         267       86    18524
+sports             76       64     7535
+superheroes         1        0       83
+weapons            42       37     4333
+total bytes 1374126
+  top proglangs: PHP | C | Python | JavaScript | Java | Cascading Style Sheets
+  top dogs: German Shepherd | dingo | Labrador Retriever | beagle | Chihuahua | Bulldog
+  top catbreeds: Siamese | Persian cat | Abyssinian | Maine coon | Bengal cat | Turkish Angora
+  top dinosaurs: Cygnus | Corvus | Meleagris | pelican | falcon | Phoenicopterus
+  top fruits: grape | orange | Artocarpus heterophyllus | raspberry | cranberry | pitahaya
+  top desserts: zabaione | Baked Alaska | fried ice cream | Kadayif | Christmas cake | mango sticky rice
+  top pasta: samosa | ravioli | xiaolongbao | agnolotti | Taro dumpling
+  top cheese: mozzarella | Parmesan | Roquefort cheese | pecorino | Grana Padano PDO | Limburger
+  top cocktails: Mojito | sangria | Bloody Mary | Martini | Piña Colada | Cuba libre
+  top cuisines: meal | seafood | street food | Mediterranean diet | tapas | jiaozi
+  top sports: association football | chess | boxing | baseball | rugby | Formula One
+  top podcasts: Democracy Now! | Welcome to Night Vale | The Joe Rogan Experience | Hello Internet | Desert Island Discs | The Skeptics' Guide to the Universe
+  top kdramas: Squid Game | Crash Landing on You | True Beauty | The Penthouse: War in Life | Guardian: The Lonely and Great God | Descendants of the Sun
+  top comedians: Charlie Chaplin | Jackie Chan | Robin Williams | Woody Allen | Tom Hanks | Douglas Adams
+  top painters: Leonardo da Vinci | George W. Bush | Johann Wolfgang von Goethe | Vincent van Gogh | Pablo Picasso | Michelangelo
+  top philosophers: Albert Einstein | Aristotle | Confucius | Karl Marx | Plato | Isaac Newton
+  top influencers: IShowSpeed | Brian May | Mia Khalifa | Ron Paul | PewDiePie | Jordan Peterson
+  top weapons: Iron Dome | Excalibur | MIM-104 Patriot | Mjölnir | Death Star | vajra
+  top aircraft: Airbus A380 | Boeing 737 | Boeing 747 | Concorde | General Dynamics F-16 Fighting Falcon | Lockheed Martin F-22 Raptor
+  top motorcycles: Suzuki Hayabusa | Yamaha YZF-R1 | BMW S1000RR | Honda Super Cub | Lambretta | Kettenkrad
+  top cars: Bugatti Veyron | Ford Model T | Volkswagen Beetle | Citroën 2CV | Tata Nano | Tesla Cybertruck
+  top countries: Turkey | France | United States | Russia | Japan | Italy
+  top cities: London | Rome | Moscow | Singapore | New York City | Beijing
+  top authors: William Shakespeare | Donald Trump | Albert Einstein | Confucius | Karl Marx | Leonardo da Vinci
+  top superheroes: Hal Jordan

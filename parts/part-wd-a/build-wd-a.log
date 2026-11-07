@@ -1,0 +1,72 @@
+wd fragrances     perfume                    226 rows -> 226 kept
+wd watches        watch models               41 rows -> 41 kept
+wd tech           smartphone models          1063 rows -> 1063 kept
+wd tech           game consoles              3 rows -> 3 kept
+wd boardgames     board games                339 rows -> 339 kept
+wd boardgames     card games                 83 rows -> 83 kept
+wd games          video games                941 rows -> 941 kept
+wd fastfood       restaurant chains          253 rows -> 253 kept
+wd restaurants    restaurants                151 rows -> 151 kept
+wd cafes          coffeehouses               55 rows -> 55 kept
+wd brands         brands                     554 rows -> 554 kept
+wd airlines       airlines                   1085 rows -> 1085 kept
+wd universities   universities               1198 rows -> 1198 kept
+wd clubs          football clubs             2500 rows -> 2500 kept
+wd themeparks     theme parks                193 rows -> 193 kept
+wd wonders        world heritage sites       116 rows -> 116 kept
+wd wonders        tourist attractions        260 rows -> 260 kept
+wd civilizations  civilizations              70 rows -> 70 kept
+wd civilizations  empires                    14 rows -> 14 kept
+wd mythology      deities                    1500 rows -> 1500 kept
+wd mythology      mythical creatures         600 rows -> 600 kept
+wd hobbies        hobbies                    500 rows -> 500 kept
+  retry 502 https://query.wikidata.org/sparql
+wd subjects       academic disciplines       800 rows -> 800 kept
+wd holidays       holidays                   578 rows -> 578 kept
+wd instruments    instruments                69 rows -> 69 kept
+wd languages      languages                  184 rows -> 184 kept
+
+category        items  withPic   bytes
+airlines         1031      536    70372
+boardgames        361      263    24623
+brands            491      398    40240
+cafes              54       15     3890
+civilizations      75       40     7337
+clubs            2422      555   188763
+fastfood          218      135    16790
+fragrances        183       19     9653
+games             924      132    62972
+hobbies           404      292    42275
+holidays          340      289    35338
+instruments        54       45     5046
+languages         181       74    14665
+mythology        1100      950    97115
+restaurants       129       67     9595
+subjects          571      388    62387
+tech             1021      757    79290
+themeparks        176       25    12220
+universities      818      531    82872
+watches            35       24     2839
+wonders           319      318    34622
+total bytes 902904
+  top fragrances: Chanel No. 5 | Fame | Little Trees | Curious | Purr | Eau de Gaga
+  top watches: Prague Astronomical Clock | Casio F-91W | Glashütte Original | Pixel Watch | Rolex Submariner | Samsung Gear S3
+  top tech: iPhone 7 | iPhone | iPhone 3GS | Samsung Galaxy S4 | Samsung Galaxy S7 | Samsung Galaxy S III
+  top boardgames: chess | backgammon | checkers | Monopoly | contract bridge | Scrabble
+  top games: Minecraft | Grand Theft Auto V | Tetris | Grand Theft Auto: San Andreas | Roblox | Grand Theft Auto IV
+  top fastfood: McDonald's | Baskin-Robbins | Burger King | KFC | Pizza Hut | Jack in the Box
+  top restaurants: McDonald's | Baskin-Robbins | Burger King | KFC | Pizza Hut | Jack in the Box
+  top cafes: Starbucks | Costa Coffee | Café de la Régence | Café de Flore | Hotel Sacher Vienna | Circle K
+  top brands: Star Wars | Coca-Cola | Toyota | McDonald's | Volkswagen | Mercedes-Benz
+  top airlines: Lufthansa | Turkish Airlines | Air France | British Airways | VietJet Air | United Airlines
+  top universities: Harvard University | University of Oxford | University of Cambridge | Università degli Studi Niccolò Cusano | Massachusetts Institute of Technology | Stanford University
+  top clubs: FC Barcelona | Real Madrid Club de Fútbol | Manchester United F.C. | Liverpool F.C. | Juventus FC | AC Milan
+  top themeparks: Disneyland | Walt Disney World Resort | Europa-Park | Efteling | Tokyo Disneyland | Hong Kong Disneyland
+  top wonders: Lake Baikal | Machu Picchu | Eiffel Tower | Statue of Liberty | Aachen | Burj Khalifa
+  top civilizations: Ancient Egypt | Ancient Greece | Mesopotamia | Aztec | Maya civilization | Sumer
+  top mythology: God | Zeus | Shiva | Vishnu | Krishna | Athena
+  top hobbies: association football | chess | dance | basketball | painting | tennis
+  top subjects: mathematics | science | music | philosophy | astronomy | physics
+  top holidays: Christmas | September 29 | Easter | Halloween | Valentine's Day | Eid al-Adha
+  top instruments: Big Ben | double bass | lute | piccolo | Adobe Illustrator | acoustic guitar
+  top languages: English | French | Spanish | Russian | Arabic | Latin

@@ -1,0 +1,83 @@
+wd proglangs      programming languages      600 rows -> 600 kept
+wd dogs           dog breeds                 600 rows -> 600 kept
+wd catbreeds      cat breeds                 126 rows -> 126 kept
+wd dinosaurs      dinosaur genera            500 rows -> 500 kept
+wd fruits         fruits                     22 rows -> 22 kept
+wd desserts       desserts                   17 rows -> 17 kept
+wd pasta          pasta                      7 rows -> 7 kept
+wd cheese         cheeses                    127 rows -> 127 kept
+wd cocktails      cocktails                  101 rows -> 101 kept
+wd sauces         sauces                     0 rows -> 0 kept
+wd cuisines       cuisines                   45 rows -> 45 kept
+wd sports         sports                     98 rows -> 98 kept
+wd podcasts       podcasts                   12 rows -> 12 kept
+wd musicals       musicals                   0 rows -> 0 kept
+wd kdramas        K-dramas                   1200 rows -> 1200 kept
+wd comedians      comedians                  504 rows -> 504 kept
+  retry 504 https://query.wikidata.org/sparql
+wd painters       painters                   296 rows -> 296 kept
+wd philosophers   philosophers               782 rows -> 782 kept
+wd influencers    YouTubers                  948 rows -> 948 kept
+wd weapons        weapon models              55 rows -> 55 kept
+wd aircraft       aircraft models            1500 rows -> 1500 kept
+wd motorcycles    motorcycle models          1272 rows -> 1269 kept
+wd cars           car models                 4000 rows -> 4000 kept
+wd countries      countries                  201 rows -> 201 kept
+wd cities         cities                     2500 rows -> 2500 kept
+  retry 504 https://query.wikidata.org/sparql
+wd authors        writers                    2000 rows -> 2000 kept
+wd pizza          pizza types                0 rows -> 0 kept
+wd superheroes    superheroes                1 rows -> 1 kept
+
+category        items  withPic   bytes
+aircraft         1413     1395   140549
+authors          1921     1901   195713
+cars             3816     3797   315133
+catbreeds         101       95     7714
+cheese            112      104     9184
+cities           1873     1869   178777
+cocktails          95       93     8457
+comedians         476      462    43187
+countries         199      166    18487
+cuisines           18       18     1695
+desserts           15       15     1278
+dinosaurs         331      331    24643
+dogs              547      533    37937
+fruits             14       14     1205
+influencers       925      810    83924
+kdramas          1178       57    74983
+motorcycles      1221     1133    89034
+painters          282      280    28765
+pasta               5        5      371
+philosophers      769      752    81755
+podcasts           12        3      860
+proglangs         267       86    18524
+sports             76       64     7535
+superheroes         1        0       83
+weapons            42       37     4333
+total bytes 1374126
+  top proglangs: PHP | C | Python | JavaScript | Java | Cascading Style Sheets
+  top dogs: German Shepherd | dingo | Labrador Retriever | beagle | Chihuahua | Bulldog
+  top catbreeds: Siamese | Persian cat | Abyssinian | Maine coon | Bengal cat | Turkish Angora
+  top dinosaurs: Cygnus | Corvus | Meleagris | pelican | falcon | Phoenicopterus
+  top fruits: grape | orange | Artocarpus heterophyllus | raspberry | cranberry | pitahaya
+  top desserts: zabaione | Baked Alaska | fried ice cream | Kadayif | Christmas cake | mango sticky rice
+  top pasta: samosa | ravioli | xiaolongbao | agnolotti | Taro dumpling
+  top cheese: mozzarella | Parmesan | Roquefort cheese | pecorino | Grana Padano PDO | Limburger
+  top cocktails: Mojito | sangria | Bloody Mary | Martini | Piña Colada | Cuba libre
+  top cuisines: meal | seafood | street food | Mediterranean diet | tapas | jiaozi
+  top sports: association football | chess | boxing | baseball | rugby | Formula One
+  top podcasts: Democracy Now! | Welcome to Night Vale | The Joe Rogan Experience | Hello Internet | Desert Island Discs | The Skeptics' Guide to the Universe
+  top kdramas: Squid Game | Crash Landing on You | True Beauty | The Penthouse: War in Life | Guardian: The Lonely and Great God | Descendants of the Sun
+  top comedians: Charlie Chaplin | Jackie Chan | Robin Williams | Woody Allen | Tom Hanks | Douglas Adams
+  top painters: Leonardo da Vinci | George W. Bush | Johann Wolfgang von Goethe | Vincent van Gogh | Pablo Picasso | Michelangelo
+  top philosophers: Albert Einstein | Aristotle | Confucius | Karl Marx | Plato | Isaac Newton
+  top influencers: IShowSpeed | Brian May | Mia Khalifa | Ron Paul | PewDiePie | Jordan Peterson
+  top weapons: Iron Dome | Excalibur | MIM-104 Patriot | Mjölnir | Death Star | vajra
+  top aircraft: Airbus A380 | Boeing 737 | Boeing 747 | Concorde | General Dynamics F-16 Fighting Falcon | Lockheed Martin F-22 Raptor
+  top motorcycles: Suzuki Hayabusa | Yamaha YZF-R1 | BMW S1000RR | Honda Super Cub | Lambretta | Kettenkrad
+  top cars: Bugatti Veyron | Ford Model T | Volkswagen Beetle | Citroën 2CV | Tata Nano | Tesla Cybertruck
+  top countries: Turkey | France | United States | Russia | Japan | Italy
+  top cities: London | Rome | Moscow | Singapore | New York City | Beijing
+  top authors: William Shakespeare | Donald Trump | Albert Einstein | Confucius | Karl Marx | Leonardo da Vinci
+  top superheroes: Hal Jordan
