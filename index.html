@@ -9927,19 +9927,22 @@ function queueLive(){
 let rfRunning=0; const rfQ=[];
 /* One Wikipedia request for the pictures of everything on screen: exact page titles only (redirects followed), and the page must describe the right kind of thing.
    The slower per-item lookup (findImage) still runs for whatever this misses. */
+const TITLE_ALT = {cuisines:n=>[n+' cuisine'], brands:n=>[n+', Inc.',n+' (brand)',n+' (company)'], fastfood:n=>[n+' (restaurant)'], restaurants:n=>[n+' (restaurant)'], cafes:n=>[n+' (company)'], languages:n=>[n+' language'], clubs:n=>[n+' F.C.',n+' CF',n+' (football club)']};
 async function batchWikiImages(c,items){
   const df=IMG_DESC[c]; if(!df&&!RULES[c]) return [];
-  const names=[...new Set(items.map(it=>it[1].n))].slice(0,20); if(!names.length) return [];
+  const alt=TITLE_ALT[c]||(()=>[]), names=[...new Set(items.slice(0,12).flatMap(it=>[it[1].n,...alt(it[1].n)]))].slice(0,48); if(!names.length) return [];
   await gate('wiki',120);
   const j=await getJSON('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&converttitles=1&prop=pageimages|description&piprop=thumbnail&pithumbsize=400&pilicense=any&titles='+encodeURIComponent(names.join('|')));
   const q=j.query||{}, hop={}; [...(q.normalized||[]),...(q.converted||[]),...(q.redirects||[])].forEach(x=>{ hop[x.from]=x.to; });
   const byTitle={}; Object.values(q.pages||{}).forEach(pg=>{ byTitle[pg.title]=pg; });
   const out=[]; if(window.PALATE_DEBUG) console.log('BATCH-RAW',c,JSON.stringify(Object.values(q.pages||{}).map(pg=>[pg.title,!!pg.thumbnail,pg.description])).slice(0,900));
-  for(const it of items){ let t=it[1].n; for(let i=0;i<4&&hop[t];i++) t=hop[t]; const pg=byTitle[t];
-    if(!pg||!pg.thumbnail||badImg(c,pg.thumbnail.source)) continue;
-    const d=pg.description||''; if(df&&!df.test(d)) continue; if(RULES[c]&&!fitsShelf(c,d,null)) continue;
-    if(LOGO_CATS.has(c)&&!LOGO_NAME.test(decodeURIComponent(pg.thumbnail.source).split('/').pop())) continue;
-    out.push([it,pg.thumbnail.source]); }
+  for(const it of items){
+    for(const cand of [it[1].n,...alt(it[1].n)]){ let t=cand; for(let i=0;i<4&&hop[t];i++) t=hop[t]; const pg=byTitle[t];
+      if(!pg||!pg.thumbnail||badImg(c,pg.thumbnail.source)) continue;
+      const d=pg.description||''; if(df&&!df.test(d)) continue; if(RULES[c]&&!fitsShelf(c,d,null)) continue;
+      const file=decodeURIComponent(pg.thumbnail.source).split('/').pop();
+      if(LOGO_CATS.has(c)&&!LOGO_NAME.test(file)&&!/\.svg(\.png)?$/i.test(file)&&!/\.png$/i.test(file)) continue;   /* logos: names with logo words, or svg/png files; plain photos are storefronts */
+      out.push([it,pg.thumbnail.source]); break; } }
   if(window.PALATE_DEBUG) console.log('BATCH-HITS',c,out.length,'of',items.length);
   return out;
 }
@@ -9978,7 +9981,7 @@ function results(){
     return html;
   }
   const live=(ed.liveQ===raw?ed.live:[]);
-  const tk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
+  const tk=t=>String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/['’`]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();   /* "Nando's" and "nandos" are the same word */   /* keeps what is inside brackets, so "992 gt3" finds "911 (992) GT3" */
   const qq=tk(q), toks=qq.split(' ').filter(Boolean);
   const score=it=>matchScore(tk(it.n),tk(it.s),qq,toks,(it.alt||[]).map(tk));
   const music=ed.cat==='albums'||ed.cat==='songs', keyOf=it=>normT(it.n)+(music?'|'+normT(artistOf(it.s)):'');

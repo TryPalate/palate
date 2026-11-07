@@ -1,0 +1,1026 @@
+{
+"pizza": [
+[
+"Margherita",
+"Pizza",
+"",
+90
+],
+[
+"Pepperoni",
+"Pizza",
+"",
+89
+],
+[
+"Neapolitan",
+"Pizza",
+"",
+88
+],
+[
+"New York Style",
+"Pizza",
+"",
+87
+],
+[
+"Chicago Deep Dish",
+"Pizza",
+"",
+86
+],
+[
+"Detroit Style",
+"Pizza",
+"",
+85
+],
+[
+"Hawaiian",
+"Pizza",
+"",
+84
+],
+[
+"Quattro Formaggi",
+"Pizza",
+"",
+83
+],
+[
+"Marinara",
+"Pizza",
+"",
+82
+],
+[
+"Diavola",
+"Pizza",
+"",
+81
+],
+[
+"Capricciosa",
+"Pizza",
+"",
+80
+],
+[
+"Prosciutto e Funghi",
+"Pizza",
+"",
+79
+],
+[
+"BBQ Chicken",
+"Pizza",
+"",
+78
+],
+[
+"Sicilian",
+"Pizza",
+"",
+77
+],
+[
+"Calzone",
+"Pizza",
+"",
+76
+],
+[
+"Quattro Stagioni",
+"Pizza",
+"",
+75
+],
+[
+"Napoli",
+"Pizza",
+"",
+74
+],
+[
+"Buffalo Chicken",
+"Pizza",
+"",
+73
+],
+[
+"Veggie",
+"Pizza",
+"",
+72
+],
+[
+"Meat Lovers",
+"Pizza",
+"",
+71
+],
+[
+"White Pizza",
+"Pizza",
+"",
+70
+],
+[
+"Margherita Extra",
+"Pizza",
+"",
+69
+],
+[
+"Roman Style",
+"Pizza",
+"",
+68
+],
+[
+"Grandma",
+"Pizza",
+"",
+67
+],
+[
+"Pesto",
+"Pizza",
+"",
+66
+],
+[
+"Truffle",
+"Pizza",
+"",
+65
+],
+[
+"Four Cheese",
+"Pizza",
+"",
+64
+],
+[
+"Stuffed Crust",
+"Pizza",
+"",
+63
+],
+[
+"Cheese",
+"Pizza",
+"",
+62
+],
+[
+"Supreme",
+"Pizza",
+"",
+61
+]
+],
+"pokemon": [
+[
+"Mega Venusaur",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Charizard X",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Charizard Y",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Blastoise",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Alakazam",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Gengar",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Kangaskhan",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Pinsir",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Gyarados",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Aerodactyl",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Mewtwo X",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Mewtwo Y",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Ampharos",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Scizor",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Heracross",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Houndoom",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Tyranitar",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Blaziken",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Gardevoir",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Mawile",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Aggron",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Medicham",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Manectric",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Banette",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Absol",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Garchomp",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Lucario",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Abomasnow",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Latias",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Latios",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Swampert",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Sceptile",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Sableye",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Altaria",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Gallade",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Audino",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Diancie",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Rayquaza",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Lopunny",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Salamence",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Metagross",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Slowbro",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Steelix",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Pidgeot",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Glalie",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Camerupt",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Sharpedo",
+"Pokémon",
+"",
+50
+],
+[
+"Mega Beedrill",
+"Pokémon",
+"",
+50
+]
+],
+"sneakers": [
+[
+"Yeezy Boost 350 V2 Zebra",
+"Adidas",
+"",
+70
+],
+[
+"Yeezy Boost 350 V2 Beluga",
+"Adidas",
+"",
+69
+],
+[
+"Yeezy Boost 350 V2 Bred",
+"Adidas",
+"",
+68
+],
+[
+"Yeezy 350 V2 Cream White",
+"Adidas",
+"",
+67
+],
+[
+"Yeezy Slide",
+"Adidas",
+"",
+66
+],
+[
+"Yeezy 700 Wave Runner",
+"Adidas",
+"",
+65
+],
+[
+"Nike Dunk Low Panda",
+"Nike",
+"",
+64
+],
+[
+"Nike Dunk Low Grey Fog",
+"Nike",
+"",
+63
+],
+[
+"Nike Air Force 1 Low White",
+"Nike",
+"",
+62
+],
+[
+"Nike Air Max 1",
+"Nike",
+"",
+61
+],
+[
+"Nike Air Max 90",
+"Nike",
+"",
+60
+],
+[
+"Nike Air Max 95",
+"Nike",
+"",
+59
+],
+[
+"Nike Air Max 97",
+"Nike",
+"",
+58
+],
+[
+"Air Jordan 1 High OG Chicago",
+"Jordan",
+"",
+57
+],
+[
+"Air Jordan 1 High OG Bred",
+"Jordan",
+"",
+56
+],
+[
+"Air Jordan 1 Low Travis Scott",
+"Jordan",
+"",
+55
+],
+[
+"Air Jordan 4 Military Black",
+"Jordan",
+"",
+54
+],
+[
+"Air Jordan 11 Concord",
+"Jordan",
+"",
+53
+],
+[
+"Air Jordan 3 White Cement",
+"Jordan",
+"",
+52
+],
+[
+"Adidas Samba OG",
+"Adidas",
+"",
+51
+],
+[
+"Adidas Gazelle",
+"Adidas",
+"",
+50
+],
+[
+"Adidas Campus 00s",
+"Adidas",
+"",
+49
+],
+[
+"Adidas Superstar",
+"Adidas",
+"",
+48
+],
+[
+"Adidas Stan Smith",
+"Adidas",
+"",
+47
+],
+[
+"New Balance 550",
+"New Balance",
+"",
+46
+],
+[
+"New Balance 574",
+"New Balance",
+"",
+45
+],
+[
+"New Balance 990v6",
+"New Balance",
+"",
+44
+],
+[
+"New Balance 2002R",
+"New Balance",
+"",
+43
+],
+[
+"Asics Gel-Kayano 14",
+"Asics",
+"",
+42
+],
+[
+"Asics Gel-1130",
+"Asics",
+"",
+41
+],
+[
+"Converse Chuck Taylor All Star",
+"Converse",
+"",
+40
+],
+[
+"Vans Old Skool",
+"Vans",
+"",
+39
+],
+[
+"Salomon XT-6",
+"Salomon",
+"",
+38
+],
+[
+"Nike Vomero 5",
+"Nike",
+"",
+37
+],
+[
+"Nike Air Max Plus TN",
+"Nike",
+"",
+36
+],
+[
+"Puma Speedcat",
+"Puma",
+"",
+35
+],
+[
+"Reebok Club C 85",
+"Reebok",
+"",
+34
+],
+[
+"On Cloud 5",
+"On",
+"",
+33
+],
+[
+"Hoka Clifton 9",
+"Hoka",
+"",
+32
+],
+[
+"Nike Cortez",
+"Nike",
+"",
+31
+]
+],
+"spirits": [
+[
+"Blanton's Original Single Barrel",
+"Bourbon",
+"",
+60
+],
+[
+"Buffalo Trace",
+"Bourbon",
+"",
+59
+],
+[
+"Maker's Mark",
+"Bourbon",
+"",
+58
+],
+[
+"Woodford Reserve",
+"Bourbon",
+"",
+57
+],
+[
+"Eagle Rare 10 Year",
+"Bourbon",
+"",
+56
+],
+[
+"Pappy Van Winkle 15 Year",
+"Bourbon",
+"",
+55
+],
+[
+"Jack Daniel's Old No. 7",
+"Tennessee whiskey",
+"",
+54
+],
+[
+"Johnnie Walker Blue Label",
+"Scotch",
+"",
+53
+],
+[
+"Macallan 12 Double Cask",
+"Scotch",
+"",
+52
+],
+[
+"Lagavulin 16",
+"Scotch",
+"",
+51
+],
+[
+"Glenfiddich 12",
+"Scotch",
+"",
+50
+],
+[
+"Hennessy VS",
+"Cognac",
+"",
+49
+],
+[
+"Hennessy XO",
+"Cognac",
+"",
+48
+],
+[
+"Rémy Martin VSOP",
+"Cognac",
+"",
+47
+],
+[
+"Grey Goose",
+"Vodka",
+"",
+46
+],
+[
+"Tito's Handmade Vodka",
+"Vodka",
+"",
+45
+],
+[
+"Don Julio 1942",
+"Tequila",
+"",
+44
+],
+[
+"Casamigos Blanco",
+"Tequila",
+"",
+43
+],
+[
+"Patrón Silver",
+"Tequila",
+"",
+42
+],
+[
+"Clase Azul Reposado",
+"Tequila",
+"",
+41
+],
+[
+"Tanqueray London Dry",
+"Gin",
+"",
+40
+],
+[
+"Hendrick's Gin",
+"Gin",
+"",
+39
+],
+[
+"Bacardi Superior",
+"Rum",
+"",
+38
+],
+[
+"Captain Morgan Spiced",
+"Rum",
+"",
+37
+],
+[
+"Aperol",
+"Aperitif",
+"",
+36
+],
+[
+"Jägermeister",
+"Liqueur",
+"",
+35
+],
+[
+"Baileys Irish Cream",
+"Liqueur",
+"",
+34
+]
+],
+"instruments": [
+[
+"Hang drum",
+"Percussion",
+"",
+40
+],
+[
+"Handpan",
+"Percussion",
+"",
+40
+],
+[
+"Kalimba",
+"Percussion",
+"",
+40
+],
+[
+"Ukulele",
+"Strings",
+"",
+60
+],
+[
+"Electric guitar",
+"Strings",
+"",
+90
+]
+],
+"motorcycles": [
+[
+"Kawasaki Ninja H2R",
+"Hypersport",
+"",
+60
+],
+[
+"Kawasaki Ninja ZX-10R",
+"Superbike",
+"",
+60
+],
+[
+"Ducati Panigale V4 S",
+"Sportbike",
+"",
+60
+],
+[
+"Yamaha YZF-R1M",
+"Superbike",
+"",
+60
+],
+[
+"Triumph Speed Triple 1200 RS",
+"Naked bike",
+"",
+60
+]
+],
+"cafes": [
+[
+"Pret a Manger",
+"Sandwich café",
+"",
+70
+],
+[
+"Gail's",
+"Bakery café",
+"",
+60
+],
+[
+"Blue Bottle Coffee",
+"Coffee",
+"",
+60
+],
+[
+"Black Sheep Coffee",
+"Coffee",
+"",
+50
+],
+[
+"Gregorys Coffee",
+"Coffee",
+"",
+40
+]
+],
+"restaurants": [
+[
+"Nobu",
+"Japanese · Global",
+"",
+60
+],
+[
+"Nando's",
+"Portuguese chicken · UK",
+"",
+60
+],
+[
+"The Ivy",
+"British brasserie · London",
+"",
+60
+],
+[
+"Dishoom",
+"Indian · London",
+"",
+60
+],
+[
+"Sketch",
+"London",
+"",
+60
+],
+[
+"Padella",
+"Pasta · London",
+"",
+60
+],
+[
+"Wagamama",
+"Asian · UK",
+"",
+60
+],
+[
+"Zuma",
+"Japanese · London",
+"",
+60
+]
+]
+}
