@@ -1,0 +1,63 @@
+name: catalog
+# Rebuilds the big search lists in data/catalog/ from open databases (Wikidata, Open Food Facts, Open Beauty Facts, TheCocktailDB, EPA).
+# Monthly, or by hand from Actions > catalog > Run workflow: commits the new lists to the branch it runs on.
+# On pushes to the search-lab branch it only publishes the result to the branch search-lab-out for inspection.
+on:
+  schedule:
+    - cron: '17 3 1 * *'
+  workflow_dispatch:
+  push:
+    branches: [search-lab]
+    paths: ['scripts/search-lab/build.mjs', 'scripts/search-lab/merge.mjs', '.github/workflows/catalog.yml']
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [wd-a, wd-b, off, misc]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Build this part
+        continue-on-error: true
+        run: PART=${{ matrix.part }} node scripts/search-lab/build.mjs 2>&1 | tee build-${{ matrix.part }}.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: part-${{ matrix.part }}
+          path: |
+            out/part-${{ matrix.part }}
+            build-${{ matrix.part }}.log
+  merge:
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/download-artifact@v4
+        with:
+          path: parts
+          pattern: part-*
+      - name: Merge
+        run: |
+          node scripts/search-lab/merge.mjs parts data/catalog 2>&1 | tee merge.log
+          cat parts/*/build-*.log > build-all.log 2>/dev/null || true
+      - name: Publish for inspection (search-lab pushes)
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "palate-catalog"; git config user.email "actions@users.noreply.github.com"
+          mkdir -p /tmp/res && cp -r data /tmp/res/data && cp merge.log build-all.log /tmp/res/
+          git checkout --orphan out-tmp && git rm -rf -q . && cp -r /tmp/res/* . && git add -A
+          git commit -q -m "catalog build ${GITHUB_SHA::7}" && git push -f origin HEAD:search-lab-out-catalog
+      - name: Commit the new lists (monthly / manual)
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "palate-catalog"; git config user.email "actions@users.noreply.github.com"
+          git add data/catalog; git diff --cached --quiet || (git commit -m "Refresh search lists" && git push)

@@ -6878,6 +6878,62 @@ function buildCatalog(){
 buildCatalog();
 const STATIC = new Set(); for(const c in CATALOG) for(const it of CATALOG[c]) STATIC.add(c+'|'+it.n.toLowerCase());   /* what ships with the app */
 
+/* ---------- Big lists ----------
+   The built-in lists above are the hand-picked starters. data/catalog/<topic>.json holds thousands more per topic (built by the search-lab job from
+   Wikidata, Open Food Facts, Open Beauty Facts, TheCocktailDB and EPA data), loaded the first time a topic's search opens.
+   Each entry: [name, line under the name, picture, popularity]. A picture is "c:<Commons file>" or a web address. */
+const BIGPIC = {};     /* topic|name -> {img, full} picture that came with the list */
+const BIG = {};        /* topic -> promise of "loaded" */
+let BIGMAN = null;
+function bigPic(c,p,n){
+  let img='', full='';
+  if(!p) return null;
+  if(/^c:/.test(p)){ const f=p.slice(2); if(badImg(c,f)) return null; img=commonsThumb(f,240); full=commonsThumb(f,640); }
+  else if(/^https:\/\//.test(p)){ img=p; full=p.replace(/\.(\d+)\.jpg$/,(m,w)=>+w<=200?'.400.jpg':m); }
+  else return null;
+  return {img,full};
+}
+function loadBig(c){
+  if(BIG[c]) return BIG[c];
+  return BIG[c]=(async()=>{ try{
+    BIGMAN ||= fetch('data/catalog/index.json').then(r=>r.ok?r.json():{}).catch(()=>({}));
+    const man=await BIGMAN; if(!man.cats||!man.cats[c]) return false;
+    const r=await fetch('data/catalog/'+c+'.json?v='+(man.t||1)); if(!r.ok) return false; const d=await r.json();
+    const list=CATALOG[c]||(CATALOG[c]=[]), by=new Map(list.map(i=>[i.n.toLowerCase(),i]));
+    for(const [n,sub,p,pop] of d.items||[]){
+      const k=n.toLowerCase(), pic=bigPic(c,p,n); if(pic) BIGPIC[c+'|'+normT(n)]=pic;
+      const old=by.get(k);
+      if(old){ if(pic && !old.img && !(by.get(k).big)) { old.img=pic.img; old.full=pic.full; old.src='catalog'; } continue; }
+      const it={n,s:sub||'',src:'catalog',big:1,...(pic?{img:pic.img,full:pic.full}:{})}; by.set(k,it); list.push(it); STATIC.add(c+'|'+k);
+    }
+    return true;
+  }catch(e){ if(window.PALATE_DEBUG) console.warn('big list failed',c,e); return false; } })();
+}
+async function catalogImage(c,n){ const p=BIGPIC[c+'|'+normT(n)]; return p?p.full:null; }
+
+/* A very specific thing that is not in any list ("Acqua di Giò Profondo Eau de Parfum", "Taycan Turbo GT Weissach Package"):
+   find the closest listed thing, keep every extra word the person typed, and offer "that, as typed" with the listed thing's picture. */
+const VARIANT_CATS = new Set(['fragrances','cars','motorcycles','aircraft','sneakers','watches','tech','weapons','spirits','snacks','drinks','cereal','sauces','cheese','pasta','icecream','boardgames','games']);
+const VWORD = {edp:'Eau de Parfum',edt:'Eau de Toilette',edc:'Eau de Cologne',ps5:'PS5',ps4:'PS4'};
+const VSMALL = new Set(['de','di','du','la','le','of','the','and','by','for','with','in','a','an','pour','et']);
+const vStyle = w => { const l=w.toLowerCase(); if(VWORD[l]) return VWORD[l]; if(/\d/.test(l)&&l.length<=5||(l.length<=3&&!/[aeiouy]/.test(l))) return w.toUpperCase(); return VSMALL.has(l)?l:l.charAt(0).toUpperCase()+l.slice(1); };
+function variantFor(c,raw,cands,toks,tk){
+  if(!VARIANT_CATS.has(c)||toks.length<2) return null;
+  const hit=(w,t)=>w===t||(w.length>=4&&t.length>=4&&lev1(w,t,1)<=1);
+  let best=null;
+  for(const it of cands){
+    const nt=tk(it.n).split(' ').filter(Boolean); if(!nt.length) continue;
+    const inQ=nt.filter(w=>toks.some(t=>hit(w,t))); if(inQ.length<Math.min(2,nt.length)) continue;
+    const ratio=inQ.length/nt.length; if(ratio<.75) continue;
+    const sc=inQ.length+ratio; if(!best||sc>best.sc||(sc===best.sc&&it.n.length<best.it.n.length)) best={it,sc,nt};
+  }
+  if(!best) return null;
+  const words=String(raw).trim().split(/\s+/), extra=words.filter(w=>{ const t=tk(w); return t && !best.nt.some(x=>hit(x,t)); });
+  if(!extra.length||extra.length>6) return null;
+  const name=(best.it.n+' '+extra.map(vStyle).join(' ')).replace(/\s+/g,' ').trim(); if(tk(name)===tk(best.it.n)) return null;
+  return {base:best.it,name};
+}
+
 function subOf(cat, n){ const f=(CATALOG[cat]||[]).find(i=>i.n===n); return f?f.s:''; }
 function snap(cat, top, hm=[], why={}){ return {top: top.map(n=>({n,s:subOf(cat,n),why:why[n]||''})), hm: hm.map(n=>({n,s:subOf(cat,n),why:''}))}; }
 
@@ -8401,7 +8457,7 @@ async function findImage(c,n,subHint){
   if(c==='youtube' && YT_ID[n]) return {url:ytThumb(YT_ID[n]),src:'youtube',failed:false};
   if(CAT[c]&&CAT[c].custom) return {url:null,src:'',failed:true};
   const sub=((CATALOG[c]||[]).find(i=>i.n===n)||{}).s||subHint||''; let url=null, src='', failed=false;
-  const order=[['music',musicImage],['logo',logoImage],['fandom-char',fandomCharImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage],['wikidata',wikidataImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
+  const order=[['catalog',catalogImage],['music',musicImage],['logo',logoImage],['fandom-char',fandomCharImage],['hero-film',heroFilmImage],['anilist-char',anilistCharImage],['pokeapi',pokemonImage],['roblox-wiki',robloxWikiImage],['anilist',anilistImage],['deezer',deezerImage],['apple',itunesImage],['roblox',robloxImage],['roblox-fandom',robloxFandomImage],['wikipedia',wikiImage],['wikipedia-native',nativeWikiImage],['openlibrary',openLibImage],['wikidata',wikidataImage]];   /* books: Wikipedia has the cover people know, Open Library is the backup */
   for(const [name,fn] of order){
     if((c==='albums'||c==='songs') && artistOf(sub) && /^wikipedia/.test(name)) continue;   /* Wikipedia pages for songs are too easy to mix up with other songs of the same name */
     try{ url=await fn(c,n,sub); }catch(e){ failed=true; if(window.PALATE_DEBUG) console.warn('image source failed',name,n,e); }
@@ -9143,8 +9199,9 @@ function openEditor(c, flow){
   const slots=Array(7).fill(null);
   s.top.forEach((it,i)=>slots[i]={...it}); s.hm.forEach((it,i)=>slots[5+i]={...it});
   ed={cat:c,slots,query:'',confirm:false,isNew:!e,res:[],flow:!!flow,live:[],liveQ:'',shown:false};
-  renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),30);
+  renderEditor(); bigReady(); setTimeout(()=>$('#ed-q')?.focus(),30);
 }
+function bigReady(){ if(!ed||BIG[ed.cat]) return; const c=ed.cat; loadBig(c).then(ok=>{ if(ok&&ed&&ed.cat===c){ const ul=$('#ed-results'); if(ul) ul.innerHTML=results(); } }); }
 function hl(n,q){ const i=n.toLowerCase().indexOf(q); if(i<0) return esc(n); return esc(n.slice(0,i))+'<mark>'+esc(n.slice(i,i+q.length))+'</mark>'+esc(n.slice(i+q.length)); }
 const REFINED = new Map();   /* search-result pictures after the proper lookup: cat|name|sub -> url or '' */
 const rfKey=(c,it)=>c+'|'+normT(it.n)+'|'+normT(it.s||'');
@@ -9493,6 +9550,25 @@ async function generalSearch(c,q,alive){
   }
   return out;
 }
+/* Open Beauty Facts: bottles with pictures (free, open, allows browser calls). Names are tidied: no sizes, brand first. */
+async function obfSearch(q,alive){
+  await gate('obf-live',400); if(alive&&!alive()) throw new Error('stale');
+  const j=await timed('https://world.openbeautyfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=15&tagtype_0=categories&tag_contains_0=contains&tag_0=perfumes&fields=product_name,brands,image_front_small_url,code&search_terms='+encodeURIComponent(q),5000);
+  const out=[], seen=new Set(), toks=qTokens(q);
+  for(const x of j.products||[]){
+    let nm=String(x.product_name||'').replace(/&quot;/g,'"').replace(/\b\d+(\.\d+)?\s*(ml|oz|fl\.?\s*oz|cl)\b/ig,'').replace(/\s*[-–,]\s*$/,'').replace(/\s+/g,' ').trim(); const br=String(x.brands||'').split(',')[0].trim();
+    if(!nm||/^\d+$/.test(nm)) continue; if(br&&!normT(nm).includes(normT(br))) nm=br+' '+nm;
+    const k=normT(nm); if(seen.has(k)||cover(toks,wordsOf(nm))<.6) continue; seen.add(k);
+    const u=x.image_front_small_url||''; out.push({n:nm,s:br,img:/^https:/.test(u)?u:'',full:/^https:/.test(u)?u.replace(/\.200\.jpg$/,'.400.jpg'):'',src:'obf',tier:1,pop:.2});
+  }
+  return out;
+}
+/* TheCocktailDB: recipes with pictures (free, allows browser calls). */
+async function cocktailSearch(q,alive){
+  await gate('cocktaildb',300); if(alive&&!alive()) throw new Error('stale');
+  const j=await timed('https://www.thecocktaildb.com/api/json/v1/1/search.php?s='+encodeURIComponent(q),4500);
+  return (j.drinks||[]).slice(0,10).map(d=>({n:d.strDrink,s:[d.strCategory,d.strAlcoholic].filter(Boolean).join(' · '),img:(d.strDrinkThumb||'').replace(/^http:/,'https:')+'/small',full:(d.strDrinkThumb||'').replace(/^http:/,'https:'),src:'cocktaildb',tier:1,pop:.3}));
+}
 /* Apple Music: the second opinion for albums and songs. */
 async function itunesMusicSearch(c,q,cty,alive){
   await gate('itunes-live',1200); if(alive&&!alive()) throw new Error('stale');
@@ -9508,7 +9584,7 @@ async function itunesMusicSearch(c,q,cty,alive){
   return out;
 }
 /* Results from different sources for the same thing become one result with the best picture and the most useful line. */
-const SRC_RANK = {fandom:0,pokeapi:0,youtube:0,anilist:1,apple:1,deezer:1,openlibrary:1,wikidata:2,wikipedia:3};
+const SRC_RANK = {fandom:0,pokeapi:0,youtube:0,anilist:1,apple:1,deezer:1,openlibrary:1,obf:1,cocktaildb:1,catalog:2,wikidata:2,wikipedia:3};
 function mergeLive(list,c){
   const m=new Map(), music=c==='albums'||c==='songs';
   for(const x of list){ if(!x||!x.n) continue; const k=normT(x.n)+(music?'|'+normT(artistOf(x.s)):''); if(!normT(x.n)) continue; const o=m.get(k);
@@ -9582,6 +9658,10 @@ async function liveSearch1(c,q,cty,alive){
     const seen=new Set();
     for(const d of (j.docs||[])){ if(!d.cover_i||seen.has(normT(d.title))) continue; seen.add(normT(d.title));
       out.push({n:d.title,s:(d.author_name||[])[0]||'',img:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-S.jpg',full:'https://covers.openlibrary.org/b/id/'+d.cover_i+'-M.jpg',src:'openlibrary'}); }
+  } else if(c==='fragrances'||c==='cocktails'){
+    const jobs=[generalSearch(c,q,alive), c==='fragrances'?obfSearch(q,alive):cocktailSearch(q,alive)];
+    const res=await Promise.allSettled(jobs); if(alive&&!alive()) throw new Error('stale');
+    for(const r of res){ if(r.status==='fulfilled') out.push(...r.value); else if(String(r.reason&&r.reason.message)==='stale') throw r.reason; else dbg('source failed',c,r.reason&&r.reason.message); }
   } else if(CHAR_CATS.has(c)){
     out.push(...await charSearch(c,q,alive));
   } else {
@@ -9849,7 +9929,7 @@ function refineResults(){
   if(!ed) return; const c=ed.cat, shown=new Set((ed.res||[]).map(it=>rfKey(c,it)));
   for(let i=rfQ.length-1;i>=0;i--){ if(!shown.has(rfQ[i][2])){ REFINED.delete(rfQ[i][2]); rfQ.splice(i,1); } }   /* what you are looking at now goes first; old results are dropped */
   const fresh=[];
-  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); fresh.push([c,it,k]); }
+  for(const it of ed.res||[]){ const k=rfKey(c,it); if(REFINED.has(k)||it.src==='pokeapi'||it.src==='youtube'||(it.src==='catalog'&&it.img)||it.src==='variant'||(photo(c,it.n)&&photo(c,it.n).src)) continue; REFINED.set(k,''); fresh.push([c,it,k]); }
   rfQ.unshift(...fresh);
   rfPump();
 }
@@ -9859,6 +9939,7 @@ function rfPump(){
       .catch(()=>{}).finally(()=>{ rfRunning--; rfPump(); }); }
 }
 function results(){
+  bigReady();
   const raw=ed.query.trim(), q=raw.toLowerCase();
   const have=new Set(ed.slots.filter(Boolean).map(s=>s.n.toLowerCase()));
   const all=CAT[ed.cat]&&CAT[ed.cat].custom ? peopleItems().concat(CATALOG[ed.cat]||[]) : (CATALOG[ed.cat]||[]).filter(it=>!misfit(ed.cat,it));
@@ -9886,6 +9967,12 @@ function results(){
   const liveBy=new Map(live.map(x=>[keyOf(x),x]));
   rows.forEach(r=>{ const t=liveBy.get(keyOf(r.it)); if(t){ const add={}; if(t.img&&!(photo(ed.cat,r.it.n))){ add.img=t.img; add.full=t.full; add.src=t.src; } if(t.alt&&t.alt.length) add.alt=t.alt; if(t.pop) add.pop=t.pop; r.it={...r.it,...add}; } });
   live.forEach((x,i)=>{ const k=keyOf(x); if(seen.has(k)||have.has(x.n.toLowerCase())) return; seen.add(k); const sc=score(x); rows.push({it:x,sc:sc==null?4.5:sc,o:i,loc:0}); });
+  { const vr=rows.some(r=>r.sc<=2.4)?null:variantFor(ed.cat,raw,[...all,...live],toks,tk);
+    if(vr && !have.has(vr.name.toLowerCase()) && !rows.some(r=>r.it.n.toLowerCase()===vr.name.toLowerCase())){
+      BASEOF[ed.cat+'|'+vr.name]=vr.base.n;
+      const b=vr.base, bp=photo(ed.cat,b.n), img=(bp&&bp.src)||b.img||'';
+      rows.unshift({it:{n:vr.name,s:b.s||'',img,full:(bp&&bp.src)||b.full||img,src:'variant',variantOf:b.n,tier:0},sc:0.8,o:-2,loc:1});
+      if(!rows.some(r=>r.it===b||r.it.n===b.n) && !have.has(b.n.toLowerCase())) rows.push({it:b,sc:2.6,o:-1,loc:1}); } }
   const tierOf=r=>r.it.tier??5, popOf=r=>r.it.pop||0;
   rows.sort((a,b)=>Math.floor(a.sc*2)/2-Math.floor(b.sc*2)/2 || a.sc-b.sc || b.loc-a.loc || (veh&&a.loc&&b.loc?a.it.n.length-b.it.n.length:0) || (a.loc||b.loc?0:tierOf(a)-tierOf(b)) || popOf(b)-popOf(a) || a.o-b.o);
   ed.res=rows.slice(0,veh?10:8).map(r=>r.it);
@@ -10037,10 +10124,14 @@ function addItem(it){
     const cat=ed.cat, slot=ed.slots[k];
     findNative(cat,it.n,it.s).then(nm=>{ if(nm && ed && ed.cat===cat && ed.slots.includes(slot) && !isNat(slot.s)){ slot.s=[nm,slot.s].filter(Boolean).join(' · '); renderEditor(); } }).catch(()=>{});
   }
-  if(!photo(ed.cat,it.n)){                                                                     /* the photo loads now, because you picked it */
+  if(it.variantOf && !photo(ed.cat,it.n)){                                                      /* a version of something listed: use that thing's picture */
+    const cat=ed.cat, bp=photo(cat,it.variantOf), u=(bp&&bp.src)||it.full||it.img;
+    if(u) adoptImage(cat,it.n,u,'variant').catch(()=>{}); else resolveOne(cat,it.n,it.s).catch(()=>{});
+  } else if(!photo(ed.cat,it.n)){                                                                /* the photo loads now, because you picked it */
     const cat=ed.cat;
     const rf=REFINED.get(rfKey(cat,it));
     if(rf) adoptImage(cat,it.n,rf,'search').catch(()=>{});                                       /* the picture you saw in the list is the one you get */
+    else if(it.src==='catalog'&&it.full) adoptImage(cat,it.n,it.full,'catalog').catch(()=>{});
     else resolveOne(cat,it.n,it.s).catch(()=>{}).finally(()=>{ if(!photo(cat,it.n) && it.full) adoptImage(cat,it.n,it.full,it.src||'live').catch(()=>{}); });
   }
   renderEditor();
