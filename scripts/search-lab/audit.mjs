@@ -4,7 +4,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs'; import http from 'node:http'; import path from 'node:path';
 import { Q } from './queries.mjs';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-const ONLY = (process.env.ONLY_CATS || '').split(',').filter(Boolean), WORKERS = +(process.env.WORKERS || 4);
+const ONLY = (process.env.ONLY_CATS || '').split(',').filter(Boolean), WORKERS = +(process.env.WORKERS || 2);
 const SDK = fs.readFileSync(path.join(process.env.LAB_DIR || '/tmp/lab', 'node_modules/@supabase/supabase-js/dist/umd/supabase.js'), 'utf8');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.webmanifest': 'application/json', '.ico': 'image/x-icon' };
 const srv = http.createServer((req, res) => { let p = decodeURIComponent(req.url.split('?')[0]); if (!p.startsWith('/palate/')) { res.writeHead(404); return res.end(); } p = p.slice(8) || 'index.html'; let f = path.join(ROOT, p); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html'); if (!fs.existsSync(f)) { res.writeHead(404); return res.end('nf'); } res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); res.end(fs.readFileSync(f)); }).listen(8802);
