@@ -2,4 +2,3 @@ export LAB_DIR=$RUNNER_TEMP/lab; mkdir -p $LAB_DIR && (cd $LAB_DIR && npm init -
 export NODE_PATH=$LAB_DIR/node_modules
 cp -r $LAB_DIR/node_modules ./node_modules 2>/dev/null   # ESM import needs it next to the script
 node scripts/search-lab/audit.mjs
-cp out/audit.md out/audit.json /dev/null 2>&1

@@ -21,8 +21,8 @@ async function newPage(browser) {
   await page.route('**/rest/v1/rpc/*', r => { const n = r.request().url().split('/rpc/')[1].split('?')[0]; if (n === 'unlock_state') return J(r, { gate: false, v: 3, revealed: true, picks_left: 0, unlocked: [], invites: 0, days: 1, shelves: 0, rewards: [], points: 0, per_pick: 3, to_next: 3 }); return J(r, null); });
   await page.route('**/rest/v1/profiles*', r => { const obj = /pgrst\.object/.test(r.request().headers()['accept'] || ''); const row = { id: user.id, name: 'Lab', invite_code: 'LABCODE000000000', avatar: 0 }; if (r.request().method() === 'GET' && !obj) return J(r, [row]); return J(r, row, r.request().method() === 'POST' ? 201 : 200); });
   await page.goto('http://127.0.0.1:8802/palate/', { waitUntil: 'load' }); await page.waitForTimeout(800);
-  await page.click('[data-act="auth-mode"]').catch(() => {}); await page.fill('#au-email', 'lab@test.com'); await page.fill('#au-pass', 'password123'); await page.click('#auth-form button[type=submit]');
-  await page.waitForFunction(() => document.body.classList.contains('in'), null, { timeout: 20000 }); await page.waitForTimeout(500);
+  await page.fill('#au-email', 'lab@test.com'); await page.fill('#au-pass', 'password123'); await page.click('#auth-form button[type=submit]');
+  await page.waitForFunction(() => document.body.classList.contains('in'), null, { timeout: 20000 }).catch(async e => { console.log('LOGIN FAIL', (await page.evaluate(() => document.body.className + ' | ' + document.body.innerText.slice(0, 300))).replace(/\n/g, ' / ')); throw e; }); await page.waitForTimeout(500);
   return { ctx, page };
 }
 const norm = s => String(s || '').toLowerCase();
