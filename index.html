@@ -7320,7 +7320,7 @@ async function makeMatchStory(st,font){
   x.fillText(st.mcat?`${CAT[st.mcat].name} · ${nShared} shared pick${nShared===1?'':'s'}`:per.length?`${nShared} shared pick${nShared===1?'':'s'} · ${per.length} shel${per.length===1?'f':'ves'} compared`:'Rank the same topics to see a match',SW/2,1150);
   x.textAlign='left';
   if(rows.length){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`700 34px ${font}`; x.letterSpacing='4px'; x.fillText('YOU BOTH PICKED',90,1250); x.letterSpacing='0px'; drawRows(x,rows,font,false,1272,rows.length*120); }
-  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Find your match · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
+  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Find your match · '+siteLabel(st.mcat),SW-160),SW/2,1680); x.textAlign='left';
   return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
 }
 /* ---------- Coming from a friend's shared shelf: rank the same topic right away, then see the match ---------- */
@@ -7328,6 +7328,17 @@ function startVs(vs){
   PASS.add(vs.cat);
   if(eff(vs.cat,CURRENT)){ navTo({tab:'friends',profile:vs.id},{quiet:true}); openVsResult(vs.id,vs.cat); return; }
   navTo({tab:'me'},{quiet:true}); render(); openEditor(vs.cat,false); ed.vs=vs; renderEditor(); toast(`You and ${vs.name} are now friends`);
+}
+/* A link or typed address that names a topic (…/palate/albums). A brand-new account gets that shelf opened for free and lands in the editor; the pass is kept for 3 days until the shelf is saved. */
+const PASS_KEY='palate-pass';
+function restorePass(){ try{ const o=JSON.parse(localStorage.getItem(PASS_KEY)||'null'); if(o&&CAT[o.c]&&Date.now()-o.t<3*864e5&&!state.shelves[o.c]) PASS.add(o.c); else localStorage.removeItem(PASS_KEY); }catch(e){} }
+function openDeep(c,brandNew){
+  track('topic_link',c); const nm=CAT[c].name;
+  navTo({tab:'me'},{quiet:true}); render();
+  if(eff(c,CURRENT)){ toast(`Here is your ${catPhrase(c)}`); return; }
+  if(brandNew){ PASS.add(c); try{ localStorage.setItem(PASS_KEY,JSON.stringify({c,t:Date.now()})); }catch(e){} }
+  if(brandNew||isOpen(c)){ openEditor(c,false); toast(brandNew?`${nm} is open for you. Build your top 5.`:`Build your top 5 ${catPhrase(c)}`); return; }
+  openLocked(c);
 }
 function openVsResult(fid,c){
   const f=FRIENDS.find(x=>x.id===fid), mine=eff(c,CURRENT); if(!f||!mine||!CAT[c]) return;
@@ -7678,7 +7689,13 @@ async function deleteAccount(){
     await sb.auth.signOut().catch(()=>{}); location.reload();
   }catch(e){ console.error(e); toast(/delete_my_account|function/i.test(String(e.message||e))?'Run supabase/delete_account.sql in Supabase first.':"Couldn't delete the account. Try again."); if(btn) btn.disabled=false; }
 }
-const inviteLink = cat => location.origin + location.pathname.replace(/index\.html$/,'') + '?join=' + (me?me.invite:'') + (cat&&CAT[cat]?'&c='+encodeURIComponent(cat):'');
+/* Links and pictures point at a topic with a clean path: trypalate.github.io/palate/albums. The friend code rides along as ?join=CODE when there is one.
+   Whoever opens it lands straight in building that shelf (404.html and the albums/ folders just forward to ./?c=albums). Your own custom shelves can't have a path, so they keep ?c=. */
+const siteBase = () => location.origin + location.pathname.replace(/index\.html$/,'');
+const catPath = c => (c && CAT[c] && !CAT[c].custom && /^[a-z0-9-]{1,40}$/.test(c)) ? c : '';
+const siteLabel = c => location.host + location.pathname.replace(/index\.html$/,'').replace(/\/$/,'') + (catPath(c) ? '/'+catPath(c) : '');
+const inviteLink = cat => { const p=catPath(cat), q=[]; if(me&&me.invite) q.push('join='+me.invite); if(cat&&CAT[cat]&&!p) q.push('c='+encodeURIComponent(cat));
+  return siteBase() + (p?p+'/':'') + (q.length?'?'+q.join('&'):''); };
 
 /* Sign in / sign up screens */
 /* ---------- QR invites: a code anyone can scan with their phone camera to join you; also a poster to save and share ---------- */
@@ -7734,19 +7751,20 @@ function qrSave(){ if(!qrState||!qrState.blob) return; track('qr_save'); const u
 let authMode='in';
 /* An invite link can carry a topic: ?join=CODE&c=albums. We keep it (also across an email-confirmation detour) for up to 3 days. */
 const JOIN_KEY='palate-join';
-function captureJoin(){ try{ const q=new URLSearchParams(location.search), c=q.get('join'); if(c){ const v=JSON.stringify({code:c.slice(0,40),cat:(q.get('c')||'').slice(0,40),t:Date.now()}); localStorage.setItem(JOIN_KEY,v); sessionStorage.setItem(JOIN_KEY,v); history.replaceState(null,'',location.pathname); } }catch(e){} }
-const joinInfo = () => { try{ const raw=sessionStorage.getItem(JOIN_KEY)||localStorage.getItem(JOIN_KEY); if(!raw) return null; const o=JSON.parse(raw); return (o&&o.code&&Date.now()-o.t<3*864e5)?o:null; }catch(e){ return null; } };
-const pendingJoin = () => { const j=joinInfo(); return j?j.code:null; };
+function captureJoin(){ try{ const q=new URLSearchParams(location.search), code=(q.get('join')||'').slice(0,40), cat=(q.get('c')||'').slice(0,40); if(code||cat){ const v=JSON.stringify({code,cat,t:Date.now()}); localStorage.setItem(JOIN_KEY,v); sessionStorage.setItem(JOIN_KEY,v); history.replaceState(null,'',location.pathname); } }catch(e){} }
+const joinInfo = () => { try{ const raw=sessionStorage.getItem(JOIN_KEY)||localStorage.getItem(JOIN_KEY); if(!raw) return null; const o=JSON.parse(raw); return (o&&(o.code||o.cat)&&Date.now()-o.t<3*864e5)?o:null; }catch(e){ return null; } };
+const pendingJoin = () => { const j=joinInfo(); return j?(j.code||(CAT[j.cat]?j.cat:null)):null; };
 const clearJoin = () => { try{ localStorage.removeItem(JOIN_KEY); sessionStorage.removeItem(JOIN_KEY); }catch(e){} };
 let JOINPREV=null;
 function inviteBanner(){
   const j=joinInfo(), cat=j&&CAT[j.cat]; if(!j) return '';
+  if(!j.code) return cat?`<span>Build your top 5 ${esc(catPhrase(j.cat))}. Make an account and it opens right away, free.</span>`:'';
   if(JOINPREV&&JOINPREV.name){ const who=esc(JOINPREV.name.split(' ')[0]);
     return `${av({id:JOINPREV.id,name:JOINPREV.name},'s')}<span>`+(cat?`<b>${who}</b> shared their top 5 ${esc(cat.name.toLowerCase())}. Make an account, rank yours, and see how well you match.`:`<b>${who}</b> invited you to Palate. Make an account to connect and compare your taste.`)+`</span>`; }
   return `<span>${cat?`A friend shared their top 5 ${esc(cat.name.toLowerCase())}. Make an account, rank yours, and see how well you match.`:'You were invited by a friend. Make an account or sign in to connect.'}</span>`;
 }
 async function loadJoinPreview(){
-  const j=joinInfo(); if(!j||!sb||JOINPREV) return;
+  const j=joinInfo(); if(!j||!j.code||!sb||JOINPREV) return;
   try{ const r=await sb.rpc('invite_preview',{p_code:j.code}); if(r&&!r.error&&r.data&&r.data[0]) JOINPREV=r.data[0]; }catch(e){}
   const el=$('#invited'); if(el&&JOINPREV) el.innerHTML=inviteBanner();
 }
@@ -7861,6 +7879,8 @@ async function enter(user){
     synced.custom=JSON.stringify(state.custom);
     buildCatalog(); for(const k in CAT) if(CAT[k].custom) CATALOG[k] ||= []; applyCustom(); applySharedCatalog(ci);
     AUTO.map={}; if(!im.error) for(const r of im.data||[]) if(/^https:\/\//.test(r.url)) AUTO.map[pkey(r.cat,r.name)]={src:r.url,h:r.h||0,s:r.s||34,by:r.src||''};
+    let deep=null; if(!code && jinfo && CAT[jinfo.cat]){ deep=jinfo.cat; clearJoin(); }
+    restorePass();
     if(code){
       clearJoin(); let pv=JOINPREV;
       if(!pv){ try{ const q0=await sb.rpc('invite_preview',{p_code:code}); if(q0&&!q0.error&&q0.data&&q0.data[0]) pv=q0.data[0]; }catch(e){} }
@@ -7872,12 +7892,13 @@ async function enter(user){
     await Promise.all([loadPeople(),loadBadges(),loadReactions(),loadWeekly()]);
     await preloadForBoot();
     document.body.classList.add('in');
-    const fresh = joined && !joined.err && !shelfList(CURRENT).length;
+    const brandNew = !shelfList(CURRENT).length, fresh = joined && !joined.err && brandNew;
     if(joined){ ui.tab=fresh?'me':'friends'; ui.compare=null; }
     render(); window.scrollTo(0,0); navInit(); if(!enter.started){ enter.started=true; startHydration(); } upgradeLegacyCustom(); stripStrayNative(); setTimeout(warmPopular,1800); setTimeout(curateAlpha,6000); syncPush(); setTimeout(refreshMyBadges,2500); setTimeout(()=>loadUnlocks(true),900);
     if(!joined && !FRIENDS.length && !state.order.length && DIRECTORY.length && localStorage.getItem('palate-onboard') && !localStorage.getItem('palate-people-seen')){ try{ localStorage.setItem('palate-people-seen','1'); }catch(e){} openPeople(); }
     const vs = joined&&!joined.err&&joined.id&&joined.cat&&CAT[joined.cat] ? {id:joined.id,name:joined.name,cat:joined.cat} : null;
     if(vs) startVs(vs);
+    else if(deep) openDeep(deep,brandNew);
     else if(fresh) showWelcome(joined.name); else if(joined) toast(joined.err?joined.err:`You and ${joined.name} are now friends`);
     else if(!state.order.length && !localStorage.getItem('palate-onboard')) setTimeout(showFirstRun,500);
     else if(location.hash==='#week' && WK) setTimeout(openWeekly,400);
@@ -8936,7 +8957,7 @@ function drawRows(x,rows,font,notes,y0,avail){
 }
 /* ---------- Other looks for a shelf picture: a 4:5 post, a #1 spotlight, and a clean type-only list ---------- */
 const LOOKS = [['story','Story'],['post','Post'],['spot','#1'],['list','List']];
-const footLine = () => 'Rank yours with friends · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,'');
+const footLine = c => 'Rank yours with friends · '+siteLabel(c);
 async function shelfRows(c,y){
   const e=eff(c,y); if(!e) return null; const top=e.snap.top.slice(0,5);
   const rows=top.map((it,i)=>({n:it.n,s:it.s,why:it.why,c,shape:CAT[c].shape,rank:i+1,p:photo(c,it.n),im:null}));
@@ -8968,7 +8989,7 @@ async function makeVariant(st,font,y){
     rest.forEach((r,i)=>{ const ax=80+i*(cw+28), ay=870; coverArt(x,r.im,r.n,c,ax,ay,cw,cw,22);
       x.fillStyle='rgba(255,255,255,.55)'; x.font=`700 30px ${font}`; x.fillText(String(r.rank),ax,ay+cw+48);
       x.fillStyle='#fff'; x.font=`600 30px ${font}`; x.fillText(fitText(x,r.n,cw-34),ax+34,ay+cw+48); });
-    x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 26px ${font}`; x.fillText(fitText(x,'palate · '+footLine(),W-160),80,H-60);
+    x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 26px ${font}`; x.fillText(fitText(x,'palate · '+footLine(st.cat),W-160),80,H-60);
     return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
   }
   if(st.look==='spot'){   /* 1080x1920: your #1, big, with your reason */
@@ -8984,7 +9005,7 @@ async function makeVariant(st,font,y){
     if(st.notes&&r.why){ x.fillStyle='rgba(255,255,255,.88)'; x.font=`italic 500 42px ${font}`; wrapLines(x,'“'+r.why+'”',W-220,3).forEach((l,i)=>x.fillText(l,W/2,ty+20+i*54)); }
     const others=rows.slice(1).map(o=>o.rank+'. '+o.n).join('   ');
     if(others){ x.fillStyle='rgba(255,255,255,.5)'; x.font=`500 32px ${font}`; x.fillText(fitText(x,others,W-180),W/2,H-200); }
-    x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.fillText(fitText(x,footLine(),W-160),W/2,H-120); x.textAlign='left';
+    x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.fillText(fitText(x,footLine(st.cat),W-160),W/2,H-120); x.textAlign='left';
     return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
   }
   /* list: 1080x1920, type only, on warm paper */
@@ -9003,7 +9024,7 @@ async function makeVariant(st,font,y){
     const sub=st.notes&&r.why?'“'+r.why+'”':r.s; if(sub){ x.fillStyle='rgba(22,21,26,.55)'; x.font=`${st.notes&&r.why?'italic ':''}500 34px ${font}`; x.fillText(fitText(x,sub,W-310),220,ry+120); }
     if(i<rows.length-1){ x.fillStyle='rgba(22,21,26,.1)'; x.fillRect(220,ry+rowH-24,W-310,2); } });
   if(hm.length){ x.fillStyle='rgba(22,21,26,.55)'; x.font=`500 34px ${font}`; x.fillText(fitText(x,'Also · '+hm.map(h=>h.n).join(', '),W-180),90,H-210); }
-  x.fillStyle='rgba(22,21,26,.4)'; x.font=`600 30px ${font}`; x.fillText(fitText(x,footLine(),W-180),90,H-120);
+  x.fillStyle='rgba(22,21,26,.4)'; x.font=`600 30px ${font}`; x.fillText(fitText(x,footLine(st.cat),W-180),90,H-120);
   return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
 }
 async function makeStory(){
@@ -9030,7 +9051,7 @@ async function makeStory(){
   x.fillStyle='rgba(255,255,255,.55)'; x.font=`700 54px ${font}`; x.fillText(fitText(x,subtitle,SW-180),90,480);
   drawRows(x,rows,font,st.notes&&hasNotes,560,also?1000:1090);
   if(also){ x.fillStyle='rgba(255,255,255,.62)'; x.font=`500 34px ${font}`; x.fillText(fitText(x,also,SW-180),90,1620); }
-  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Rank yours with friends · '+location.host+location.pathname.replace(/index\.html$/,'').replace(/\/$/,''),SW-160),SW/2,1680); x.textAlign='left';
+  x.fillStyle='rgba(255,255,255,.4)'; x.font=`600 30px ${font}`; x.textAlign='center'; x.fillText(fitText(x,'Rank yours with friends · '+siteLabel(st.cat),SW-160),SW/2,1680); x.textAlign='left';
   return new Promise(res=>cv.toBlob(b=>res(b),'image/png'));
 }
 async function renderStory(){

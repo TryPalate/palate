@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Palate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0D">
+<style>html{background:#0A0A0D;color:#F5F5F7;font:16px system-ui,sans-serif}body{margin:0;display:grid;place-items:center;min-height:100vh}a{color:#FFB06B}</style>
+<!-- GitHub Pages shows this for any address that has no page, such as /palate/some-topic.
+     /palate/albums forwards to /palate/?c=albums (the app opens that topic); anything else goes to the app's front door.
+     ROOT_DEPTH is how many path parts the app lives under: 1 for trypalate.github.io/palate/, 0 if it ever moves to its own domain. -->
+<script>
+(function(){
+  var ROOT_DEPTH = 1;
+  var parts = location.pathname.split('/').filter(Boolean);
+  var root = '/' + parts.slice(0, ROOT_DEPTH).join('/'); if (root.length > 1) root += '/';
+  var topic = (parts[ROOT_DEPTH] || '').toLowerCase();
+  var q = location.search ? '&' + location.search.slice(1) : '';
+  location.replace(/^[a-z0-9-]{1,40}$/.test(topic) ? root + '?c=' + topic + q + location.hash : root + location.search + location.hash);
+})();
+</script>
+<noscript><p>Open <a href="./">Palate</a>.</p></noscript>
+<p>Opening Palate…</p>
+</html>

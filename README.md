@@ -33,3 +33,10 @@ Each file ends with a short "Your controls" section: switches you can flip later
 - Supabase > Advisors > Security Advisor: fix anything it lists.
 - Privacy policy, terms, minimum age, and a check of picture licences (see About and credits in the app).
 - Never commit the `service_role` key.
+
+## Topic links
+
+Shared links and pictures point at a topic with a clean path, e.g. `trypalate.github.io/palate/albums`. Opening one lands a new account straight in building that shelf, free (no pick needed). A friend's `?join=CODE` rides along on links, but the typed address works without it.
+
+- `albums/index.html`, `fastfood/index.html`, … are generated forwarders (a normal page with its own link preview that redirects to `./?c=albums`). After adding a topic to `CATS` in `index.html`, run `node scripts/make-topic-pages.mjs` and commit the new folder.
+- `404.html` catches any topic without a folder and forwards it the same way.
