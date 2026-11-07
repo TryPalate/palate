@@ -1,0 +1,5828 @@
+[
+ {
+  "cat": "actors",
+  "q": "timothee chalamet",
+  "re": "timoth[eé]e chalamet",
+  "found": 0,
+  "photo": true,
+  "ms": 1957,
+  "settled": true,
+  "top": [
+   "Timothée Chalamet · Actor 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "actors",
+  "q": "margot robbie",
+  "re": "margot robbie",
+  "found": 0,
+  "photo": true,
+  "ms": 2230,
+  "settled": true,
+  "top": [
+   "Margot Robbie · Actor 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "actors",
+  "q": "denzel washington",
+  "re": "denzel washington",
+  "found": 0,
+  "photo": true,
+  "ms": 2220,
+  "settled": true,
+  "top": [
+   "Denzel Washington · Actor 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "boeing 747-8",
+  "re": "747-8",
+  "found": 0,
+  "photo": true,
+  "ms": 2378,
+  "settled": true,
+  "top": [
+   "Boeing 747-8 · Wide-body airliner 📷",
+   "Boeing 747-8F · 747 · Airliner 📷",
+   "Boeing 747-8 Intercontinental · 747 · Airliner 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "airbus a380",
+  "re": "a380",
+  "found": 0,
+  "photo": true,
+  "ms": 2150,
+  "settled": true,
+  "top": [
+   "Airbus A380 · Airliner 📷",
+   "Airbus A380-800 · A380 · Airliner 📷",
+   "Airbus A380-900 · A380 · Airliner 📷",
+   "Airbus A330 · Airbus · Airliner",
+   "Airbus A350 · Airliner 📷",
+   "Airbus A320 · Airliner 📷"
+  ],
+  "photoShare": 0.7,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "f-22 raptor",
+  "re": "f-22",
+  "found": 0,
+  "photo": true,
+  "ms": 1755,
+  "settled": true,
+  "top": [
+   "F-22 Raptor · Fighter 📷",
+   "Lockheed Martin F-22 Raptor · F-22 · Fighter 📷",
+   "Lockheed Martin FB-22 · Proposed bomber aircraft for the U.S. Air Force derived from 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "concorde",
+  "re": "concorde",
+  "found": 0,
+  "photo": true,
+  "ms": 2527,
+  "settled": true,
+  "top": [
+   "Concorde · Supersonic airliner 📷",
+   "Concorde Tu-144 · Supersonic airliner 📷",
+   "Concorde G-BOAC · Concorde · Supersonic airliner 📷",
+   "Concorde Alpha Delta · Concorde · Supersonic airliner 📷",
+   "Concorde Air France F-BTSD · Concorde · Supersonic airliner 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "sr-71 blackbird",
+  "re": "sr-71",
+  "found": 0,
+  "photo": true,
+  "ms": 1797,
+  "settled": true,
+  "top": [
+   "Lockheed SR-71 Blackbird · Reconnaissance 📷",
+   "Lockheed Martin SR-71 Blackbird · SR-71 · Spy plane"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "aircraft",
+  "q": "cessna 172 skyhawk",
+  "re": "172",
+  "found": 0,
+  "photo": true,
+  "ms": 1946,
+  "settled": true,
+  "top": [
+   "Cessna 172 Skyhawk · 172 · Light aircraft 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "airlines",
+  "q": "emirates",
+  "re": "emirates",
+  "found": 0,
+  "photo": false,
+  "ms": 1695,
+  "settled": true,
+  "top": [
+   "Emirates · UAE",
+   "Emirates SkyCargo · Cargo airline based in Dubai, United Arab Emirates",
+   "flydubai · Emirati government-owned low-cost airline based in Dubai, United Arab ",
+   "Air Arabia · Emirati low-cost airline based in Sharjah, UAE"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "airlines",
+  "q": "qatar airways",
+  "re": "qatar airways",
+  "found": 0,
+  "photo": false,
+  "ms": 1751,
+  "settled": true,
+  "top": [
+   "Qatar Airways · Qatar",
+   "Qatar Airways Cargo · Cargo carrier"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "airlines",
+  "q": "singapore airlines",
+  "re": "singapore airlines",
+  "found": 0,
+  "photo": false,
+  "ms": 2687,
+  "settled": true,
+  "top": [
+   "Singapore Airlines · Singapore",
+   "Singapore Airlines Cargo · Cargo airline based in Singapore. Subsidiary of Singapore Airlines.",
+   "Singapore Airlines Flights 23 and 24 · Longest scheduled airlines flight(s)",
+   "Mandala Airlines · Singapore airline 📷",
+   "Scoot · Singaporean low-cost airline and a wholly owned subsidiary of Singapor 📷",
+   "SilkAir · Defunct airline (Singapore)"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "wsrv.nl",
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "airlines",
+  "q": "ryanair",
+  "re": "ryanair",
+  "found": 0,
+  "photo": true,
+  "ms": 1909,
+  "settled": true,
+  "top": [
+   "Ryanair · Ireland 📷",
+   "Ryanair UK · British Airline; part of Ryanair Holdings",
+   "Ryanair Pilot Group · Unrecognised airline union",
+   "Buzz · Polish low-cost airline; part of Ryanair Holdings 📷",
+   "Spanair · Defunct Spanish airline 📷",
+   "RwandAir · Flag carrier airline of Rwanda"
+  ],
+  "photoShare": 0.5714285714285714,
+  "src": [
+   "commons.wikimedia.org",
+   "wsrv.nl",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "albums",
+  "q": "short n sweet",
+  "re": "short n.? sweet",
+  "found": 0,
+  "photo": true,
+  "ms": 2449,
+  "settled": true,
+  "top": [
+   "Short n' Sweet · Sabrina Carpenter · 2024 📷",
+   "Short n' sweet · Daniel Stark",
+   "Short n' Sweet · Dearveni",
+   "Short n sweet · Shino! · 2025 📷",
+   "Short n Sweet · DJ Bhav · 2024 📷",
+   "short n' sweet, but lofi · Louisette"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "albums",
+  "q": "blonde frank ocean",
+  "re": "^blonde$",
+  "found": 0,
+  "photo": true,
+  "ms": 2497,
+  "settled": true,
+  "top": [
+   "Blonde · Frank Ocean · 2016 📷",
+   "Ocean Waves 3 Hours - Relaxing Music for Self Control · Frank Blonde",
+   "Ocean Waves to Sleep – Ocen Music for Sleeping, Soothing Sounds, Sound of the Sea · Frank Blonde",
+   "Swim Good · Frank Ocean · 2011 📷",
+   "Moon River · Frank Ocean · 2018 📷",
+   "Dear April (Side A - Acoustic) · Frank Ocean · 2020 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "albums",
+  "q": "the romantic bruno mars",
+  "re": "the romantic",
+  "found": 0,
+  "photo": true,
+  "ms": 2550,
+  "settled": true,
+  "top": [
+   "The Romantic · Bruno Mars 📷",
+   "Doo-Wops & Hooligans · Bruno Mars · 2010 📷",
+   "Finesse (Remix) [feat. Cardi B] · Bruno Mars · 2018 📷",
+   "The Romantic (Piano Instrumentals) · Miss Chill",
+   "Wedding Songs 2 · The Eternal Romantic",
+   "Songs For My Wedding, Vol. 2 · The Eternal Romantic"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "albums",
+  "q": "gnx",
+  "re": "^gnx$",
+  "found": 0,
+  "photo": true,
+  "ms": 2069,
+  "settled": true,
+  "top": [
+   "GNX · Kendrick Lamar · 2024 📷",
+   "GNX FREESTYLE · Sy the Rapper",
+   "Trap Bag (feat. Gnx) · Layloe · 2017 📷",
+   "Empire · GNX · 2018 📷",
+   "Concentrado · GNR",
+   "Gnb · Sweet Micky"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "albums",
+  "q": "good kid maad city",
+  "re": "good kid",
+  "found": 0,
+  "photo": false,
+  "ms": 2590,
+  "settled": true,
+  "top": [
+   "GOOD KiD / MAAD CiTY · mikeebiy ☆",
+   "good kid, m.A.A.d city · Kendrick Lamar · 2012 📷",
+   "good kid, m.a.a.d. city · Cjones912",
+   "Good Kid, M.A.A.D City · KubikKubs",
+   "Can We Hang Out Sometime? · Good Kid · 2026 📷",
+   "To Pimp a Butterfly · Kendrick Lamar · 2015 📷"
+  ],
+  "photoShare": 0.625,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "animals",
+  "q": "red panda",
+  "re": "red panda",
+  "found": 0,
+  "photo": true,
+  "ms": 1368,
+  "settled": true,
+  "top": [
+   "Red panda · Animal 📷",
+   "Ailuridae · Monotypic family of mammals"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "animals",
+  "q": "axolotl",
+  "re": "axolotl",
+  "found": 0,
+  "photo": true,
+  "ms": 1859,
+  "settled": true,
+  "top": [
+   "Axolotl · Animal 📷",
+   "Ambystoma · Genus of amphibians 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "animals",
+  "q": "octopus",
+  "re": "octopus",
+  "found": 0,
+  "photo": false,
+  "ms": 1339,
+  "settled": true,
+  "top": [
+   "Octopus · Largest genus of octopuses",
+   "Octopoda · Order of molluscs 📷",
+   "Octopus minor · Species of mollusc 📷",
+   "Octopus maya · Species of mollusc 📷",
+   "common octopus · Species of mollusc 📷",
+   "Caribbean reef octopus · Species of mollusc 📷"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "animals",
+  "q": "capybara",
+  "re": "capybara",
+  "found": 0,
+  "photo": true,
+  "ms": 1373,
+  "settled": true,
+  "top": [
+   "Capybara · Animal 📷",
+   "Hydrochoerus · Genus of mammals 📷",
+   "Sus hydrochaeris · Species of mammal",
+   "Capybaras Huddled Together · Video game developed by Catnip studio",
+   "Capybara associated cyclovirus · Species of virus",
+   "Lesser capybara · Species of rodent 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "anime",
+  "q": "frieren",
+  "re": "frieren",
+  "found": 0,
+  "photo": true,
+  "ms": 1610,
+  "settled": true,
+  "top": [
+   "Frieren · Japanese anime television series 📷",
+   "Frieren: Beyond Journey's End · 葬送のフリーレン · Madhouse · 2023 📷",
+   "Frieren: Beyond Journey’s End Season 2 · MADHOUSE · 2026 📷",
+   "Sousou no Frieren 3rd Season · MADHOUSE · 2027 📷",
+   "Sousou no Frieren: ●● no Mahou · TOHO animation STUDIO · 2023 📷",
+   "Sousou no Frieren: ●● no Mahou Part 2 · TOHO animation STUDIO · 2025 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "anime",
+  "q": "jujutsu kaisen",
+  "re": "jujutsu kaisen",
+  "found": 0,
+  "photo": true,
+  "ms": 1434,
+  "settled": true,
+  "top": [
+   "Jujutsu Kaisen · 呪術廻戦 · MAPPA · 2020 📷",
+   "JUJUTSU KAISEN 0 · MAPPA · 2021 📷",
+   "Jujutsu Kaisen PV · Yokohama Animation Lab · 2018 📷",
+   "Jujutsu Kaisen: Shimetsu Kaiyuu - Kouhen · MAPPA 📷",
+   "JUJUTSU KAISEN Season 3: The Culling Game Part 1 · MAPPA · 2026 📷",
+   "JUJUTSU KAISEN Season 2 · MAPPA · 2023 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "anime",
+  "q": "spy x family",
+  "re": "spy.*family",
+  "found": 0,
+  "photo": true,
+  "ms": 1398,
+  "settled": true,
+  "top": [
+   "Spy x Family · スパイファミリー · Wit Studio · 2022 📷",
+   "SPY x FAMILY Season 2 · WIT STUDIO · 2023 📷",
+   "SPY x FAMILY Season 3 · WIT STUDIO · 2025 📷",
+   "SPY x FAMILY Cour 2 · WIT STUDIO · 2022 📷",
+   "SPY x FAMILY CODE: White · WIT STUDIO · 2023 📷",
+   "Spy × Family Code: White · 2023 Japanese animated film by Takashi Katagiri 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "anime",
+  "q": "one piece",
+  "re": "one piece",
+  "found": 0,
+  "photo": true,
+  "ms": 1381,
+  "settled": true,
+  "top": [
+   "One Piece · ワンピース · Toei Animation · 1999 📷",
+   "ONE PIECE: The Movie · Toei Animation · 2000 📷",
+   "One Piece: Episode of Merry - The Tale of One More Friend · Toei Animation · 2013 📷",
+   "ONE PIECE: Episode of Nami - Koukaishi no Namida to Nakama no Kizuna · 2012 📷",
+   "One Piece: Romance Dawn Story · Toei Animation · 2008 📷",
+   "Koisuru ONE PIECE · 2025"
+  ],
+  "photoShare": 0.7142857142857143,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "apps",
+  "q": "instagram",
+  "re": "instagram",
+  "found": 0,
+  "photo": true,
+  "ms": 2627,
+  "settled": true,
+  "top": [
+   "Instagram · Social 📷",
+   "Threads · Instagram, Inc. 📷",
+   "TikTok - Videos, Shop & LIVE · TIKTOK PTE. LTD. 📷",
+   "Snapchat · Snap, Inc. 📷",
+   "Facebook · Meta Platforms, Inc. 📷",
+   "YouTube · Google LLC 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "apps",
+  "q": "bereal",
+  "re": "bereal",
+  "found": 0,
+  "photo": true,
+  "ms": 2602,
+  "settled": true,
+  "top": [
+   "BeReal · Social 📷",
+   "BeReal: Photos & Friends Daily · BeReal 📷",
+   "Snapchat · Snap, Inc. 📷",
+   "Locket Widget · Locket Labs, Inc. 📷",
+   "Instagram · Instagram, Inc. 📷",
+   "TikTok - Videos, Shop & LIVE · TIKTOK PTE. LTD. 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "apps",
+  "q": "duolingo",
+  "re": "duolingo",
+  "found": 0,
+  "photo": true,
+  "ms": 2628,
+  "settled": true,
+  "top": [
+   "Duolingo · Learning 📷",
+   "Duolingo: Learn Languages · Duolingo, Inc 📷",
+   "Learn to Read - Duolingo ABC · Duolingo, Inc 📷",
+   "Babbel - Language Learning · Babbel GmbH 📷",
+   "Falou - Fast language learning · Moymer Negocios e Servicos em Tecnologia LTDA. 📷",
+   "Speak: Language Learning · Speakeasy Labs, Inc 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "apps",
+  "q": "notion",
+  "re": "notion",
+  "found": 0,
+  "photo": false,
+  "ms": 2347,
+  "settled": true,
+  "top": [
+   "Notion · Productivity",
+   "Notion: Notes, Tasks, AI · Notion Labs, Incorporated 📷",
+   "Notion Calendar · Notion Labs, Incorporated 📷",
+   "Notion Agents · Notion Labs, Incorporated 📷",
+   "To-Do List & Tasks for Notion · Zipo Apps Ltd. 📷",
+   "Widget for Notion · YUYA YOSHIDA 📷"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "artists",
+  "q": "tyler the creator",
+  "re": "tyler.* the creator",
+  "found": 0,
+  "photo": true,
+  "ms": 1538,
+  "settled": true,
+  "top": [
+   "Tyler, The Creator · Hip-hop 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "artists",
+  "q": "bruno mars",
+  "re": "^bruno mars$",
+  "found": 0,
+  "photo": true,
+  "ms": 1969,
+  "settled": true,
+  "top": [
+   "Bruno Mars · Pop / R&B 📷",
+   "Bruno Mars Cover Band · Artist",
+   "Berklee Bruno Mars Ensemble · Artist"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "artists",
+  "q": "blackpink",
+  "re": "blackpink",
+  "found": 0,
+  "photo": false,
+  "ms": 1411,
+  "settled": true,
+  "top": [
+   "BLACKPINK · 블랙핑크 · K-pop",
+   "Blackpinky · Artist",
+   "LISA · Artist",
+   "Thrice · Artist",
+   "Black Milk · Artist"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "artists",
+  "q": "sza",
+  "re": "^sza$",
+  "found": 0,
+  "photo": true,
+  "ms": 1589,
+  "settled": true,
+  "top": [
+   "SZA · R&B 📷",
+   "Szabolcs Fényes · Hungarian composer",
+   "Aza · Artist 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "cdn-images.dzcdn.net"
+  ]
+ },
+ {
+  "cat": "artists",
+  "q": "rosé",
+  "re": "ros[eé]",
+  "found": 0,
+  "photo": false,
+  "ms": 1329,
+  "settled": true,
+  "top": [
+   "Rosé · 로제 · K-pop",
+   "Rose & the Howling North · Artist",
+   "Guns N' Roses · Rock",
+   "Rosalía · Latin 📷"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "athletes",
+  "q": "cristiano ronaldo",
+  "re": "cristiano ronaldo",
+  "found": 0,
+  "photo": false,
+  "ms": 1962,
+  "settled": true,
+  "top": [
+   "Cristiano Ronaldo · Football"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "athletes",
+  "q": "lebron james",
+  "re": "lebron james",
+  "found": 0,
+  "photo": false,
+  "ms": 1654,
+  "settled": true,
+  "top": [
+   "LeBron James · Basketball"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "athletes",
+  "q": "lamine yamal",
+  "re": "lamine yamal",
+  "found": 0,
+  "photo": true,
+  "ms": 2170,
+  "settled": true,
+  "top": [
+   "Lamine Yamal · Football 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "athletes",
+  "q": "simone biles",
+  "re": "simone biles",
+  "found": 0,
+  "photo": true,
+  "ms": 2176,
+  "settled": true,
+  "top": [
+   "Simone Biles · Gymnastics 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "authors",
+  "q": "haruki murakami",
+  "re": "haruki murakami",
+  "found": 0,
+  "photo": true,
+  "ms": 1424,
+  "settled": true,
+  "top": [
+   "Haruki Murakami · Novelist 📷",
+   "Haruki Murakami bibliography · Works of the Japanese author"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "authors",
+  "q": "brandon sanderson",
+  "re": "brandon sanderson",
+  "found": 0,
+  "photo": true,
+  "ms": 1706,
+  "settled": true,
+  "top": [
+   "Brandon Sanderson · Fantasy 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "authors",
+  "q": "sarah j maas",
+  "re": "sarah j\\.? maas",
+  "found": 0,
+  "photo": false,
+  "ms": 1911,
+  "settled": true,
+  "top": [
+   "Sarah J. Maas · American fantasy writer"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "boardgames",
+  "q": "catan",
+  "re": "catan",
+  "found": 0,
+  "photo": true,
+  "ms": 1368,
+  "settled": true,
+  "top": [
+   "Catan · Strategy 📷",
+   "Catan Card Game · Card game based on the Catan board game 📷",
+   "Catan: Seafarers · Expansion for the Catan board game 📷",
+   "Catan: Cities & Knights · Board game expansion set",
+   "Catan series · Family of games beginning with Settlers of Catan",
+   "The Settlers of Catan · Board game (1995)"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "boardgames",
+  "q": "monopoly",
+  "re": "monopoly",
+  "found": 0,
+  "photo": true,
+  "ms": 1904,
+  "settled": true,
+  "top": [
+   "Monopoly · Classic 📷",
+   "Monopoly Tycoon · 2001 video game 📷",
+   "Monopoly Star Wars · 1997 video game 📷",
+   "Monopoly Plus · 2014 video game 📷",
+   "Monopoly Party! · 2002 video game",
+   "Monopoly Go! · 2023 video game 📷"
+  ],
+  "photoShare": 0.625,
+  "src": [
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "boardgames",
+  "q": "exploding kittens",
+  "re": "exploding kittens",
+  "found": 0,
+  "photo": true,
+  "ms": 1509,
+  "settled": true,
+  "top": [
+   "Exploding Kittens · Cards 📷",
+   "Exploding Kittens® 2 · 2024 video game developed by Marmalade Game Studio Ltd",
+   "Exploding Kittens VR · 2024 video game",
+   "Exploding Kittens Inc · Game publishing business"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "boardgames",
+  "q": "codenames",
+  "re": "codenames",
+  "found": 0,
+  "photo": true,
+  "ms": 1659,
+  "settled": true,
+  "top": [
+   "Codenames · Party 📷",
+   "Codenames Online · 2020 video game",
+   "Codenames App · 2024 video game",
+   "Codenames: Pictures · 2016 party game 📷",
+   "Codenames Duet · 2017 party game",
+   "Codename: Outbreak · 2001 video game 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "books",
+  "q": "the great gatsby",
+  "re": "great gatsby",
+  "found": 0,
+  "photo": true,
+  "ms": 2225,
+  "settled": true,
+  "top": [
+   "The Great Gatsby · F. Scott Fitzgerald 📷",
+   "The Great Gatsby / The Last Tycoon · F. Scott Fitzgerald 📷",
+   "The great Gatsby, by F. Scott Fitzgerald · Morris Dickstein 📷",
+   "F. Scott Fitzgerald's the great Gatsby · John W. Campbell 📷",
+   "Jay Gatsby · Character in the novel The Great Gatsby 📷",
+   "Careless people · Sarah Bartlett Churchwell"
+  ],
+  "photoShare": 0.8571428571428571,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "covers.openlibrary.org"
+  ]
+ },
+ {
+  "cat": "books",
+  "q": "atomic habits",
+  "re": "atomic habits",
+  "found": 0,
+  "photo": true,
+  "ms": 1419,
+  "settled": true,
+  "top": [
+   "Atomic Habits · James Clear 📷",
+   "Atomic Habits Journal · Atomic Habit Journal 📷",
+   "Companion Workbook : Atomic Habits · Julie Ann Price 📷",
+   "Summary of Atomic Habits by James Clear · James C. Scott 📷",
+   "Summary of Atomic Habits · John Cleverly 📷",
+   "SUMMARY : ATOMIC HABITS · Key Notes 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "covers.openlibrary.org",
+   "covers.openlibrary.org"
+  ]
+ },
+ {
+  "cat": "books",
+  "q": "fourth wing",
+  "re": "fourth wing",
+  "found": 0,
+  "photo": true,
+  "ms": 1707,
+  "settled": true,
+  "top": [
+   "Fourth Wing · Rebecca Yarros 📷",
+   "Empyrean Series, 3 Books Collection Set, Fourth Wing, Iron Flame, Onyx Storm, by Rebecca Yarros · Rebecca Yarros 📷",
+   "Onyx Storm · Rebecca Yarros 📷",
+   "House of Marionne · J. Elle 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "covers.openlibrary.org",
+   "covers.openlibrary.org"
+  ]
+ },
+ {
+  "cat": "books",
+  "q": "project hail mary",
+  "re": "project hail mary",
+  "found": 0,
+  "photo": true,
+  "ms": 1993,
+  "settled": true,
+  "top": [
+   "Project Hail Mary · Andy Weir 📷",
+   "Study Guide -- The Other Wes Moore by Wes Moore · SuperSummary 📷",
+   "Study Guide The Personal Librarian by Marie Benedict and Victoria Christopher Murray · SuperSummary 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "covers.openlibrary.org",
+   "covers.openlibrary.org"
+  ]
+ },
+ {
+  "cat": "brands",
+  "q": "supreme",
+  "re": "supreme",
+  "found": 0,
+  "photo": true,
+  "ms": 2161,
+  "settled": true,
+  "top": [
+   "Supreme · Streetwear 📷",
+   "Lidl · German global discount supermarket chain 📷",
+   "Aldi · Brand name of two global discount supermarket chains 📷",
+   "Target Corporation · American retailer and supermarket chain 📷",
+   "Sainsbury's · Chain of supermarkets in the United Kingdom 📷",
+   "Billa · Austrian supermarket chain that operates throughout Central, Eastern a 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "brands",
+  "q": "nike",
+  "re": "^nike",
+  "found": 0,
+  "photo": false,
+  "ms": 1591,
+  "settled": true,
+  "top": [
+   "Nike · Sportswear",
+   "Nivea · German personal care brand that specializes in skin and body care 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "brands",
+  "q": "stussy",
+  "re": "st[uü]ssy",
+  "found": 0,
+  "photo": false,
+  "ms": 2120,
+  "settled": true,
+  "top": [
+   "Stüssy · Streetwear"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "brands",
+  "q": "aime leon dore",
+  "re": "aim[eé] leon dore",
+  "found": 0,
+  "photo": false,
+  "ms": 1728,
+  "settled": true,
+  "top": [
+   "Aimé Leon Dore · Fashion"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "breakfast",
+  "q": "pancakes",
+  "re": "pancake",
+  "found": 0,
+  "photo": true,
+  "ms": 1377,
+  "settled": true,
+  "top": [
+   "Pancakes · Breakfast 📷",
+   "Pancake · Thin round cake made of eggs, milk, and flour 📷",
+   "Potato pancake · Shallow-fried pancakes of grated or ground potato",
+   "Dutch baby pancake · Pancake originating from the United States 📷",
+   "Blini · Russian pancake 📷"
+  ],
+  "photoShare": 0.8,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "breakfast",
+  "q": "avocado toast",
+  "re": "avocado toast",
+  "found": 0,
+  "photo": true,
+  "ms": 1982,
+  "settled": true,
+  "top": [
+   "Avocado toast · Breakfast 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "breakfast",
+  "q": "shakshuka",
+  "re": "shakshuka",
+  "found": 0,
+  "photo": true,
+  "ms": 2178,
+  "settled": true,
+  "top": [
+   "Shakshuka · Breakfast 📷",
+   "Shakshouka · Maghrebi dish of eggs poached in a sauce 📷",
+   "Şakşuka · Turkish side dish of vegetables cooked in olive oil 📷",
+   "Menemen · Turkish tomato and egg dish similar to shakshouka 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "breakfast",
+  "q": "full english",
+  "re": "full english|english breakfast",
+  "found": 0,
+  "photo": true,
+  "ms": 1707,
+  "settled": true,
+  "top": [
+   "Full English · Breakfast 📷",
+   "English breakfast · Fried food 📷",
+   "full breakfast · Substantial British and Irish breakfast"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cafes",
+  "q": "starbucks",
+  "re": "starbucks",
+  "found": 0,
+  "photo": true,
+  "ms": 2147,
+  "settled": true,
+  "top": [
+   "Starbucks · Coffee 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cafes",
+  "q": "blue bottle coffee",
+  "re": "blue bottle",
+  "found": 0,
+  "photo": false,
+  "ms": 2214,
+  "settled": true,
+  "top": [
+   "Blue Bottle Coffee · Coffee"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "cafes",
+  "q": "pret a manger",
+  "re": "pret",
+  "found": 0,
+  "photo": false,
+  "ms": 2435,
+  "settled": true,
+  "top": [
+   "Pret a Manger · Sandwich café"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "cafes",
+  "q": "gails",
+  "re": "gail",
+  "found": 0,
+  "photo": false,
+  "ms": 2092,
+  "settled": true,
+  "top": [
+   "Gail's · Bakery café",
+   "Gail's Bakery · Bakery café"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "cars",
+  "q": "porsche taycan turbo gt weissach package",
+  "re": "taycan turbo gt",
+  "found": 0,
+  "photo": true,
+  "ms": 6187,
+  "settled": true,
+  "top": [
+   "Porsche Taycan Turbo GT with Weissach Package · Taycan · Electric sedan 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cars",
+  "q": "bmw m3 competition xdrive",
+  "re": "m3 competition",
+  "found": 1,
+  "photo": false,
+  "ms": 3284,
+  "settled": true,
+  "top": [
+   "BMW M3 (G80) Competition xDrive · M3 (G80) · Sports sedan 📷",
+   "BMW M3 Competition M xDrive Sedan · BMW · 2022–2027"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cars",
+  "q": "tesla model 3 performance",
+  "re": "model 3",
+  "found": 0,
+  "photo": true,
+  "ms": 4618,
+  "settled": true,
+  "top": [
+   "Tesla Model 3 Performance · Model 3 · Electric sedan 📷",
+   "Tesla Model 3 Performance AWD · Tesla · 2021–2027",
+   "Tesla Model 3 Highland Performance · Model 3 · Electric sedan 📷",
+   "Tesla Model 3 Long Range AWD Performance · Tesla · 2018",
+   "Tesla Model 3 Long Range Performance AWD (18in) · Tesla · 2020",
+   "Tesla Model 3 · Electric mid-size sedan 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cars",
+  "q": "toyota supra a90",
+  "re": "supra",
+  "found": 0,
+  "photo": false,
+  "ms": 3608,
+  "settled": true,
+  "top": [
+   "Toyota Supra (A90) 3.0 · Supra · Sports car",
+   "Toyota Supra (A90) 2.0 · Supra · Sports car",
+   "Toyota Supra (A90) GR 45 Edition · Supra · Sports car"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "cars",
+  "q": "honda civic type r fl5",
+  "re": "civic type r",
+  "found": 0,
+  "photo": true,
+  "ms": 3937,
+  "settled": true,
+  "top": [
+   "Honda Civic Type R FL5 · Civic Type R · Hot hatch 📷",
+   "Honda Civic Type R FL5 Ultimate Edition · Civic Type R · Hot hatch 📷",
+   "Honda Civic Type R TCR · Racing car model 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cars",
+  "q": "nissan gt r nismo",
+  "re": "gt-?r.*nismo",
+  "found": 0,
+  "photo": true,
+  "ms": 3313,
+  "settled": true,
+  "top": [
+   "Nissan GT-R (R35) Nismo · GT-R (R35) · Supercar 📷",
+   "Nissan Skyline GT-R R32 Nismo · Skyline GT-R · Sports car 📷",
+   "Nissan GT-R (R35) Nismo Special Edition · GT-R (R35) · Supercar 📷",
+   "Nissan GT-R LM Nismo · Sports prototype racing car",
+   "Nissan GT-R · Sports car manufactured by Japanese automobile manufacturer  📷",
+   "Nissan GT-R in motorsport · Japanese car adapted for racing"
+  ],
+  "photoShare": 0.7142857142857143,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cars",
+  "q": "mercedes amg gt black series",
+  "re": "amg gt.*black series",
+  "found": 0,
+  "photo": false,
+  "ms": 4750,
+  "settled": true,
+  "top": [
+   "Mercedes-Benz AMG GT Black Series · AMG GT · Sports car"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "cars",
+  "q": "lamborghini huracan sto",
+  "re": "hurac[aá]n.*sto",
+  "found": 0,
+  "photo": false,
+  "ms": 4378,
+  "settled": true,
+  "top": [
+   "Lamborghini Huracán STO · Huracán · Supercar"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "catbreeds",
+  "q": "maine coon",
+  "re": "maine coon",
+  "found": 0,
+  "photo": true,
+  "ms": 1661,
+  "settled": true,
+  "top": [
+   "Maine Coon · Large 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "catbreeds",
+  "q": "british shorthair",
+  "re": "british shorthair",
+  "found": 0,
+  "photo": true,
+  "ms": 2075,
+  "settled": true,
+  "top": [
+   "British Shorthair · Short-haired 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "catbreeds",
+  "q": "scottish fold",
+  "re": "scottish fold",
+  "found": 0,
+  "photo": true,
+  "ms": 1697,
+  "settled": true,
+  "top": [
+   "Scottish Fold · Short-haired 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "catbreeds",
+  "q": "sphynx",
+  "re": "sphynx",
+  "found": 0,
+  "photo": true,
+  "ms": 1869,
+  "settled": true,
+  "top": [
+   "Sphynx · Hairless 📷",
+   "Sphynx cat · Hairless breed of cat 📷",
+   "Sphynx kittens · Kitten from the Sphynx cat breed 📷",
+   "Bambino · Breed of cat that was created as a cross between the Sphynx and the Mu"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "celebrities",
+  "q": "zendaya",
+  "re": "zendaya",
+  "found": 0,
+  "photo": true,
+  "ms": 2110,
+  "settled": true,
+  "top": [
+   "Zendaya · Actor 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "celebrities",
+  "q": "taylor swift",
+  "re": "taylor swift",
+  "found": 0,
+  "photo": true,
+  "ms": 1657,
+  "settled": true,
+  "top": [
+   "Taylor Swift · Music 📷",
+   "Taylor Swift singles discography · Singles by American singer-songwriter",
+   "Taylor Swift albums discography · Albums by American singer-songwriter"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "celebrities",
+  "q": "kylie jenner",
+  "re": "kylie jenner",
+  "found": 0,
+  "photo": true,
+  "ms": 1656,
+  "settled": true,
+  "top": [
+   "Kylie Jenner · Media 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cereal",
+  "q": "lucky charms",
+  "re": "lucky charms",
+  "found": 0,
+  "photo": true,
+  "ms": 1483,
+  "settled": true,
+  "top": [
+   "Lucky Charms · Cereal 📷",
+   "General Mills Lucky Charms · General Mills 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "cereal",
+  "q": "honey nut cheerios",
+  "re": "honey nut cheerios",
+  "found": 0,
+  "photo": true,
+  "ms": 1613,
+  "settled": true,
+  "top": [
+   "Honey Nut Cheerios · Cereal 📷",
+   "General Mills Honey Nut Cheerios · General Mills 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "cereal",
+  "q": "reeses puffs",
+  "re": "reese.?s puffs",
+  "found": 0,
+  "photo": true,
+  "ms": 1474,
+  "settled": true,
+  "top": [
+   "Reese's Puffs · Cereal 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "cereal",
+  "q": "cinnamon toast crunch",
+  "re": "cinnamon toast crunch",
+  "found": 0,
+  "photo": false,
+  "ms": 1644,
+  "settled": true,
+  "top": [
+   "Cinnamon Toast Crunch · Cereal",
+   "Catalina Crunch Cinnamon Toast Protein Cereal · Catalina Crunch 📷",
+   "General Mills Cinnamon Toast Crunch · General Mills 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "characters",
+  "q": "naruto uzumaki",
+  "re": "naruto uzumaki",
+  "found": 0,
+  "photo": false,
+  "ms": 2179,
+  "settled": true,
+  "top": [
+   "Naruto Uzumaki · Naruto",
+   "Naruto: Uzumaki Chronicles · 2005 video game",
+   "Boruto Uzumaki · Naruto",
+   "Uzumaki Clan · Naruto",
+   "Ashina Uzumaki · Naruto",
+   "Menma Uzumaki · Naruto"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "characters",
+  "q": "walter white",
+  "re": "walter white",
+  "found": 0,
+  "photo": false,
+  "ms": 1407,
+  "settled": true,
+  "top": [
+   "Walter White · Breaking Bad",
+   "Walter White Jr. · Fictional character from Breaking Bad"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "characters",
+  "q": "hermione granger",
+  "re": "hermione granger",
+  "found": 0,
+  "photo": false,
+  "ms": 1716,
+  "settled": true,
+  "top": [
+   "Hermione Granger · Harry Potter"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "characters",
+  "q": "spongebob squarepants",
+  "re": "spongebob",
+  "found": 0,
+  "photo": true,
+  "ms": 1514,
+  "settled": true,
+  "top": [
+   "SpongeBob SquarePants · Main character from the animated television show SpongeBob S 📷",
+   "SpongeBob SquarePants: The Cosmic Shake · 2023 video game developed by Purple Lamp Studios 📷",
+   "SpongeBob SquarePants: Battle for Bikini Bottom · 2003 video game 📷",
+   "SpongeBob SquarePants: Creature from the Krusty Krab · 2006 video game 📷",
+   "SpongeBob SquarePants: Battle for Bikini Bottom – Rehydrated · 2020 platform video game remake of 2003's \"SpongeBob SquareP 📷",
+   "SpongeBob SquarePants: Lights, Camera, Pants! · 2005 video game 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cheese",
+  "q": "brie",
+  "re": "brie",
+  "found": 0,
+  "photo": true,
+  "ms": 1618,
+  "settled": true,
+  "top": [
+   "Brie · France 📷",
+   "Brie de Meaux · Unpasteurized brie manufactured in the town of Meaux in the Brie regio 📷",
+   "Brie de Melun · Unpasteurized brie manufactured in the town of Melun in the Brie regio 📷",
+   "Kirkland Signature Imported French Brie · Kirkland Signature 📷",
+   "President brie triple creme · Président 📷",
+   "Cornish Brie · Type of British cheese from Cornwall, England"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cheese",
+  "q": "halloumi",
+  "re": "halloumi",
+  "found": 0,
+  "photo": true,
+  "ms": 1963,
+  "settled": true,
+  "top": [
+   "Halloumi · Cyprus 📷",
+   "Marka Hellas Halloumi · Marka Hellas"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cheese",
+  "q": "manchego",
+  "re": "manchego",
+  "found": 0,
+  "photo": true,
+  "ms": 2227,
+  "settled": true,
+  "top": [
+   "Manchego · Spain 📷",
+   "Manchego cheese PDO · Spanish protected designation of origin for Manchego cheese 📷",
+   "Ranchero Queso Fresco Part Skim Milk Cheese · Cacique"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cheese",
+  "q": "gruyere",
+  "re": "gruy[eè]re",
+  "found": 0,
+  "photo": true,
+  "ms": 1641,
+  "settled": true,
+  "top": [
+   "Gruyère · Switzerland 📷",
+   "Gruyere Aop Cheese",
+   "Gruyère français · French cheese 📷",
+   "Gruyère cheese · Swiss medium-hard Alpine cheese 📷",
+   "Kars gravyer cheese · Turkish cheese similar to Emmental although its name suggests Gruyère 📷"
+  ],
+  "photoShare": 0.8,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cities",
+  "q": "tokyo",
+  "re": "^tokyo",
+  "found": 0,
+  "photo": true,
+  "ms": 1987,
+  "settled": true,
+  "top": [
+   "Tokyo · 東京 · Japan 📷",
+   "Tokyo City · Historic municipality in Japan, 1889-1943. now area of 23 sp 📷",
+   "ward area of Tokyo · Special municipality in the eastern part of Tokyo Metropolis 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cities",
+  "q": "new york city",
+  "re": "new york",
+  "found": 0,
+  "photo": true,
+  "ms": 1774,
+  "settled": true,
+  "top": [
+   "New York City · United States 📷",
+   "New York City Subway · Rapid transit system in New York City",
+   "New York City Public Schools · Department of the government of New York City 📷",
+   "New York City Department of Parks and Recreation · Governmental department responsible for maintaining public p",
+   "New York City Landmark · Designation assigned by the New York City Landmarks Preserva 📷",
+   "New York Public Library · Public library system in New York City"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cities",
+  "q": "seoul",
+  "re": "seoul",
+  "found": 0,
+  "photo": true,
+  "ms": 1912,
+  "settled": true,
+  "top": [
+   "Seoul · 서울 · South Korea 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cities",
+  "q": "lisbon",
+  "re": "lisbon",
+  "found": 0,
+  "photo": true,
+  "ms": 1413,
+  "settled": true,
+  "top": [
+   "Lisbon · Portugal 📷",
+   "al-Lixbûnâ · Muslim city of al Andalus in present-day Lisbon"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "civilizations",
+  "q": "ancient egypt",
+  "re": "egypt",
+  "found": 0,
+  "photo": true,
+  "ms": 1967,
+  "settled": true,
+  "top": [
+   "Ancient Egypt · Africa 📷",
+   "Ancient Egyptian deity · Deities in the Ancient Egyption religion 📷",
+   "Ancient Egyptian race controversy · Question of the race of ancient Egyptians 📷",
+   "Egyptian language · Extinct Afro-Asiatic language spoken in ancient Egypt",
+   "Egyptian hieroglyphs · Formal writing system used by the ancient Egyptians 📷",
+   "religion of ancient Egypt · System of polytheistic beliefs and rituals of ancient Egypti 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "civilizations",
+  "q": "roman empire",
+  "re": "roman empire",
+  "found": 0,
+  "photo": false,
+  "ms": 1692,
+  "settled": true,
+  "top": [
+   "Roman Empire · Europe",
+   "Gallo-Roman culture · Romanised culture of Gaul under the rule of the Roman Empire"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "civilizations",
+  "q": "mongol empire",
+  "re": "mongol",
+  "found": 0,
+  "photo": false,
+  "ms": 1947,
+  "settled": true,
+  "top": [
+   "Mongol Empire · Asia"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "civilizations",
+  "q": "mali empire",
+  "re": "mali",
+  "found": 0,
+  "photo": false,
+  "ms": 1900,
+  "settled": true,
+  "top": [
+   "Mali Empire · Africa"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "clubs",
+  "q": "tottenham hotspur",
+  "re": "tottenham",
+  "found": 0,
+  "photo": false,
+  "ms": 2643,
+  "settled": true,
+  "top": [
+   "Tottenham Hotspur · Premier League",
+   "Tottenham Hotspur F.C. · Association football club in London, England"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "clubs",
+  "q": "real madrid",
+  "re": "real madrid",
+  "found": 0,
+  "photo": false,
+  "ms": 2849,
+  "settled": true,
+  "top": [
+   "Real Madrid · La Liga",
+   "Real Madrid Club de Fútbol · Association football club in Madrid, Spain",
+   "Real Madrid Castilla · Association football reserve team of Real Madrid CF",
+   "Real Madrid Femenino · Women's football team of the Spanish club Real Madrid CF",
+   "Real Madrid C · Association football team in Spain"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "clubs",
+  "q": "paris saint germain",
+  "re": "paris saint.?germain|psg",
+  "found": 0,
+  "photo": false,
+  "ms": 2854,
+  "settled": true,
+  "top": [
+   "Paris Saint-Germain · Ligue 1",
+   "Paris Saint-Germain FC · Association football club in Paris, France having two UCL",
+   "Paris Saint-Germain Féminine · French women's association football team"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "clubs",
+  "q": "bayern munich",
+  "re": "bayern",
+  "found": 0,
+  "photo": true,
+  "ms": 2434,
+  "settled": true,
+  "top": [
+   "Bayern Munich · Bundesliga 📷",
+   "Bayern Munich Junior Team · Association football club 📷",
+   "Bayern Munich v Norwich City · Association football match",
+   "FC Bayern Munich Women · Women's football team of the German sports club FC Bayern Mu",
+   "FC Bayern Munich · Association football club in Munich, Germany",
+   "FC Bayern Munich II · German association football team and the reserve team of FC Bayern Mun"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cocktails",
+  "q": "espresso martini",
+  "re": "espresso martini",
+  "found": 0,
+  "photo": true,
+  "ms": 1758,
+  "settled": true,
+  "top": [
+   "Espresso Martini · Vodka 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cocktails",
+  "q": "aperol spritz",
+  "re": "aperol spritz",
+  "found": 0,
+  "photo": true,
+  "ms": 1484,
+  "settled": true,
+  "top": [
+   "Aperol Spritz · Prosecco 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cocktails",
+  "q": "old fashioned",
+  "re": "old fashioned",
+  "found": 0,
+  "photo": true,
+  "ms": 1431,
+  "settled": true,
+  "top": [
+   "Old Fashioned · Whiskey 📷",
+   "Rum Old-fashioned · Ordinary Drink · Alcoholic 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "www.thecocktaildb.com",
+   "www.thecocktaildb.com"
+  ]
+ },
+ {
+  "cat": "cocktails",
+  "q": "paloma",
+  "re": "paloma",
+  "found": 0,
+  "photo": true,
+  "ms": 1372,
+  "settled": true,
+  "top": [
+   "Paloma · Tequila 📷",
+   "Lazy Coconut Paloma · Cocktail · Alcoholic 📷",
+   "Pineapple Paloma · Cocktail · Alcoholic 📷",
+   "Winter Paloma · Cocktail · Alcoholic 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "www.thecocktaildb.com",
+   "www.thecocktaildb.com",
+   "www.thecocktaildb.com"
+  ]
+ },
+ {
+  "cat": "comedians",
+  "q": "kevin hart",
+  "re": "kevin hart",
+  "found": 0,
+  "photo": true,
+  "ms": 1686,
+  "settled": true,
+  "top": [
+   "Kevin Hart · Stand-up 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "comedians",
+  "q": "dave chappelle",
+  "re": "dave chappelle",
+  "found": 0,
+  "photo": true,
+  "ms": 2279,
+  "settled": true,
+  "top": [
+   "Dave Chappelle · American comedian and actor 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "comedians",
+  "q": "hasan minhaj",
+  "re": "hasan minhaj",
+  "found": 0,
+  "photo": true,
+  "ms": 1969,
+  "settled": true,
+  "top": [
+   "Hasan Minhaj · Stand-up 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "countries",
+  "q": "japan",
+  "re": "^japan$",
+  "found": 0,
+  "photo": true,
+  "ms": 1854,
+  "settled": true,
+  "top": [
+   "Japan · 日本 · Asia 📷",
+   "Japan Aerospace Exploration Agency · Japan's national air and space agency 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "countries",
+  "q": "south korea",
+  "re": "south korea",
+  "found": 0,
+  "photo": true,
+  "ms": 1676,
+  "settled": true,
+  "top": [
+   "South Korea · 대한민국 · 韩国 📷",
+   "South Korea men's national football team · Men's national association football team representing South  📷",
+   "South Korea women's national association football team · Women's national association football team representing Sout",
+   "South Korea national under-20 football team · National association football team 📷",
+   "South Korea national under-23 football team · National association football team 📷",
+   "won · Official currency of the Republic of Korea 📷"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "countries",
+  "q": "new zealand",
+  "re": "new zealand",
+  "found": 0,
+  "photo": true,
+  "ms": 1915,
+  "settled": true,
+  "top": [
+   "New Zealand · Oceania 📷",
+   "New Zealand men's national football team · Men's national association football team representing New Ze 📷",
+   "New Zealand national cricket team · International cricket team of New Zealand 📷",
+   "Toi Whakaari · New Zealand's national drama school 📷",
+   "Heritage New Zealand Category 2 historic place listing · New Zealand heritage designation"
+  ],
+  "photoShare": 0.8,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "countries",
+  "q": "ivory coast",
+  "re": "ivory coast|c[oô]te d.?ivoire",
+  "found": 0,
+  "photo": true,
+  "ms": 1407,
+  "settled": true,
+  "top": [
+   "Ivory Coast · Sovereign state in West Africa 📷",
+   "Ivory Coast men's national football team · National association football team 📷",
+   "Ivory Coast women's national football team · Women's national association football team representing Ivor 📷",
+   "Ivory Coast national rugby union team · National rugby union team of Ivory Coast 📷",
+   "Ivory Coast Olympic football team · National association football team",
+   "Ivory Coast national under-17 football team · National association football team"
+  ],
+  "photoShare": 0.625,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cuisines",
+  "q": "ethiopian",
+  "re": "ethiopian",
+  "found": 0,
+  "photo": true,
+  "ms": 2141,
+  "settled": true,
+  "top": [
+   "Ethiopian · Cuisine 📷",
+   "Ethiopian cuisine · Culinary traditions of Ethiopia 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cuisines",
+  "q": "japanese",
+  "re": "japanese",
+  "found": 0,
+  "photo": false,
+  "ms": 1874,
+  "settled": true,
+  "top": [
+   "Japanese · Cuisine",
+   "kaiseki · Traditional multi-course Japanese dinner 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "cuisines",
+  "q": "korean",
+  "re": "korean",
+  "found": 0,
+  "photo": false,
+  "ms": 1850,
+  "settled": true,
+  "top": [
+   "Korean · Cuisine"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "desserts",
+  "q": "tiramisu",
+  "re": "tiramis",
+  "found": 0,
+  "photo": true,
+  "ms": 1876,
+  "settled": true,
+  "top": [
+   "Tiramisu · Italy 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "desserts",
+  "q": "creme brulee",
+  "re": "cr[eè]me br[uû]l[eé]e",
+  "found": 0,
+  "photo": true,
+  "ms": 1664,
+  "settled": true,
+  "top": [
+   "Crème brûlée · France 📷",
+   "Crema catalana · Catalan dessert similar to crème brûlée"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "desserts",
+  "q": "baklava",
+  "re": "baklava",
+  "found": 0,
+  "photo": true,
+  "ms": 1354,
+  "settled": true,
+  "top": [
+   "Baklava · Middle East 📷",
+   "Algerian baklawa · Dessert"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "desserts",
+  "q": "mochi",
+  "re": "mochi",
+  "found": 0,
+  "photo": true,
+  "ms": 3362,
+  "settled": true,
+  "top": [
+   "Mochi · Japan 📷",
+   "rice · Cereal grain and staple food",
+   "Mochi ice cream · Mochi filled with ice cream 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dinosaurs",
+  "q": "spinosaurus",
+  "re": "spinosaurus",
+  "found": 0,
+  "photo": true,
+  "ms": 1429,
+  "settled": true,
+  "top": [
+   "Spinosaurus · Theropod 📷",
+   "Spinosaurus mirabilis · Extinct species of spinosaurid theropod dinosaur 📷",
+   "Spinosaurus aegyptiacus · Extinct species of theropod dinosaurs 📷",
+   "Spinosaurus maroccanus · Species of theropod dinosaur (fossil) 📷",
+   "Spinosaurus marrocanus · Species of theropod dinosaur (fossil) 📷",
+   "Spinosauridae · Family of dinosaurs 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dinosaurs",
+  "q": "velociraptor",
+  "re": "velociraptor",
+  "found": 0,
+  "photo": true,
+  "ms": 1436,
+  "settled": true,
+  "top": [
+   "Velociraptor · Theropod 📷",
+   "Velociraptorinae · Subfamily of reptiles (fossil) 📷",
+   "Velociraptor mongoliensis · Extinct species of theropod dinosaur belonging to the Dromae 📷",
+   "Velociraptorichnus · Ichnogenus of dinosaur footprint",
+   "Velociraptor osmolskae · Species of reptile (fossil) 📷",
+   "Velociraptorichnus sichuanensis · Species of dinosaur footprint"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dinosaurs",
+  "q": "pachycephalosaurus",
+  "re": "pachycephalosaurus",
+  "found": 0,
+  "photo": true,
+  "ms": 1518,
+  "settled": true,
+  "top": [
+   "Pachycephalosaurus · Pachycephalosaur 📷",
+   "Pachycephalosaurus wyomingensis · Species of pachycephalosaurid dinosaur (fossil) 📷",
+   "Pachycephalosaurus spinifer · Species o ornithischian dinosaur 📷",
+   "Pachycephalosauria · Extinct clade of dinosaurs 📷",
+   "Stygimoloch · Genus of pachycephalosaurid dinosaurs 📷",
+   "Sphaerotholus · Extinct genus of pachycephalosaur dinosaurs"
+  ],
+  "photoShare": 0.8333333333333334,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dogs",
+  "q": "golden retriever",
+  "re": "golden retriever",
+  "found": 0,
+  "photo": true,
+  "ms": 2031,
+  "settled": true,
+  "top": [
+   "Golden Retriever · Breed 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dogs",
+  "q": "shiba inu",
+  "re": "shiba",
+  "found": 0,
+  "photo": true,
+  "ms": 1668,
+  "settled": true,
+  "top": [
+   "Shiba Inu · Breed 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dogs",
+  "q": "french bulldog",
+  "re": "french bulldog",
+  "found": 0,
+  "photo": true,
+  "ms": 2024,
+  "settled": true,
+  "top": [
+   "French Bulldog · Breed 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "dogs",
+  "q": "cavalier king charles spaniel",
+  "re": "cavalier king charles",
+  "found": 0,
+  "photo": false,
+  "ms": 1731,
+  "settled": true,
+  "top": [
+   "Cavalier King Charles Spaniel · Breed",
+   "King Charles Spaniel · Dog breed"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "dogs",
+  "q": "corgi",
+  "re": "corgi",
+  "found": 0,
+  "photo": true,
+  "ms": 1349,
+  "settled": true,
+  "top": [
+   "Corgi · Breed 📷",
+   "Welsh Corgi · Dog breed 📷",
+   "Pembroke Welsh Corgi · Dog breed",
+   "Cardigan Welsh Corgi · Dog breed"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "drinks",
+  "q": "dr pepper",
+  "re": "dr\\.? pepper",
+  "found": 0,
+  "photo": true,
+  "ms": 1414,
+  "settled": true,
+  "top": [
+   "Dr Pepper · Dr Pepper 📷",
+   "Dr Pepper zero sugar · Dr Pepper 📷",
+   "Dr pepper reg imp · Dr pepper 📷",
+   "Dr Pepper & Cream Soda · Dr Pepper 📷",
+   "Dr Pepper Strawberries & Cream · Dr Pepper 📷",
+   "Dr Pepper & Cream Soda Zero Sugar · Dr Pepper 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "drinks",
+  "q": "celsius",
+  "re": "celsius",
+  "found": 0,
+  "photo": true,
+  "ms": 1910,
+  "settled": true,
+  "top": [
+   "Celsius · Energy 📷",
+   "CELSIUS SPARKLING ORANGE · CELSIUS 📷",
+   "CELSIUS SPARKLING KIWI GUAVA · CELSIUS 📷",
+   "Celsius Fizz-Free Peach Mango Green Tea · Celsius 📷",
+   "CELSIUS SPARKLING GRAPE RUSH · CELSIUS 📷",
+   "CELSIUS Sparkling Cherry Cola · CELSIUS 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "drinks",
+  "q": "coca cola zero sugar",
+  "re": "coca.?cola zero",
+  "found": 0,
+  "photo": true,
+  "ms": 2162,
+  "settled": true,
+  "top": [
+   "Coca-Cola Zero Sugar · Coca-Cola 📷",
+   "Coca-Cola Zero Sugar Cola · Coca-Cola 📷",
+   "Coca-Cola Zero Sugar Zero Calorie Cola, 67.6 fl oz · Coca-Cola 📷",
+   "Coca-Cola Zero Sugar Cans · Coca-Cola 📷",
+   "COCA-COLA SERVICES SA/NV Fanta zero sugar · COCA-COLA SERVICES SA/NV 📷",
+   "Coca-Cola Coke Zero Sugar · Coca-Cola 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "drinks",
+  "q": "matcha latte",
+  "re": "matcha",
+  "found": 0,
+  "photo": true,
+  "ms": 1991,
+  "settled": true,
+  "top": [
+   "Matcha latte · Café 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fastfood",
+  "q": "chipotle",
+  "re": "chipotle",
+  "found": 0,
+  "photo": true,
+  "ms": 2395,
+  "settled": true,
+  "top": [
+   "Chipotle · Mexican grill 📷",
+   "Chipotle Mexican Grill · American fast casual Mexican restaurant chain 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fastfood",
+  "q": "in n out",
+  "re": "in.?n.?out",
+  "found": 0,
+  "photo": true,
+  "ms": 2141,
+  "settled": true,
+  "top": [
+   "In-N-Out Burger · Burgers 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fastfood",
+  "q": "raising canes",
+  "re": "raising cane",
+  "found": 0,
+  "photo": true,
+  "ms": 1952,
+  "settled": true,
+  "top": [
+   "Raising Cane's · Chicken 📷",
+   "Raising Cane's Chicken Fingers · American restaurant chain 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fastfood",
+  "q": "chick fil a",
+  "re": "chick.?fil.?a",
+  "found": 0,
+  "photo": true,
+  "ms": 1718,
+  "settled": true,
+  "top": [
+   "Chick-fil-A · Chicken 📷",
+   "Chick-fil-A Dwarf House · Restaurant in Griffin, Georgia",
+   "Corky's · Restaurant building in Los Angeles, California 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "flowers",
+  "q": "peony",
+  "re": "peon",
+  "found": 0,
+  "photo": true,
+  "ms": 1838,
+  "settled": true,
+  "top": [
+   "Peony · Spring 📷",
+   "Paeonia · Genus of flowering plants"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "flowers",
+  "q": "lavender",
+  "re": "lavender",
+  "found": 0,
+  "photo": true,
+  "ms": 1628,
+  "settled": true,
+  "top": [
+   "Lavender · Herb 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "flowers",
+  "q": "cherry blossom",
+  "re": "cherry blossom",
+  "found": 0,
+  "photo": false,
+  "ms": 1420,
+  "settled": true,
+  "top": [
+   "Cherry blossom · Spring"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "flowers",
+  "q": "lisianthus",
+  "re": "lisianthus",
+  "found": 0,
+  "photo": true,
+  "ms": 1631,
+  "settled": true,
+  "top": [
+   "Lisianthus · Genus of plants 📷",
+   "Eustoma · Genus of plants 📷",
+   "Eustoma russellianum · Species of plant 📷",
+   "Lisianthus seemannii · Species of plant",
+   "Lisianthus enation leaf curl virus · Species of virus"
+  ],
+  "photoShare": 0.6,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fragrances",
+  "q": "dior sauvage elixir",
+  "re": "sauvage elixir",
+  "found": 0,
+  "photo": true,
+  "ms": 2434,
+  "settled": true,
+  "top": [
+   "Dior Sauvage Elixir · Dior 📷",
+   "Dior Sauvage · Dior 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openbeautyfacts.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "fragrances",
+  "q": "acqua di gio profondo eau de parfum",
+  "re": "acqua di gi[oò] profondo",
+  "found": 0,
+  "photo": false,
+  "ms": 2478,
+  "settled": true,
+  "top": [
+   "Acqua di Giò Profondo Eau de Parfum · Armani",
+   "Acqua di Giò · Armani"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "creed aventus",
+  "re": "aventus",
+  "found": 0,
+  "photo": false,
+  "ms": 2496,
+  "settled": true,
+  "top": [
+   "Creed Aventus · Creed",
+   "Aventus · Perfume from Creed"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "baccarat rouge 540 extrait",
+  "re": "baccarat rouge 540",
+  "found": 0,
+  "photo": false,
+  "ms": 2278,
+  "settled": true,
+  "top": [
+   "Baccarat Rouge 540 Extrait · Maison Francis Kurkdjian",
+   "Baccarat Rouge 540 · Maison Francis Kurkdjian"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "maison margiela replica jazz club",
+  "re": "jazz club",
+  "found": 0,
+  "photo": false,
+  "ms": 2630,
+  "settled": true,
+  "top": [
+   "Maison Margiela Replica Jazz Club · Maison Margiela"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "ysl libre",
+  "re": "libre",
+  "found": 0,
+  "photo": false,
+  "ms": 2160,
+  "settled": true,
+  "top": [
+   "YSL Libre · Yves Saint Laurent",
+   "Yves Saint Laurent YSL Libre - Eau de Parfum Rechargeable · Yves Saint Laurent 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "images.openbeautyfacts.org"
+  ]
+ },
+ {
+  "cat": "fragrances",
+  "q": "bleu de chanel parfum",
+  "re": "bleu de chanel",
+  "found": 0,
+  "photo": false,
+  "ms": 2416,
+  "settled": true,
+  "top": [
+   "Bleu de Chanel Parfum · Chanel",
+   "Bleu de Chanel · Men's fragrance by Chanel 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "fragrances",
+  "q": "tom ford tobacco vanille",
+  "re": "tobacco vanille",
+  "found": 0,
+  "photo": false,
+  "ms": 1871,
+  "settled": true,
+  "top": [
+   "Tom Ford Tobacco Vanille · Tom Ford",
+   "Tobacco Vanille · Perfume from Tom Ford"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "le labo santal 33",
+  "re": "santal 33",
+  "found": 0,
+  "photo": false,
+  "ms": 2273,
+  "settled": true,
+  "top": [
+   "Le Labo Santal 33 · Le Labo",
+   "Santal 33 · Perfume from Le Labo 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "fragrances",
+  "q": "byredo gypsy water",
+  "re": "gypsy water",
+  "found": 0,
+  "photo": false,
+  "ms": 2103,
+  "settled": true,
+  "top": [
+   "Byredo Gypsy Water · Byredo"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "parfums de marly layton",
+  "re": "layton",
+  "found": 0,
+  "photo": false,
+  "ms": 2755,
+  "settled": true,
+  "top": [
+   "Parfums de Marly Layton · Parfums de Marly"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fragrances",
+  "q": "jean paul gaultier le male elixir",
+  "re": "le male elixir",
+  "found": 0,
+  "photo": false,
+  "ms": 2378,
+  "settled": true,
+  "top": [
+   "Jean Paul Gaultier Le Male Elixir · JPG"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fruits",
+  "q": "mango",
+  "re": "mango",
+  "found": 0,
+  "photo": false,
+  "ms": 1582,
+  "settled": true,
+  "top": [
+   "Mango · Fruit"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fruits",
+  "q": "lychee",
+  "re": "lychee",
+  "found": 0,
+  "photo": false,
+  "ms": 1597,
+  "settled": true,
+  "top": [
+   "Lychee · Fruit"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fruits",
+  "q": "dragon fruit",
+  "re": "dragon ?fruit|pitaya",
+  "found": 0,
+  "photo": false,
+  "ms": 1654,
+  "settled": true,
+  "top": [
+   "Dragon fruit · Fruit"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "fruits",
+  "q": "blood orange",
+  "re": "blood orange",
+  "found": 0,
+  "photo": false,
+  "ms": 1907,
+  "settled": true,
+  "top": [
+   "blood orange scent · Citrusy smell: odor of blood oranges",
+   "Arancia Rossa di Sicilia PGI · Italian PGI fruit, vegetable or cereal product 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "games",
+  "q": "elden ring",
+  "re": "^elden ring$",
+  "found": 0,
+  "photo": true,
+  "ms": 1737,
+  "settled": true,
+  "top": [
+   "Elden Ring · FromSoftware · 2022 📷",
+   "Elden Ring Nightreign · 2025 video game developed by FromSoftware 📷",
+   "Elden Ring: Shadow of the Erdtree · 2024 expansion to the video game Elden Ring 📷",
+   "Elden Ring: Shadow of the Erdtree Deluxe Edition · Video game bundle",
+   "Elden Ring: Shadow of the Erdtree Edition · Video game bundle 📷",
+   "Elden Ring Nightreign: The Forsaken Hollows · 2025 video game expansion 📷"
+  ],
+  "photoShare": 0.8333333333333334,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "games",
+  "q": "zelda tears of the kingdom",
+  "re": "tears of the kingdom",
+  "found": 0,
+  "photo": true,
+  "ms": 2284,
+  "settled": true,
+  "top": [
+   "The Legend of Zelda: Tears of the Kingdom · Nintendo · 2023 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "games",
+  "q": "minecraft",
+  "re": "^minecraft$",
+  "found": 0,
+  "photo": true,
+  "ms": 1968,
+  "settled": true,
+  "top": [
+   "Minecraft · Mojang · 2011 📷",
+   "Minecraft Dungeons · 2020 video game developed by Mojang and Double Eleven 📷",
+   "Minecraft: Story Mode · 2015 video game 📷",
+   "Minecraft Earth · 2019 augmented reality spin-off video game of Minecraft 📷",
+   "Minecraft Legends · 2023 video game developed by Mojang Studios and Blackbird Interactive 📷",
+   "Minecraft Education · 2016 video game"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "games",
+  "q": "baldurs gate 3",
+  "re": "baldur.?s gate (3|iii)",
+  "found": 0,
+  "photo": true,
+  "ms": 2085,
+  "settled": true,
+  "top": [
+   "Baldur's Gate 3 · Larian · 2023 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "games",
+  "q": "grand theft auto v",
+  "re": "grand theft auto v|gta v",
+  "found": 0,
+  "photo": true,
+  "ms": 3204,
+  "settled": true,
+  "top": [
+   "Grand Theft Auto V · Rockstar · 2013 📷",
+   "Grand Theft Auto: Vice City · 2002 open world action-adventure video game developed by Rockstar Nort 📷",
+   "Grand Theft Auto VI · 2026 video game developed and published by Rockstar Games 📷",
+   "Grand Theft Auto: Vice City Stories · 2006 action-adventure open world video game developed by Rockstar Leed 📷",
+   "Grand Theft Auto VI Trailer 1 · First trailer for the video game Grand Theft Auto VI 📷",
+   "Grand Theft Auto V: Premium Online Edition · Video game bundle 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "hobbies",
+  "q": "rock climbing",
+  "re": "climbing",
+  "found": 0,
+  "photo": true,
+  "ms": 1749,
+  "settled": true,
+  "top": [
+   "rock climbing · Sporting activity that involves climbing natural rock formations using 📷",
+   "rock and sport climbing equipment · Manufactured gear used in rock climbing and sport climbing 📷",
+   "climbing gym · Sports venue for sport climbing on artificial climbing walls",
+   "Climbing wall · Artificial rock climbing wall 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "hobbies",
+  "q": "thrifting",
+  "re": "thrift",
+  "found": 0,
+  "photo": true,
+  "ms": 2463,
+  "settled": true,
+  "top": [
+   "Thrifting · Hobby 📷",
+   "drifting · Driving technique 📷",
+   "The Thriving Cult of Greed and Power · 1991 newsmagazine article on Scientology 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "hobbies",
+  "q": "pottery",
+  "re": "pottery",
+  "found": 0,
+  "photo": true,
+  "ms": 1657,
+  "settled": true,
+  "top": [
+   "pottery · Craft of making objects from clay 📷",
+   "pottery of ancient Greece · Ancient Greek artifact made of clay 📷",
+   "pottery ware · Class of physical objects, as distinguished from the craft o",
+   "pottery manufactory · Establishment that specializes in making clay pottery, such ",
+   "Pre-Pottery Neolithic · Earlier part of the Neolithic period in Southwest Asia 📷"
+  ],
+  "photoShare": 0.6,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "hobbies",
+  "q": "journaling",
+  "re": "journal",
+  "found": 0,
+  "photo": false,
+  "ms": 2214,
+  "settled": true,
+  "top": [
+   "Journaling · Hobby",
+   "Journaling engagements with literature on racism: a critical race theoretic approach · Article published in 2015",
+   "Sports journalism · Form of journalism that reports on sporting topics and compe 📷",
+   "Video game journalism · Journalism genre that reports on video games 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "holidays",
+  "q": "christmas",
+  "re": "christmas",
+  "found": 0,
+  "photo": true,
+  "ms": 1955,
+  "settled": true,
+  "top": [
+   "Christmas · Holiday 📷",
+   "Christmas Eve · Evening or entire day before Christmas Day 📷",
+   "Christmas in Ukraine · Christmas celebrations and traditions in Ukraine 📷",
+   "Christmas and holiday season · Christmas period with related and unrelated holidays between 📷",
+   "All Saints' Day · Christian feast day 📷",
+   "Holy Friday · Christian holiday 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "holidays",
+  "q": "diwali",
+  "re": "diwali",
+  "found": 0,
+  "photo": true,
+  "ms": 1877,
+  "settled": true,
+  "top": [
+   "Diwali · Holiday 📷",
+   "Diwali in Gujarat · Festival of light in Indian state Gujarat 📷",
+   "Diwali in B.C. · Arts festival in British Columbia, Canada",
+   "Igas Bagwal · Festival of Uttarakhand 📷",
+   "Dipavali Killa · Fort building tradition during Dipavali festival",
+   "Dhanteras · First day of Diwali, the Indian festival of lights 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "holidays",
+  "q": "eid al fitr",
+  "re": "eid al.?fitr",
+  "found": 0,
+  "photo": true,
+  "ms": 1429,
+  "settled": true,
+  "top": [
+   "Eid al-Fitr · Islamic holiday on the first of Shawwal 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "holidays",
+  "q": "lunar new year",
+  "re": "lunar new year",
+  "found": 0,
+  "photo": true,
+  "ms": 1512,
+  "settled": true,
+  "top": [
+   "Lunar New Year · Holiday 📷",
+   "Lunar New Year's Eve · The last day of the Lunar year 📷",
+   "Lunar New Year customs in Taiwan · Traditional Taiwanese holiday 📷",
+   "Lunar New Year in Portland, Oregon · Annual celebration in Portland",
+   "Lunar/Lunisolar New Year's Day · Day of the East Asian Lunisolar Calendar",
+   "2006 Lunar New Year Cup · 2006 edition of international association football competiti"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "icecream",
+  "q": "mint chocolate chip",
+  "re": "mint choc",
+  "found": 0,
+  "photo": true,
+  "ms": 1873,
+  "settled": true,
+  "top": [
+   "Mint chocolate chip · Flavor 📷",
+   "Mint Chocolate Chip Ice Cream · Baskin Robbins 📷",
+   "Breyers Mint Chocolate Chip · Breyers 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "icecream",
+  "q": "cherry garcia",
+  "re": "cherry garcia",
+  "found": 0,
+  "photo": true,
+  "ms": 2031,
+  "settled": true,
+  "top": [
+   "Cherry Garcia · Flavor of ice cream sold by Ben & Jerry's 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "icecream",
+  "q": "cookie dough",
+  "re": "cookie dough",
+  "found": 0,
+  "photo": true,
+  "ms": 2009,
+  "settled": true,
+  "top": [
+   "Cookie dough · Flavor 📷",
+   "Ben & Jerry's Cookie Dough · Ben & Jerry's 📷",
+   "Ben & Jerry's Chocolate Chip Cookie Dough · Ben & Jerry's 📷",
+   "Chocolate Chip Cookie Dough Light Ice Cream · Halo Top 📷",
+   "Protein Pints Cookie Dough · Protein Pints 📷",
+   "Booja-Booja Cookie Dough (Special Edition) · Booja-Booja 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "influencers",
+  "q": "mrbeast",
+  "re": "mrbeast|mr\\.? ?beast",
+  "found": 0,
+  "photo": true,
+  "ms": 1925,
+  "settled": true,
+  "top": [
+   "MrBeast · YouTube 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "influencers",
+  "q": "kai cenat",
+  "re": "kai cenat",
+  "found": 0,
+  "photo": true,
+  "ms": 1927,
+  "settled": true,
+  "top": [
+   "Kai Cenat · Twitch / YouTube 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "influencers",
+  "q": "emma chamberlain",
+  "re": "emma chamberlain",
+  "found": 0,
+  "photo": true,
+  "ms": 2113,
+  "settled": true,
+  "top": [
+   "Emma Chamberlain · YouTube 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "influencers",
+  "q": "ishowspeed",
+  "re": "ishowspeed|i show speed",
+  "found": 0,
+  "photo": true,
+  "ms": 1734,
+  "settled": true,
+  "top": [
+   "IShowSpeed · YouTube 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "instruments",
+  "q": "saxophone",
+  "re": "saxophone",
+  "found": 0,
+  "photo": true,
+  "ms": 1635,
+  "settled": true,
+  "top": [
+   "Saxophone · Woodwind 📷",
+   "saxophone concerto · Concerto for solo saxophone and instrumental ensemble 📷",
+   "Bass saxophone · Wind instrument 📷",
+   "Contrabass saxophone · Low-pitched instrument in the saxophone family 📷",
+   "Subcontrabass saxophone · Largest low-pitched instrument in the saxophone family 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "instruments",
+  "q": "electric guitar",
+  "re": "electric guitar",
+  "found": 0,
+  "photo": false,
+  "ms": 1975,
+  "settled": true,
+  "top": [
+   "Electric guitar · Strings",
+   "electric guitar concerto · Concerto for solo electric guitar and instrumental ensemble",
+   "semi-acoustic guitar · Electric guitar designed to be played with a guitar amplifier featurin",
+   "Bass guitar · Electric plucked string instrument 📷",
+   "Fender Jaguar · Electric guitar model made by Fender Musical Instruments 📷",
+   "Red Special · Electric guitar designed and built by Queen guitarist Brian May and hi 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "instruments",
+  "q": "hang drum",
+  "re": "hang",
+  "found": 0,
+  "photo": true,
+  "ms": 1649,
+  "settled": true,
+  "top": [
+   "Hang drum · Percussion 📷",
+   "pandeiro · Hand frame drum 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "instruments",
+  "q": "kalimba",
+  "re": "kalimba",
+  "found": 0,
+  "photo": true,
+  "ms": 1429,
+  "settled": true,
+  "top": [
+   "Kalimba · Percussion 📷",
+   "Kisanji · Lamellophone instrument 📷",
+   "Akogo · Traditional musical instrument from Uganda"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "upload.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "kdramas",
+  "q": "squid game",
+  "re": "squid game",
+  "found": 0,
+  "photo": true,
+  "ms": 1611,
+  "settled": true,
+  "top": [
+   "Squid Game · 오징어 게임 · Netflix · 2021 📷",
+   "Squid Game, season 2 · Season 2 of South Korean television series Squid Game 📷",
+   "Squid Game, season 3 · The final season of South Korean television series Squid Gam 📷",
+   "Squid Game, season 1 · The first season of South Korean television series Squid Gam 📷",
+   "Squid Game: The Challenge · Netflix reality competition television series 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "kdramas",
+  "q": "crash landing on you",
+  "re": "crash landing on you",
+  "found": 0,
+  "photo": true,
+  "ms": 2367,
+  "settled": true,
+  "top": [
+   "Crash Landing on You · 사랑의 불시착 · tvN · 2019 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "kdramas",
+  "q": "goblin",
+  "re": "goblin|guardian",
+  "found": 0,
+  "photo": false,
+  "ms": 1949,
+  "settled": true,
+  "top": [
+   "Goblin · 도깨비 · tvN · 2016",
+   "Guardian: The Lonely and Great God · 2016 South Korean TV series 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "kdramas",
+  "q": "my love from the star",
+  "re": "my love from the star",
+  "found": 0,
+  "photo": true,
+  "ms": 2371,
+  "settled": true,
+  "top": [
+   "My Love from the Star · 별에서 온 그대 · SBS · 2013 📷",
+   "My Love from Another Star · 2019 Thai TV series or program"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "languages",
+  "q": "swahili",
+  "re": "swahili",
+  "found": 0,
+  "photo": true,
+  "ms": 1879,
+  "settled": true,
+  "top": [
+   "Swahili · Bantu 📷",
+   "Swahili Wikipedia · Swahili-language edition of Wikipedia 📷",
+   "Swahili literature · Literature in the Swahili language 📷",
+   "Swahili noun class · Grammatical feature of the Swahili language 📷",
+   "Swahili Forum · Academic journal published by University of Leipzig, coverin",
+   "Congo Swahili · Dialect of Swahili spoken in the DRC 📷"
+  ],
+  "photoShare": 0.8333333333333334,
+  "src": [
+   "upload.wikimedia.org",
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "languages",
+  "q": "korean",
+  "re": "korean",
+  "found": 0,
+  "photo": true,
+  "ms": 1607,
+  "settled": true,
+  "top": [
+   "Korean · Koreanic 📷",
+   "Korean Wikipedia · Korean-language edition of Wikipedia",
+   "Korean language · Language spoken in Korea 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "languages",
+  "q": "welsh",
+  "re": "welsh",
+  "found": 0,
+  "photo": true,
+  "ms": 1594,
+  "settled": true,
+  "top": [
+   "Welsh · Celtic 📷",
+   "Welsh Wikipedia · Welsh-language edition of Wikipedia 📷",
+   "Welsh language · Brittonic language 📷",
+   "Welsh-medium school · School that teaches in the Welsh language",
+   "National Eisteddfod of Wales · Annual festival of Welsh-language culture"
+  ],
+  "photoShare": 0.6,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "manga",
+  "q": "chainsaw man",
+  "re": "chainsaw man",
+  "found": 0,
+  "photo": true,
+  "ms": 1407,
+  "settled": true,
+  "top": [
+   "Chainsaw Man · チェンソーマン · Tatsuki Fujimoto 📷",
+   "Chainsaw Man: Buddy Stories · 2021 📷",
+   "Tatsuki Fujimoto Before Chainsaw Man: 17-21 · 2021",
+   "Tatsuki Fujimoto Before Chainsaw Man: 22-26 · 2021 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "upload.wikimedia.org",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "manga",
+  "q": "berserk",
+  "re": "berserk",
+  "found": 0,
+  "photo": true,
+  "ms": 1352,
+  "settled": true,
+  "top": [
+   "Berserk · ベルセルク · Kentaro Miura 📷",
+   "Berserk of Gluttony · 2018 📷",
+   "Berserk: The Prototype · 1988 📷",
+   "Berserk: The Flame Dragon Knight · 2017 📷",
+   "Isekai Guild no Berserk · 2016 📷",
+   "Jueshi Zhan Hun · 2015 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "manga",
+  "q": "solo leveling",
+  "re": "solo leveling",
+  "found": 0,
+  "photo": true,
+  "ms": 1417,
+  "settled": true,
+  "top": [
+   "Solo Leveling · 나 혼자만 레벨업 · Chugong 📷",
+   "Solo Leveling: Ragnarok · 2024 📷",
+   "The Privilege of the Second Life is Power Leveling · 2024 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "manga",
+  "q": "tower of god",
+  "re": "tower of god",
+  "found": 0,
+  "photo": true,
+  "ms": 1408,
+  "settled": true,
+  "top": [
+   "Tower of God · 신의 탑 · SIU 📷",
+   "Tower of God: Urek Mazino · 2025 📷",
+   "Babel-shiki Kami Girl · 2014 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "mobilegames",
+  "q": "clash royale",
+  "re": "clash royale",
+  "found": 0,
+  "photo": true,
+  "ms": 2426,
+  "settled": true,
+  "top": [
+   "Clash Royale · Supercell 📷",
+   "Stats Royale for Clash Royale · Overwolf Ltd 📷",
+   "Clash of Clans · Supercell Oy 📷",
+   "Brawl Stars · Supercell Oy 📷",
+   "Fortnite · Epic Games Sweden AB 📷",
+   "Last War:Survival · FUNFLY PTE. LTD. 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "mobilegames",
+  "q": "genshin impact",
+  "re": "genshin impact",
+  "found": 0,
+  "photo": true,
+  "ms": 2701,
+  "settled": true,
+  "top": [
+   "Genshin Impact · HoYoverse 📷",
+   "Genshin Impact · Cloud · COGNOSPHERE PTE. LTD. 📷",
+   "Honkai: Star Rail · COGNOSPHERE PTE. LTD. 📷",
+   "HoYoLAB · COGNOSPHERE PTE. LTD. 📷",
+   "Smart Translator: AI Translate · Hong Kong Wenzel Limited 📷",
+   "Zenless Zone Zero · COGNOSPHERE PTE. LTD. 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "mobilegames",
+  "q": "subway surfers",
+  "re": "subway surfers",
+  "found": 0,
+  "photo": true,
+  "ms": 2437,
+  "settled": true,
+  "top": [
+   "Subway Surfers · SYBO 📷",
+   "Subway Surfers City · Sybo Games ApS 📷",
+   "Temple Run · Imangi Studios, LLC 📷",
+   "Block Blast！ · ARETIS LIMITED 📷",
+   "Geometry Dash Lite · RobTop Games AB 📷",
+   "Magic Tiles 3™: Piano Game · Amanotes Pte Ltd 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "mobilegames",
+  "q": "brawl stars",
+  "re": "brawl stars",
+  "found": 0,
+  "photo": true,
+  "ms": 2397,
+  "settled": true,
+  "top": [
+   "Brawl Stars · Supercell 📷",
+   "Box Simulator Brawl Stars · Hevorh Karibian 📷",
+   "Clash Royale · Supercell Oy 📷",
+   "Roblox · Roblox Corporation 📷",
+   "Stumble Guys · Scopely, Inc. 📷",
+   "Squad Busters · Supercell Oy 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "motorcycles",
+  "q": "ducati panigale v4 s",
+  "re": "panigale v4",
+  "found": 0,
+  "photo": true,
+  "ms": 2736,
+  "settled": true,
+  "top": [
+   "Ducati Panigale V4 S · Panigale V4 · Sportbike 📷",
+   "Ducati Panigale V4 SP · Panigale V4 · Sportbike",
+   "Ducati Panigale V4 SP2 · Panigale V4 · Sportbike",
+   "Ducati Panigale V4 Speciale · Panigale V4 · Sportbike",
+   "Ducati Panigale V4 Superleggera · Panigale V4 · Sportbike",
+   "Ducati Panigale V4 · Sport 📷"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "motorcycles",
+  "q": "yamaha r1m",
+  "re": "r1m",
+  "found": 0,
+  "photo": false,
+  "ms": 2566,
+  "settled": true,
+  "top": [
+   "Yamaha YZF-R1M · Yamaha · Superbike",
+   "Yamaha YZF-R1M 2015 · YZF-R1M · Superbike",
+   "Yamaha YZF-R1M 2020 · YZF-R1M · Superbike"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "motorcycles",
+  "q": "kawasaki ninja h2r",
+  "re": "h2r",
+  "found": 0,
+  "photo": true,
+  "ms": 2776,
+  "settled": true,
+  "top": [
+   "Kawasaki Ninja H2R · Hypersport 📷",
+   "Kawasaki Ninja H2 R · Ninja H2 · Hypersport 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "motorcycles",
+  "q": "triumph speed triple 1200 rs",
+  "re": "speed triple",
+  "found": 0,
+  "photo": true,
+  "ms": 3087,
+  "settled": true,
+  "top": [
+   "Triumph Speed Triple 1200 RS · Speed Triple · Naked bike 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "movies",
+  "q": "avengers endgame",
+  "re": "avengers.* endgame",
+  "found": 0,
+  "photo": true,
+  "ms": 2527,
+  "settled": true,
+  "top": [
+   "Avengers: Endgame · Russo Brothers · 2019 📷",
+   "Avengers Endgame: Encore · 2026 Marvel Studios film re-release 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "movies",
+  "q": "the dark knight",
+  "re": "the dark knight",
+  "found": 0,
+  "photo": true,
+  "ms": 2476,
+  "settled": true,
+  "top": [
+   "The Dark Knight · Christopher Nolan · 2008 📷",
+   "The Dark Knight Rises · 2012 film by Christopher Nolan 📷",
+   "Batman: The Dark Knight Returns · 2012 American two-part animated film directed by Jay Oliva 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "movies",
+  "q": "dune part two",
+  "re": "dune.* part two",
+  "found": 0,
+  "photo": true,
+  "ms": 2447,
+  "settled": true,
+  "top": [
+   "Dune: Part Two · Denis Villeneuve · 2024 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "movies",
+  "q": "spirited away",
+  "re": "spirited away",
+  "found": 0,
+  "photo": true,
+  "ms": 2464,
+  "settled": true,
+  "top": [
+   "Spirited Away · 千と千尋の神隠し · Hayao Miyazaki · 2001 📷",
+   "Music of Spirited Away · Music of the 2001 feature film"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "musicals",
+  "q": "hamilton",
+  "re": "hamilton",
+  "found": 0,
+  "photo": true,
+  "ms": 1878,
+  "settled": true,
+  "top": [
+   "Hamilton · Broadway · 2015 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "musicals",
+  "q": "wicked",
+  "re": "wicked",
+  "found": 0,
+  "photo": true,
+  "ms": 1851,
+  "settled": true,
+  "top": [
+   "Wicked · Broadway · 2003 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "musicals",
+  "q": "les miserables",
+  "re": "mis[eé]rables",
+  "found": 0,
+  "photo": true,
+  "ms": 1694,
+  "settled": true,
+  "top": [
+   "Les Misérables · West End · 1985 📷",
+   "Les Misérables: The Dream Cast in Concert · 1995 English-language video recording of a concert version o",
+   "Les Misérables in Concert: The 25th Anniversary · 2010 English-language video recording of a concert version o 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "mythology",
+  "q": "anubis",
+  "re": "anubis",
+  "found": 0,
+  "photo": true,
+  "ms": 2164,
+  "settled": true,
+  "top": [
+   "Anubis · Egyptian 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "mythology",
+  "q": "zeus",
+  "re": "^zeus$",
+  "found": 0,
+  "photo": true,
+  "ms": 1866,
+  "settled": true,
+  "top": [
+   "Zeus · Greek 📷",
+   "Zelus · Ancient Greek personification of emulation/envy",
+   "Ziusudra · In the Sumerian flood myth, ruler of Shuruppak and builder of a big sh",
+   "Heracles · Divine hero in Greek mythology, son of Zeus and Alcmene 📷",
+   "Perseus · Legendary Greek hero and founder of Mycenae, demigod son of Zeus and D 📷",
+   "Rhea · Female Titan in Greek mythology, mother of Zeus and mother of Hera 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "mythology",
+  "q": "quetzalcoatl",
+  "re": "quetzalcoatl",
+  "found": 0,
+  "photo": true,
+  "ms": 1499,
+  "settled": true,
+  "top": [
+   "Quetzalcoatl · Aztec 📷",
+   "feathered serpent · Type of Mayan or Aztec god associated with the west, winds, "
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "mythology",
+  "q": "amaterasu",
+  "re": "amaterasu",
+  "found": 0,
+  "photo": true,
+  "ms": 1484,
+  "settled": true,
+  "top": [
+   "Amaterasu · Japanese 📷",
+   "Amaterasu Kuniteruhiko Hikari Kushi Tama Hayasui no Mikoto · Kami (Shinto deity)"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "painters",
+  "q": "van gogh",
+  "re": "van gogh",
+  "found": 0,
+  "photo": true,
+  "ms": 1380,
+  "settled": true,
+  "top": [
+   "Vincent van Gogh · Post-impressionism 📷",
+   "Death of Vincent van Gogh · 1890 death of the Dutch painter 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "painters",
+  "q": "frida kahlo",
+  "re": "frida kahlo",
+  "found": 0,
+  "photo": true,
+  "ms": 1950,
+  "settled": true,
+  "top": [
+   "Frida Kahlo · Painting 📷",
+   "Cristina Kahlo · Sister of artist Frida Kahlo"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "painters",
+  "q": "banksy",
+  "re": "banksy",
+  "found": 0,
+  "photo": true,
+  "ms": 2137,
+  "settled": true,
+  "top": [
+   "Banksy · Street art 📷",
+   "Slave Labour · Painting by Banksy (street artist) 📷",
+   "Flower Thrower · Mural in Palestine by artist Banksy"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "wsrv.nl",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "painters",
+  "q": "yayoi kusama",
+  "re": "yayoi kusama",
+  "found": 0,
+  "photo": true,
+  "ms": 4479,
+  "settled": true,
+  "top": [
+   "Yayoi Kusama · Contemporary 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pasta",
+  "q": "cacio e pepe",
+  "re": "cacio e pepe",
+  "found": 0,
+  "photo": true,
+  "ms": 2203,
+  "settled": true,
+  "top": [
+   "cacio e pepe · Italian pasta dish 📷",
+   "Trader Joe's Spaghetti Cacio E Pepe · Trader Joe's"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pasta",
+  "q": "rigatoni",
+  "re": "rigatoni",
+  "found": 0,
+  "photo": true,
+  "ms": 1657,
+  "settled": true,
+  "top": [
+   "Rigatoni · Tubes 📷",
+   "Rigatoni con la pajata · Traditional Italian pasta dish 📷",
+   "Barilla Rigatoni n.89 · Barilla",
+   "Barilla Rigatoni · Barilla",
+   "Trader Joe's RIGATONI · Trader Joe's",
+   "De Cecco Rigatoni no. 24 · De Cecco"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pasta",
+  "q": "tagliatelle",
+  "re": "tagliatelle",
+  "found": 0,
+  "photo": true,
+  "ms": 1695,
+  "settled": true,
+  "top": [
+   "Tagliatelle · Long 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pasta",
+  "q": "orecchiette",
+  "re": "orecchiette",
+  "found": 0,
+  "photo": true,
+  "ms": 1969,
+  "settled": true,
+  "top": [
+   "Orecchiette · Shapes 📷",
+   "Orecchiette alla materana · Italian pasta with meat sauce",
+   "De Cecco Orecchiette · De Cecco"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "philosophers",
+  "q": "nietzsche",
+  "re": "nietzsche",
+  "found": 0,
+  "photo": true,
+  "ms": 1708,
+  "settled": true,
+  "top": [
+   "Friedrich Nietzsche · Existentialism 📷",
+   "Philosophy of Friedrich Nietzsche · Ideas of 19th-century German philosopher",
+   "God is dead · Quote by philosopher Friedrich Nietzsche"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "philosophers",
+  "q": "simone de beauvoir",
+  "re": "simone de beauvoir",
+  "found": 0,
+  "photo": true,
+  "ms": 2385,
+  "settled": true,
+  "top": [
+   "Simone de Beauvoir · Feminism 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "philosophers",
+  "q": "socrates",
+  "re": "socrates",
+  "found": 0,
+  "photo": true,
+  "ms": 1694,
+  "settled": true,
+  "top": [
+   "Socrates · Ancient Greece 📷",
+   "Anaximander · Pre-Socratic Greek philosopher",
+   "Parmenides · Late 6th/early 5th century BC Greek pre-Socratic philosopher",
+   "Protagoras · Pre-Socratic Greek philosopher (c.490–c.420 BC) 📷",
+   "Xenophanes · Greek Pre-Socratic philosopher (c.570–c.478 BC)",
+   "Anaximenes of Miletus · Greek Ionian Pre-Socratic philosopher (c.586–c.526 BC) 📷"
+  ],
+  "photoShare": 0.42857142857142855,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "philosophers",
+  "q": "confucius",
+  "re": "confucius",
+  "found": 0,
+  "photo": true,
+  "ms": 1447,
+  "settled": true,
+  "top": [
+   "Confucius · China 📷",
+   "Disciples of Confucius · Followers of the Chinese philosopher Confucius",
+   "Zhu Xi · Chinese historian, neo-Confucian philosopher, poet, and politician dur",
+   "Xunzi · Chinese Confucian philosopher (c. 310 – after 238 BCE)"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pizza",
+  "q": "pepperoni",
+  "re": "pepperoni",
+  "found": 0,
+  "photo": true,
+  "ms": 1650,
+  "settled": true,
+  "top": [
+   "Pepperoni · Topping 📷",
+   "pepperoni pizza · Pizza with pepperoni toppings",
+   "Windsor-style pizza · Medium-thick cornmeal crust pizza with shredded pepperoni 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pizza",
+  "q": "pineapple",
+  "re": "pineapple",
+  "found": 0,
+  "photo": true,
+  "ms": 2132,
+  "settled": true,
+  "top": [
+   "Pineapple · Topping 📷",
+   "pineapple juice · Fruit juice made from pineapple fruit"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pizza",
+  "q": "margherita",
+  "re": "margherita",
+  "found": 0,
+  "photo": false,
+  "ms": 2144,
+  "settled": true,
+  "top": [
+   "Margherita · Pizza",
+   "Margherita Extra · Pizza"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "podcasts",
+  "q": "call her daddy",
+  "re": "call her daddy",
+  "found": 0,
+  "photo": true,
+  "ms": 1677,
+  "settled": true,
+  "top": [
+   "Call Her Daddy · Culture 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "podcasts",
+  "q": "smartless",
+  "re": "smartless",
+  "found": 0,
+  "photo": true,
+  "ms": 1625,
+  "settled": true,
+  "top": [
+   "SmartLess · Comedy 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "podcasts",
+  "q": "joe rogan experience",
+  "re": "joe rogan",
+  "found": 0,
+  "photo": false,
+  "ms": 1480,
+  "settled": true,
+  "top": [
+   "Joe Rogan Experience Review podcast · Podcast produced by Adam Thorne",
+   "The Joe Rogan Experience · Podcast 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "podcasts",
+  "q": "diary of a ceo",
+  "re": "diary of a ceo",
+  "found": 0,
+  "photo": false,
+  "ms": 1673,
+  "settled": true,
+  "top": [
+   "The Diary of a CEO · Interviews"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "pokemon",
+  "q": "charizard",
+  "re": "^charizard$",
+  "found": 0,
+  "photo": true,
+  "ms": 1126,
+  "settled": true,
+  "top": [
+   "Charizard · Fire / Flying 📷",
+   "Mega Charizard X · Pokémon 📷",
+   "Mega Charizard Y · Pokémon 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "raw.githubusercontent.com",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pokemon",
+  "q": "mega charizard x",
+  "re": "charizard.*mega.*x|mega charizard x",
+  "found": 0,
+  "photo": true,
+  "ms": 942,
+  "settled": true,
+  "top": [
+   "Mega Charizard X · Pokémon 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "pokemon",
+  "q": "mr mime",
+  "re": "mr\\.? mime",
+  "found": 0,
+  "photo": true,
+  "ms": 837,
+  "settled": true,
+  "top": [
+   "Mr. Mime · #122 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "raw.githubusercontent.com"
+  ]
+ },
+ {
+  "cat": "proglangs",
+  "q": "python",
+  "re": "python",
+  "found": 0,
+  "photo": true,
+  "ms": 1608,
+  "settled": true,
+  "top": [
+   "Python · General purpose 📷",
+   "Python 3 · Major release of Python programming language 📷",
+   "Python package · Software library for the Python programming language 📷",
+   "Python 2 · Programming language version 📷",
+   "Stackless Python · Alternative Python implementation",
+   "Cython · Programming language compatible with Python 📷"
+  ],
+  "photoShare": 0.8333333333333334,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "proglangs",
+  "q": "typescript",
+  "re": "typescript",
+  "found": 0,
+  "photo": true,
+  "ms": 1929,
+  "settled": true,
+  "top": [
+   "TypeScript · Web 📷",
+   "AssemblyScript · TypeScript-based programming language"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "proglangs",
+  "q": "rust",
+  "re": "^rust$",
+  "found": 0,
+  "photo": true,
+  "ms": 1860,
+  "settled": true,
+  "top": [
+   "Rust · Systems 📷",
+   "Metafont · Description language used to define rastertype fonts",
+   "CICS · IBM customer data and transaction management application"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "proglangs",
+  "q": "c++",
+  "re": "c\\+\\+",
+  "found": 1,
+  "photo": false,
+  "ms": 1567,
+  "settled": true,
+  "top": [
+   "C · Systems 📷",
+   "C++/CLI · Programming language",
+   "Cascading Style Sheets · Declarative language for styling web pages 📷",
+   "Classic Visual Basic · Legacy programming language by Microsoft 📷",
+   "COBOL · Programming language with English-like syntax 📷",
+   "Clojure · Dialect of the Lisp programming language 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "restaurants",
+  "q": "nobu",
+  "re": "^nobu",
+  "found": 0,
+  "photo": true,
+  "ms": 1581,
+  "settled": true,
+  "top": [
+   "Nobu · Japanese · Global 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "restaurants",
+  "q": "dishoom",
+  "re": "dishoom",
+  "found": 0,
+  "photo": false,
+  "ms": 1860,
+  "settled": true,
+  "top": [
+   "Dishoom · Indian · London"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "restaurants",
+  "q": "nandos",
+  "re": "nando",
+  "found": 0,
+  "photo": false,
+  "ms": 2102,
+  "settled": true,
+  "top": [
+   "Nando's · Portuguese chicken · UK"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "restaurants",
+  "q": "the ivy",
+  "re": "^the ivy",
+  "found": 0,
+  "photo": true,
+  "ms": 1867,
+  "settled": true,
+  "top": [
+   "The Ivy · British brasserie · London 📷",
+   "The Ivy Collection · Fine dining restaurant chain in the UK and Ireland"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sauces",
+  "q": "sriracha",
+  "re": "sriracha",
+  "found": 0,
+  "photo": true,
+  "ms": 2442,
+  "settled": true,
+  "top": [
+   "Sriracha · Sauce 📷",
+   "sriracha sauce · Hot sauce 📷",
+   "sriracha mayonnaise · Type of sauce 📷",
+   "Flying Goose Brand Sriracha Sauce · Flying Goose Brand 📷",
+   "McIlhenny Company Sriracha Sauce🙂 · McIlhenny Company 📷",
+   "FLYING GOOSE Sriracha sauce mayo · FLYING GOOSE 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sauces",
+  "q": "chick fil a sauce",
+  "re": "chick.?fil.?a",
+  "found": 0,
+  "photo": true,
+  "ms": 2078,
+  "settled": true,
+  "top": [
+   "Chick-fil-A sauce · Sauce 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "sauces",
+  "q": "gochujang",
+  "re": "gochujang",
+  "found": 0,
+  "photo": true,
+  "ms": 2177,
+  "settled": true,
+  "top": [
+   "Gochujang · Sauce 📷",
+   "Gochujang Brown Rice Red Pepper Paste · O'Food 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "sauces",
+  "q": "hot honey",
+  "re": "hot honey",
+  "found": 0,
+  "photo": false,
+  "ms": 1926,
+  "settled": true,
+  "top": [
+   "Hot honey · Sauce"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "scientists",
+  "q": "albert einstein",
+  "re": "albert einstein",
+  "found": 0,
+  "photo": true,
+  "ms": 1697,
+  "settled": true,
+  "top": [
+   "Albert Einstein · Physics 📷",
+   "Hans Albert Einstein · Swiss-American engineer and educator 📷",
+   "Brain of Albert Einstein · Preserved brain of the scientist"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "scientists",
+  "q": "marie curie",
+  "re": "marie curie",
+  "found": 0,
+  "photo": true,
+  "ms": 2187,
+  "settled": true,
+  "top": [
+   "Marie Curie · Physics / Chemistry 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "scientists",
+  "q": "richard feynman",
+  "re": "richard feynman",
+  "found": 0,
+  "photo": true,
+  "ms": 1692,
+  "settled": true,
+  "top": [
+   "Richard Feynman · Physics 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "scientists",
+  "q": "katherine johnson",
+  "re": "katherine johnson",
+  "found": 0,
+  "photo": true,
+  "ms": 1706,
+  "settled": true,
+  "top": [
+   "Katherine Johnson · Mathematics 📷",
+   "Katharine Johnson Jackson · American physician; stenographer"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "seasons",
+  "q": "autumn",
+  "re": "autumn|fall",
+  "found": 0,
+  "photo": false,
+  "ms": 1586,
+  "settled": true,
+  "top": [
+   "Autumn · Season"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "seasons",
+  "q": "summer",
+  "re": "summer",
+  "found": 0,
+  "photo": false,
+  "ms": 1592,
+  "settled": true,
+  "top": [
+   "Summer · Season"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "snacks",
+  "q": "takis fuego",
+  "re": "takis",
+  "found": 0,
+  "photo": true,
+  "ms": 1698,
+  "settled": true,
+  "top": [
+   "Takis Fuego · Chips 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "snacks",
+  "q": "flamin hot cheetos",
+  "re": "flamin.? hot cheetos",
+  "found": 0,
+  "photo": true,
+  "ms": 1807,
+  "settled": true,
+  "top": [
+   "Flamin' Hot Cheetos · Chips 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "snacks",
+  "q": "oreo double stuf",
+  "re": "oreo",
+  "found": 0,
+  "photo": true,
+  "ms": 1784,
+  "settled": true,
+  "top": [
+   "OREO Double Stuf · Oreo 📷",
+   "OREO · Oreo 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "snacks",
+  "q": "hi chew",
+  "re": "hi.?chew",
+  "found": 0,
+  "photo": true,
+  "ms": 1364,
+  "settled": true,
+  "top": [
+   "Hi-Chew · Candy 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sneakers",
+  "q": "nike air force 1 low white",
+  "re": "air force 1",
+  "found": 0,
+  "photo": false,
+  "ms": 2082,
+  "settled": true,
+  "top": [
+   "Nike Air Force 1 Low White · Nike"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sneakers",
+  "q": "air jordan 1 retro high og chicago",
+  "re": "jordan 1.*chicago|air jordan 1.*chicago",
+  "found": 0,
+  "photo": false,
+  "ms": 2410,
+  "settled": true,
+  "top": [
+   "Air Jordan 1 High OG Chicago Retro · Jordan",
+   "Air Jordan 1 High OG Chicago · Jordan"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sneakers",
+  "q": "new balance 550",
+  "re": "550",
+  "found": 0,
+  "photo": true,
+  "ms": 2209,
+  "settled": true,
+  "top": [
+   "New Balance 550 · New Balance 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sneakers",
+  "q": "adidas samba og",
+  "re": "samba",
+  "found": 0,
+  "photo": false,
+  "ms": 2215,
+  "settled": true,
+  "top": [
+   "Adidas Samba OG · Adidas"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sneakers",
+  "q": "yeezy boost 350 v2 zebra",
+  "re": "350 v2.*zebra|yeezy.*zebra",
+  "found": 0,
+  "photo": false,
+  "ms": 1792,
+  "settled": true,
+  "top": [
+   "Yeezy Boost 350 V2 Zebra · Adidas"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sneakers",
+  "q": "asics gel kayano 14",
+  "re": "kayano 14",
+  "found": 0,
+  "photo": true,
+  "ms": 5017,
+  "settled": true,
+  "top": [
+   "Asics Gel-Kayano 14 · Asics 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sneakers",
+  "q": "nike dunk low panda",
+  "re": "dunk low.*panda",
+  "found": 0,
+  "photo": false,
+  "ms": 1755,
+  "settled": true,
+  "top": [
+   "Nike Dunk Low Panda · Nike"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "songs",
+  "q": "die with a smile",
+  "re": "die with a smile",
+  "found": 0,
+  "photo": true,
+  "ms": 2539,
+  "settled": true,
+  "top": [
+   "Die With a Smile · Lady Gaga & Bruno Mars 📷",
+   "Die with a Smile · FKJ",
+   "Die With A Smile · Lady Gaga 📷",
+   "Die With A Smile · Bossa Nova Covers",
+   "Die with A Smile · little fictions 📷",
+   "Die With a Smile · Boyce Avenue 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "is1-ssl.mzstatic.com",
+   "cdn-images.dzcdn.net",
+   "cdn-images.dzcdn.net"
+  ]
+ },
+ {
+  "cat": "songs",
+  "q": "good days sza",
+  "re": "good days",
+  "found": 0,
+  "photo": true,
+  "ms": 2463,
+  "settled": true,
+  "top": [
+   "Good Days · SZA 📷",
+   "What Lovers Do (feat. SZA) · Maroon 5 · 2017 📷",
+   "Good Day, USA! · Johnny Rain",
+   "Good Days · Broken Back",
+   "A Good Day · Sean Mason",
+   "Good Days, Bad Days · Rebecca Ferguson"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "songs",
+  "q": "blinding lights",
+  "re": "blinding lights",
+  "found": 0,
+  "photo": true,
+  "ms": 2562,
+  "settled": true,
+  "top": [
+   "Blinding Lights · The Weeknd 📷",
+   "Blinding Lights · Teddy Swims",
+   "Blinding Lights · X Ambassadors",
+   "Blinding Lights · Victoria Voss",
+   "Blinding Lights · Loi 📷",
+   "Blinding Lights · Pablo Cepeda"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "cdn-images.dzcdn.net",
+   "cdn-images.dzcdn.net",
+   "cdn-images.dzcdn.net"
+  ]
+ },
+ {
+  "cat": "songs",
+  "q": "espresso sabrina carpenter",
+  "re": "^espresso$",
+  "found": 5,
+  "photo": true,
+  "ms": 2394,
+  "settled": true,
+  "top": [
+   "Espresso - Sabrina Carpenter (Wrightsmind Media Remix) · Wrightsmind Media · 2024 📷",
+   "Espresso - Sabrina Carpenter for Babies · Thomas The Beat Engine",
+   "Espresso Sabrina Carpenter | Original Music · Yeah Bert",
+   "Sabrina Carpenter Espresso Brixxx Club (Jersey Club) · Brenton Brixxx",
+   "Cappuccino — Parody of Espresso to Sabrina Carpenter · Mat Ryxx",
+   "Espresso · Sabrina Carpenter 📷"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "is1-ssl.mzstatic.com",
+   "cdn-images.dzcdn.net",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "spirits",
+  "q": "hennessy vs",
+  "re": "hennessy",
+  "found": 0,
+  "photo": false,
+  "ms": 1761,
+  "settled": true,
+  "top": [
+   "Hennessy VS · Cognac"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "spirits",
+  "q": "blantons original single barrel",
+  "re": "blanton",
+  "found": 0,
+  "photo": false,
+  "ms": 1890,
+  "settled": true,
+  "top": [
+   "Blanton's Original Single Barrel · Bourbon"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "spirits",
+  "q": "guinness draught",
+  "re": "guinness",
+  "found": 0,
+  "photo": true,
+  "ms": 2105,
+  "settled": true,
+  "top": [
+   "Guinness · Irish brand of beer 📷",
+   "Guinness Draught Stout · Guinness 📷",
+   "Guinness Draught 0.0 · Beer brewed by Guinness"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "images.openfoodfacts.org",
+   "images.openfoodfacts.org"
+  ]
+ },
+ {
+  "cat": "spirits",
+  "q": "don julio 1942",
+  "re": "don julio",
+  "found": 0,
+  "photo": false,
+  "ms": 2007,
+  "settled": true,
+  "top": [
+   "Don Julio 1942 · Tequila"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "spirits",
+  "q": "lagavulin 16",
+  "re": "lagavulin",
+  "found": 0,
+  "photo": false,
+  "ms": 1805,
+  "settled": true,
+  "top": [
+   "Lagavulin 16 · Scotch",
+   "Lagavulin 16 years whisky · Lagavulin 16 years single malt scotch whisky 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "sports",
+  "q": "padel",
+  "re": "padel",
+  "found": -1,
+  "photo": null,
+  "ms": 1595,
+  "settled": true,
+  "top": [],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sports",
+  "q": "bouldering",
+  "re": "bouldering",
+  "found": -1,
+  "photo": null,
+  "ms": 1649,
+  "settled": true,
+  "top": [],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sports",
+  "q": "formula 1",
+  "re": "formula (1|one)",
+  "found": 0,
+  "photo": false,
+  "ms": 1633,
+  "settled": true,
+  "top": [
+   "Formula 1 · Motorsport"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "sports",
+  "q": "table tennis",
+  "re": "table tennis",
+  "found": 0,
+  "photo": false,
+  "ms": 1661,
+  "settled": true,
+  "top": [
+   "Table tennis · Racket sport"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "subjects",
+  "q": "economics",
+  "re": "economics",
+  "found": 0,
+  "photo": true,
+  "ms": 1698,
+  "settled": true,
+  "top": [
+   "Economics · Subject 📷",
+   "economics of banking · Field in economics",
+   "economics and politics · Relation of two subjects",
+   "history of economic thought · History of economic thought",
+   "agricultural economics · Applied field of economics that optimizes the production of ",
+   "health economics · Branch of economics 📷"
+  ],
+  "photoShare": 0.25,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "subjects",
+  "q": "psychology",
+  "re": "psychology",
+  "found": 0,
+  "photo": true,
+  "ms": 1990,
+  "settled": true,
+  "top": [
+   "Psychology · Subject 📷",
+   "counseling psychology · Branch of psychology 📷",
+   "work psychology · Branch of psychology that studies human behavior and attitud 📷",
+   "Psicologia: Reflexão e Crítica · Academic journal published by Springer, covering the subject",
+   "personality psychology · Branch of psychology focused on personality 📷",
+   "social psychology · A branch of psychology that combines concepts from psychology and soci 📷"
+  ],
+  "photoShare": 0.875,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "subjects",
+  "q": "computer science",
+  "re": "computer science",
+  "found": 0,
+  "photo": true,
+  "ms": 2131,
+  "settled": true,
+  "top": [
+   "Computer science · Subject 📷",
+   "computer science term · Technical term; word or phrase that is part of computer scie",
+   "history of computer science · Aspect of history 📷",
+   "MIT Computer Science and Artificial Intelligence Laboratory · Computer Science research institute at MIT 📷",
+   "computing education · The education of computer science",
+   "Outline of computer science · Overview of and topical guide to computer science"
+  ],
+  "photoShare": 0.625,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "superheroes",
+  "q": "spider man miles morales",
+  "re": "miles morales",
+  "found": 0,
+  "photo": false,
+  "ms": 2035,
+  "settled": true,
+  "top": [
+   "Miles Morales · Spider Man"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "superheroes",
+  "q": "black panther",
+  "re": "black panther",
+  "found": 0,
+  "photo": false,
+  "ms": 1668,
+  "settled": true,
+  "top": [
+   "Black Panther · Marvel",
+   "Mu-Yeong Baek · Crazy Girl Shin Bi-A  Igyejenchokro Gada!! 📷",
+   "Shuri · Fictional character in Marvel Comics",
+   "T'Challa · Fictional character from the Marvel Cinematic Universe",
+   "Ramon Victorino · Captain Tsubasa: Junior Youth Arc 📷",
+   "Abel · Fire Emblem"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "superheroes",
+  "q": "invincible",
+  "re": "invincible",
+  "found": 0,
+  "photo": true,
+  "ms": 1388,
+  "settled": true,
+  "top": [
+   "Invincible · Image 📷",
+   "Manjirou Sano · Tokyo Revengers 📷",
+   "Reinhard von Lohengramm · Legend of the Galactic Heroes 📷",
+   "Thorkell · Vinland Saga 📷",
+   "Kyros · ONE PIECE 📷",
+   "Pyrrha Nikos · RWBY: Ice Queendom 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "teams",
+  "q": "boston celtics",
+  "re": "boston celtics",
+  "found": 0,
+  "photo": true,
+  "ms": 1947,
+  "settled": true,
+  "top": [
+   "Boston Celtics · NBA 📷",
+   "Boston Celtics Radio Network · NBA team radio network",
+   "history of the Boston Celtics · The Celtics are an NBA franchise",
+   "2025–26 Boston Celtics season · 2025–26 NBA season by team",
+   "2023–24 Boston Celtics season · 2023–24 NBA season by team",
+   "2026–27 Boston Celtics season · NBA professional basketball team season"
+  ],
+  "photoShare": 0.125,
+  "src": [
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "teams",
+  "q": "dallas cowboys",
+  "re": "dallas cowboys",
+  "found": 0,
+  "photo": true,
+  "ms": 1940,
+  "settled": true,
+  "top": [
+   "Dallas Cowboys · NFL 📷",
+   "Dallas Cowboys Cheerleaders · Cheerleading squad of the Dallas Cowboys American football t 📷",
+   "2021 Dallas Cowboys season · 62nd season in franchise history",
+   "2022 Dallas Cowboys season · 63rd season in franchise history 📷",
+   "2019 Dallas Cowboys season · 60th season in franchise history",
+   "2020 Dallas Cowboys season · 61st season in franchise history"
+  ],
+  "photoShare": 0.375,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "teams",
+  "q": "new york yankees",
+  "re": "new york yankees",
+  "found": 0,
+  "photo": true,
+  "ms": 1981,
+  "settled": true,
+  "top": [
+   "New York Yankees · MLB 📷",
+   "history of the New York Yankees · Sports team history",
+   "1998 New York Yankees season · Season for the Major League Baseball team the New York Yanke",
+   "1999 New York Yankees season · Season for the Major League Baseball team the New York Yanke",
+   "2000 New York Yankees season · Season for the Major League Baseball team the New York Yanke",
+   "2024 New York Yankees season · Season for the Major League Baseball team the New York Yanke 📷"
+  ],
+  "photoShare": 0.2857142857142857,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tech",
+  "q": "iphone 16 pro max",
+  "re": "iphone 16 pro max",
+  "found": 0,
+  "photo": false,
+  "ms": 2111,
+  "settled": true,
+  "top": [
+   "iPhone 16 Pro Max · 18th generation of the iPhone",
+   "iPhone 16 Pro · 18th generation of the iPhone (Pro version) 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tech",
+  "q": "playstation 5 pro",
+  "re": "playstation 5 pro|ps5 pro",
+  "found": 0,
+  "photo": false,
+  "ms": 2095,
+  "settled": true,
+  "top": [
+   "PlayStation 5 Pro · Video game console developed by Sony, upgraded version of th"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "tech",
+  "q": "nintendo switch 2",
+  "re": "switch 2",
+  "found": 0,
+  "photo": true,
+  "ms": 1865,
+  "settled": true,
+  "top": [
+   "Nintendo Switch 2 · Nintendo 📷",
+   "Nintendo Switch system software · Proprietary operating system of the Nintendo Switch 1 and 2"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tech",
+  "q": "airpods pro 2",
+  "re": "airpods pro",
+  "found": 0,
+  "photo": false,
+  "ms": 2049,
+  "settled": true,
+  "top": [
+   "AirPods Pro 2 · Apple",
+   "AirPods Pro · Apple 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tech",
+  "q": "steam deck oled",
+  "re": "steam deck",
+  "found": 0,
+  "photo": false,
+  "ms": 2050,
+  "settled": true,
+  "top": [
+   "Steam Deck Oled · Valve",
+   "Steam Deck · Valve 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tech",
+  "q": "sony wh 1000xm5",
+  "re": "1000xm5",
+  "found": 0,
+  "photo": false,
+  "ms": 1811,
+  "settled": true,
+  "top": [
+   "Sony WH-1000XM5 · Sony",
+   "Sony WH-1000XM5 Noise-Canceling Headphones · Wireless headphones designed and sold by Sony Group"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "tech",
+  "q": "macbook air m3",
+  "re": "macbook air",
+  "found": 0,
+  "photo": false,
+  "ms": 1822,
+  "settled": true,
+  "top": [
+   "MacBook Air M3 · Apple",
+   "MacBook Air · Apple 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "themeparks",
+  "q": "disneyland paris",
+  "re": "disneyland paris",
+  "found": 0,
+  "photo": true,
+  "ms": 2257,
+  "settled": true,
+  "top": [
+   "Disneyland Paris · France 📷",
+   "Disneyland Park · Theme park in France in Disneyland Paris",
+   "Disney Adventure World · Theme park at the Disneyland Paris complex in Paris, France 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "themeparks",
+  "q": "universal studios japan",
+  "re": "universal studios japan",
+  "found": 0,
+  "photo": true,
+  "ms": 2086,
+  "settled": true,
+  "top": [
+   "Universal Studios Japan · Osaka 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "wsrv.nl"
+  ]
+ },
+ {
+  "cat": "themeparks",
+  "q": "alton towers",
+  "re": "alton towers",
+  "found": 0,
+  "photo": true,
+  "ms": 1928,
+  "settled": true,
+  "top": [
+   "Alton Towers · UK 📷",
+   "Alton Towers Waterpark · Water park at Alton Towers Resort in Staffordshire, England 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "wsrv.nl",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "themeparks",
+  "q": "cedar point",
+  "re": "cedar point",
+  "found": 0,
+  "photo": true,
+  "ms": 1406,
+  "settled": true,
+  "top": [
+   "Cedar Point · Ohio 📷",
+   "Cedar Point Shores · Water park near Cedar Point 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tv",
+  "q": "breaking bad",
+  "re": "breaking bad",
+  "found": 0,
+  "photo": true,
+  "ms": 2415,
+  "settled": true,
+  "top": [
+   "Breaking Bad · AMC · 2008 📷",
+   "Breaking Bad season 4 · Fourth season of the AMC crime drama television series 📷",
+   "Breaking Bad season 5 · Fifth season of the AMC crime drama television series 📷",
+   "Breaking Bad, Deluxe Edition · 2013 📷",
+   "Breaking Bad, Deluxe Edition: Seasons 1 & 2 · 2013 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "upload.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "tv",
+  "q": "the bear",
+  "re": "^the bear$",
+  "found": 0,
+  "photo": true,
+  "ms": 2123,
+  "settled": true,
+  "top": [
+   "The Bear · FX · 2022 📷",
+   "The Polar Bear Family & Me · 2013 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "is1-ssl.mzstatic.com"
+  ]
+ },
+ {
+  "cat": "tv",
+  "q": "severance",
+  "re": "severance",
+  "found": 0,
+  "photo": false,
+  "ms": 2124,
+  "settled": true,
+  "top": [
+   "Severance · Apple TV+ · 2022"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "tv",
+  "q": "arcane",
+  "re": "arcane",
+  "found": 0,
+  "photo": false,
+  "ms": 2350,
+  "settled": true,
+  "top": [
+   "Arcane · Netflix · 2021"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "universities",
+  "q": "columbia university",
+  "re": "columbia university",
+  "found": 0,
+  "photo": true,
+  "ms": 2502,
+  "settled": true,
+  "top": [
+   "Columbia University · USA 📷",
+   "University of British Columbia · Public research university in British Columbia, Canada 📷",
+   "National University of Colombia · Colombian public university 📷",
+   "Ohio State University · Public research university in Columbus, Ohio, United States 📷",
+   "University of Missouri · Public research university in Columbia, Missouri, USA 📷",
+   "Simon Fraser University · Public research university in Greater Vancouver, British Columbia, Can"
+  ],
+  "photoShare": 0.8571428571428571,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "universities",
+  "q": "university of oxford",
+  "re": "oxford",
+  "found": 0,
+  "photo": true,
+  "ms": 2638,
+  "settled": true,
+  "top": [
+   "University of Oxford · Collegiate research university in Oxford, England 📷",
+   "Oxford University Press · Publishing arm of the University of Oxford",
+   "University College, Oxford · College of the University of Oxford 📷",
+   "Magdalen College, Oxford · College of the University of Oxford 📷",
+   "Oxford Brookes University · Public university in Oxford, England 📷"
+  ],
+  "photoShare": 0.8,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "universities",
+  "q": "babson college",
+  "re": "babson",
+  "found": 0,
+  "photo": false,
+  "ms": 2300,
+  "settled": true,
+  "top": [
+   "Babson College · USA"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "universities",
+  "q": "ucl",
+  "re": "university college london|^ucl",
+  "found": 0,
+  "photo": false,
+  "ms": 1585,
+  "settled": true,
+  "top": [
+   "UCL · UK",
+   "University College London · Public research university in London, England, United Kingdo 📷",
+   "Catholic University of Leuven (1834–1968) · Former University in Belgium, 1834–1970 📷",
+   "UCLouvain · French-speaking university in Louvain-la-Neuve, Belgium 📷",
+   "UCLA · USA 📷",
+   "UCLA Bruins · Intercollegiate sports teams of the University of California 📷"
+  ],
+  "photoShare": 0.75,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "villains",
+  "q": "thanos",
+  "re": "thanos",
+  "found": 0,
+  "photo": true,
+  "ms": 1360,
+  "settled": true,
+  "top": [
+   "Thanos · Marvel 📷",
+   "Thanos Averroës · Fictional character from in the Lanfeust comics"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "villains",
+  "q": "joker",
+  "re": "joker",
+  "found": 0,
+  "photo": false,
+  "ms": 1334,
+  "settled": true,
+  "top": [
+   "Joker · DC",
+   "Doflamingo Donquixote · ONE PIECE",
+   "Takashi Mitsuya · Tokyo Revengers",
+   "Ren Amamiya · PERSONA5 the Animation 📷",
+   "Ryuusei Shidou · BLUE LOCK",
+   "Heath Ledger's Joker · Film"
+  ],
+  "photoShare": 0.2857142857142857,
+  "src": [
+   "s4.anilist.co",
+   "s4.anilist.co"
+  ]
+ },
+ {
+  "cat": "villains",
+  "q": "voldemort",
+  "re": "voldemort",
+  "found": 0,
+  "photo": true,
+  "ms": 1385,
+  "settled": true,
+  "top": [
+   "Voldemort · Harry Potter 📷",
+   "Lord Voldemort · Main antagonist of J. K. Rowling's Harry Potter series"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "villains",
+  "q": "darth vader",
+  "re": "darth vader",
+  "found": 0,
+  "photo": true,
+  "ms": 1402,
+  "settled": true,
+  "top": [
+   "Darth Vader · Star Wars 📷",
+   "Anakin Skywalker · Fictional character from Star Wars",
+   "Darth Vader: Dark Lord of the Sith · Comic series 📷",
+   "Darth Vader's lightsaber · Fictional weapon from Star Wars 📷",
+   "Darth Vader's TIE Advanced · Fictional spacecraft from the Star Wars universe",
+   "Eddie · Gangnam-ui Gisa 📷"
+  ],
+  "photoShare": 0.6666666666666666,
+  "src": [
+   "upload.wikimedia.org",
+   "upload.wikimedia.org",
+   "upload.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "watches",
+  "q": "rolex submariner date",
+  "re": "submariner",
+  "found": 0,
+  "photo": true,
+  "ms": 2027,
+  "settled": true,
+  "top": [
+   "Rolex Submariner Date · Rolex 📷",
+   "Rolex Submariner · Rolex 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "commons.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "watches",
+  "q": "omega speedmaster moonwatch",
+  "re": "speedmaster",
+  "found": 0,
+  "photo": false,
+  "ms": 2093,
+  "settled": true,
+  "top": [
+   "Omega Speedmaster Moonwatch · Omega",
+   "Omega Speedmaster · Omega 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "watches",
+  "q": "apple watch ultra 2",
+  "re": "apple watch ultra",
+  "found": 0,
+  "photo": false,
+  "ms": 1742,
+  "settled": true,
+  "top": [
+   "Apple Watch Ultra 2 · Smartwatch developed by Apple, Inc.",
+   "Apple Watch Ultra · Line of smartwatches 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "watches",
+  "q": "casio g shock dw 5600",
+  "re": "5600",
+  "found": 0,
+  "photo": false,
+  "ms": 2036,
+  "settled": true,
+  "top": [
+   "G-Shock DW-5600 Casio · Casio",
+   "G-Shock DW-5600 · Casio"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "watches",
+  "q": "tudor black bay 58",
+  "re": "black bay 58",
+  "found": 0,
+  "photo": false,
+  "ms": 1719,
+  "settled": true,
+  "top": [
+   "Tudor Black Bay 58 · Tudor",
+   "Tudor Black Bay · Tudor"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "watches",
+  "q": "audemars piguet royal oak 15500st",
+  "re": "royal oak",
+  "found": 0,
+  "photo": false,
+  "ms": 2152,
+  "settled": true,
+  "top": [
+   "Audemars Piguet Royal Oak 15500st · AP",
+   "Audemars Piguet Royal Oak · AP"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "weapons",
+  "q": "katana",
+  "re": "katana",
+  "found": 0,
+  "photo": true,
+  "ms": 1882,
+  "settled": true,
+  "top": [
+   "Katana · Japan 📷",
+   "Katana-1917.266.1184 · Katana blade signed by Hizen Yukihiro 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "weapons",
+  "q": "ak 47",
+  "re": "ak-?47",
+  "found": 0,
+  "photo": true,
+  "ms": 1603,
+  "settled": true,
+  "top": [
+   "AK-47 · Rifle 📷",
+   "AK-47 Type 1 · AK-47 · Assault rifle 📷",
+   "AK-47 Type 2 · AK-47 · Assault rifle 📷",
+   "AK-47 Type 3 · AK-47 · Assault rifle 📷",
+   "AK-47 Type 56 · AK-47 · Assault rifle 📷",
+   "AK-74 · Soviet assault rifle to replace earlier Kalashnikov models 📷"
+  ],
+  "photoShare": 1,
+  "src": [
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org",
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "weapons",
+  "q": "m1 garand",
+  "re": "garand",
+  "found": 0,
+  "photo": false,
+  "ms": 1910,
+  "settled": true,
+  "top": [
+   "M1 Garand · Semi-automatic rifle"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "weapons",
+  "q": "glock 19 gen 5",
+  "re": "glock 19",
+  "found": 0,
+  "photo": false,
+  "ms": 2301,
+  "settled": true,
+  "top": [
+   "Glock 19 Gen 5 · 19 · Pistol"
+  ],
+  "photoShare": 0,
+  "src": []
+ },
+ {
+  "cat": "wonders",
+  "q": "machu picchu",
+  "re": "machu picchu",
+  "found": 0,
+  "photo": true,
+  "ms": 1452,
+  "settled": true,
+  "top": [
+   "Machu Picchu · Peru 📷",
+   "Montaña Machu Picchu · Mountain in Peru",
+   "Takeda Castle · Ruined castle in Japan",
+   "UTEC campus · Building in Barranco, Peru 📷",
+   "Historic Sanctuary of Machu Picchu · UNESCO World Heritage Site in Latin America and the Caribbea 📷"
+  ],
+  "photoShare": 0.6,
+  "src": [
+   "commons.wikimedia.org",
+   "commons.wikimedia.org",
+   "commons.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "wonders",
+  "q": "burj khalifa",
+  "re": "burj khalifa",
+  "found": 0,
+  "photo": false,
+  "ms": 1473,
+  "settled": true,
+  "top": [
+   "Burj Khalifa · Dubai",
+   "Address Downtown · Tower block 📷"
+  ],
+  "photoShare": 0.5,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "wonders",
+  "q": "taj mahal",
+  "re": "taj mahal",
+  "found": 0,
+  "photo": true,
+  "ms": 1937,
+  "settled": true,
+  "top": [
+   "Taj Mahal · India 📷",
+   "Taj Mahal Palace · Taj Mahal Palace,Bhopal",
+   "Black Taj Mahal · Historic site in Agra"
+  ],
+  "photoShare": 0.3333333333333333,
+  "src": [
+   "thumb.wikimedia.org"
+  ]
+ },
+ {
+  "cat": "wonders",
+  "q": "sagrada familia",
+  "re": "sagrada",
+  "found": 0,
+  "photo": false,
+  "ms": 1760,
+  "settled": true,
+  "top": [
+   "Sagrada Família · Barcelona"
+  ],
+  "photoShare": 0,
+  "src": []
+ }
+]
