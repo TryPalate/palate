@@ -1,7 +1,7 @@
 // Combines the parts written by build.mjs (parts/**/part-*/<cat>.json) into data/catalog/<cat>.json + index.json
 import fs from 'node:fs'; import path from 'node:path';
 const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-const dirs = []; (function walk(d) { for (const e of fs.existsSync(d) ? fs.readdirSync(d, { withFileTypes: true }) : []) { const p = path.join(d, e.name); if (e.isDirectory()) { if (/^part-/.test(e.name)) dirs.push(p); else walk(p); } } })(process.argv[2] || 'parts');
+const dirs = []; (function walk(d) { for (const e of fs.existsSync(d) ? fs.readdirSync(d, { withFileTypes: true }) : []) { const p = path.join(d, e.name); if (e.isDirectory()) { if (/^part-/.test(e.name) && fs.readdirSync(p).some(x => x.endsWith('.json'))) dirs.push(p); else walk(p); } } })(process.argv[2] || 'parts');
 const by = {}; for (const d of dirs) for (const f of fs.readdirSync(d).filter(x => x.endsWith('.json'))) { const c = f.slice(0, -5), j = JSON.parse(fs.readFileSync(path.join(d, f), 'utf8')); const m = by[c] ||= new Map();
   for (const [n, s, p, pop] of j.items) { const k = norm(n); const o = m.get(k); if (!o) m.set(k, [n, s, p, pop]); else { if (!o[2] && p) o[2] = p; if (!o[1] && s) o[1] = s; o[3] = Math.max(o[3], pop); } } }
 const OUT = process.argv[3] || 'data/catalog'; fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true }); const cats = {}; let total = 0;
