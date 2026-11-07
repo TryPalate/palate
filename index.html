@@ -480,6 +480,12 @@ button.me-av{border:0;cursor:pointer;font-family:inherit;padding:0}
 .results{list-style:none;margin:6px 0 0;padding:0}
 .results:empty{display:none}
 .results .sec{font-size:12.5px;font-weight:600;color:var(--muted);padding:10px 8px 2px}
+.vr{font-size:.72em;font-weight:500;color:var(--muted);letter-spacing:0}
+.grp-h{display:flex;align-items:center;gap:2px}.grp-h .res{flex:1;min-width:0}
+.grp-tog{flex:none;display:inline-flex;align-items:center;gap:5px;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;padding:8px 8px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.grp-tog i{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+.grp-tog[aria-expanded=true] i{transform:rotate(-135deg) translate(-1px,-1px)}
+.kid .res{padding-left:20px;margin-left:22px;width:calc(100% - 22px);border-left:2px solid var(--line,rgba(128,128,128,.25));border-radius:0 12px 12px 0}
 .res{width:100%;display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;border-radius:12px;padding:7px 8px;text-align:left;cursor:pointer}
 .res:hover,.res:focus-visible{background:var(--raise)}
 .res .art{justify-self:center}
@@ -6914,6 +6920,20 @@ async function catalogImage(c,n){ const p=BIGPIC[c+'|'+normT(n)]; return p?p.ful
 /* A very specific thing that is not in any list ("Acqua di Giò Profondo Eau de Parfum", "Taycan Turbo GT Weissach Package"):
    find the closest listed thing, keep every extra word the person typed, and offer "that, as typed" with the listed thing's picture. */
 const VARIANT_CATS = new Set(['fragrances','cars','motorcycles','aircraft','sneakers','watches','tech','weapons','spirits','snacks','drinks','cereal','sauces','cheese','pasta','icecream','boardgames','games']);
+/* Families: "Porsche Taycan" is the parent of "Porsche Taycan Turbo GT". Search shows the parent with its variants folded under it; a picked variant keeps the parent as its main name (b) and shows the rest as small grey text. */
+const GROUP_CATS = new Set([...VARIANT_CATS,'apps','mobilegames','dogs','catbreeds','instruments','cocktails','breakfast','pizza','fruits','cuisines']);
+const FAM1 = new Set(['dogs','catbreeds','instruments','fruits','cheese','pasta','cocktails','pizza','cuisines','breakfast','icecream','sauces','drinks','snacks','cereal','spirits']);   /* shelves where a one-word parent ("Poodle") is fine */
+const FAM = {};
+const famKey = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/['\u2019`]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+function famOf(c){ const list=CATALOG[c]||[]; let f=FAM[c]; if(f&&f.len===list.length) return f;
+  const byKey=new Map(); for(const it of list){ const k=famKey(it.n); if(k&&!byKey.has(k)) byKey.set(k,it); } return FAM[c]={len:list.length,byKey}; }
+function famRoot(c,name){ const f=famOf(c), w=famKey(name).split(' '), min=FAM1.has(c)?1:2;
+  for(let i=min;i<w.length;i++){ const it=f.byKey.get(w.slice(0,i).join(' ')); if(it) return it; } return null; }
+/* main words + small grey variant for a saved pick */
+function nameParts(it){ const n=String(it.n||''), b=String(it.b||'');
+  if(b && n.length>b.length && n.toLowerCase().startsWith(b.toLowerCase())){ const v=n.slice(b.length).replace(/^[\s\-\u2013\u2014\u00b7:,]+/,'').trim(); if(v) return {main:b,v}; }
+  return {main:n,v:''}; }
+const nameHTML = it => { const m=nameParts(it); return esc(m.main)+(m.v?` <small class="vr">${esc(m.v)}</small>`:''); };
 const VWORD = {edp:'Eau de Parfum',edt:'Eau de Toilette',edc:'Eau de Cologne',ps5:'PS5',ps4:'PS4'};
 const VSMALL = new Set(['de','di','du','la','le','of','the','and','by','for','with','in','a','an','pour','et']);
 const vStyle = w => { const l=w.toLowerCase(); if(VWORD[l]) return VWORD[l]; if(/\d/.test(l)&&l.length<=5||(l.length<=3&&!/[aeiouy]/.test(l))) return w.toUpperCase(); return VSMALL.has(l)?l:l.charAt(0).toUpperCase()+l.slice(1); };
@@ -8032,7 +8052,7 @@ function toast(msg, act){
   clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'), act?5200:2600);
 }
 
-function row(it,i,c,prev,extra){ return `<li class="row"><span class="rk">${i+1}</span>${art(it.n,c,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${extra?extra(it):''}</div>${change(it,i,prev)}</li>`; }
+function row(it,i,c,prev,extra){ return `<li class="row"><span class="rk">${i+1}</span>${art(it.n,c,'row')}<div class="nm"><b>${nameHTML(it)}</b><span>${esc(it.s)}</span>${extra?extra(it):''}</div>${change(it,i,prev)}</li>`; }
 function emptyRow(i){ return `<li class="row empty"><span class="rk">${i+1}</span><span class="ghost-art"></span><div class="nm"><b>—</b></div><span></span></li>`; }
 
 /* ---------- Artwork lookup ----------
@@ -8643,7 +8663,7 @@ function openWeeklyEditor(){
   renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),30);
 }
 async function saveWeekly(){
-  const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s||'',why:(x.why||'').trim()}));
+  const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s||'',...(x.b?{b:x.b}:{}),why:(x.why||'').trim()}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
   const b=$('#sheet-root [data-act="save"]'); if(b) b.disabled=true;
   haptic('success');
@@ -9961,6 +9981,26 @@ function rfPump(){
     findImage(c,it.n,it.s).then(r=>{ if(r&&r.url){ REFINED.set(k,r.url); if(ed&&ed.cat===c){ document.querySelectorAll('#ed-results .res[data-rf]').forEach(b=>{ if(b.dataset.rf===k){ const a=b.querySelector('.art'); if(a) a.outerHTML=photoSpan(c,r.url,'sm',it.n); } }); } } })
       .catch(()=>{}).finally(()=>{ rfRunning--; rfPump(); }); }
 }
+/* Search results folded into families: the parent on top, its variants beneath (open when a variant is the better match). */
+function groupedResults(c,rows,have,max,q){
+  const gs=new Map(), order=[];
+  rows.slice(0,50).forEach((r,i)=>{ const root=famRoot(c,r.it.n), self=!root||famKey(root.n)===famKey(r.it.n), rk=famKey(root?root.n:r.it.n);
+    let g=gs.get(rk); if(!g){ g={rk,root:root||r.it,head:null,hi:99,kids:[]}; gs.set(rk,g); order.push(g); }
+    if(self){ g.head=r.it; g.hi=i; } else g.kids.push({it:{...r.it,b:g.root.n},i}); });
+  const res=[], st=ed.gst||(ed.gst={}); let html='';
+  const plain=it=>{ res.push(it); return resBtn(it,res.length-1,q); };
+  for(const g of order.slice(0,max)){
+    const head=g.head||(have.has(g.root.n.toLowerCase())?null:g.root), kids=g.kids.slice(0,14);
+    if(!kids.length){ if(head) html+=plain(head); continue; }
+    if(!head){ kids.forEach(k=>{ html+=plain(k.it); }); continue; }
+    const open=g.rk in st?st[g.rk]:(!g.head||kids[0].i<g.hi);
+    res.push(head); const hk=res.length-1;
+    html+=`<li class="grp-h"><button type="button" class="res" data-act="pick" data-k="${hk}" data-rf="${esc(rfKey(c,head))}">${resArt(head)}<div class="nm"><b>${hl(head.n,q)}</b><span>${esc(head.s)}</span></div><span class="add">Add</span></button><button type="button" class="grp-tog" data-act="grp" data-g="${esc(g.rk)}" aria-expanded="${open}">${kids.length}${g.kids.length>kids.length?'+':''} variant${kids.length===1?'':'s'}<i aria-hidden="true"></i></button></li>`;
+    kids.forEach(k=>{ res.push(k.it); const kk=res.length-1, v=nameParts(k.it).v||k.it.n;
+      html+=`<li class="kid" data-g="${esc(g.rk)}"${open?'':' hidden'}><button type="button" class="res" data-act="pick" data-k="${kk}" data-rf="${esc(rfKey(c,k.it))}">${resArt(k.it)}<div class="nm"><b>${hl(v,q)}</b><span>${esc(k.it.s||'')}</span></div><span class="add">Add</span></button></li>`; });
+  }
+  return {res,html};
+}
 function results(){
   bigReady();
   const raw=ed.query.trim(), q=raw.toLowerCase();
@@ -9994,16 +10034,17 @@ function results(){
     if(vr && !have.has(vr.name.toLowerCase()) && !rows.some(r=>r.it.n.toLowerCase()===vr.name.toLowerCase())){
       BASEOF[ed.cat+'|'+vr.name]=vr.base.n;
       const b=vr.base, bp=photo(ed.cat,b.n), img=(bp&&bp.src)||b.img||'';
-      rows.unshift({it:{n:vr.name,s:b.s||'',img,full:(bp&&bp.src)||b.full||img,src:'variant',variantOf:b.n,tier:0},sc:0.8,o:-2,loc:1});
+      rows.unshift({it:{n:vr.name,s:b.s||'',b:b.n,img,full:(bp&&bp.src)||b.full||img,src:'variant',variantOf:b.n,tier:0},sc:0.8,o:-2,loc:1});
       if(!rows.some(r=>r.it===b||r.it.n===b.n) && !have.has(b.n.toLowerCase())) rows.push({it:b,sc:2.6,o:-1,loc:1}); } }
   const tierOf=r=>r.it.tier??5, popOf=r=>r.it.pop||0;
   rows.sort((a,b)=>Math.floor(a.sc*2)/2-Math.floor(b.sc*2)/2 || a.sc-b.sc || b.loc-a.loc || (veh&&a.loc&&b.loc?a.it.n.length-b.it.n.length:0) || (a.loc||b.loc?0:tierOf(a)-tierOf(b)) || popOf(b)-popOf(a) || a.o-b.o);
-  ed.res=rows.slice(0,veh?10:8).map(r=>r.it);
+  const grouped=GROUP_CATS.has(ed.cat)?groupedResults(ed.cat,rows,have,veh?10:8,q):null;
+  ed.res=grouped?grouped.res:rows.slice(0,veh?10:8).map(r=>r.it);
   setTimeout(refineResults,0);
   const exact=all.some(it=>it.n.toLowerCase()===q) || have.has(q) || live.some(x=>x.n.toLowerCase()===q);
   const waiting=ed.pending===raw;
   const custom=CAT[ed.cat]&&CAT[ed.cat].custom;
-  let html=ed.res.map((it,k)=>resBtn(it,k,q)).join('');
+  let html=grouped?grouped.html:ed.res.map((it,k)=>resBtn(it,k,q)).join('');
   if(waiting) html+=`<li class="res-wait" aria-live="polite"><span class="spin" aria-hidden="true"></span>Searching ${esc(CAT[ed.cat].name.toLowerCase())}…</li>`;
   else if(!ed.res.length) html+=`<li class="res-none">${ed.liveFailed?"Couldn't reach the search right now. Check your connection.":`Nothing in ${esc(CAT[ed.cat].name.toLowerCase())} matches “${esc(raw)}” yet. Check the spelling, or add it below.`}</li>`;
   if(!exact && !waiting) html+=`<li><button type="button" class="res" data-act="custom"><span class="plus">+</span><div class="nm"><b>Add “${esc(raw)}”</b><span>${custom?'Add it as you wrote it':'Not listed yet · we will check it fits and look up the details'}</span></div><span class="add">Add</span></button></li>`;
@@ -10041,7 +10082,7 @@ function slotRow(i){
   const it=ed.slots[i], label=i<5?String(i+1):'·';
   if(!it) return `<li class="slot empty dz-item" data-slot="${i}"><span class="rk">${label}</span><span>Empty</span></li>`;
   const p=photo(ed.cat,it.n);
-  return `<li class="slot dz-item" data-slot="${i}"><span class="rk">${label}</span>${photoBtn(ed.cat,it.n,'row')}<div class="nm"><b>${esc(it.n)}</b><span>${esc(it.s)}</span>${p?`<button type="button" class="linkish" data-act="photo-rm" data-n="${esc(it.n)}">Remove photo</button> `:''}<button type="button" class="linkish" data-act="alt-photo" data-n="${esc(it.n)}">Wrong photo?</button></div>
+  return `<li class="slot dz-item" data-slot="${i}"><span class="rk">${label}</span>${photoBtn(ed.cat,it.n,'row')}<div class="nm"><b>${nameHTML(it)}</b><span>${esc(it.s)}</span>${p?`<button type="button" class="linkish" data-act="photo-rm" data-n="${esc(it.n)}">Remove photo</button> `:''}<button type="button" class="linkish" data-act="alt-photo" data-n="${esc(it.n)}">Wrong photo?</button></div>
     <div class="ctl"><button type="button" class="ib" data-act="rm" data-i="${i}" aria-label="Remove ${esc(it.n)}">✕</button>${grip(it.n)}</div>
     ${i<5?`<textarea class="why-in" id="why-${i}" data-i="${i}" rows="1" aria-label="Why ${esc(it.n)}" placeholder="Why this one? (optional)">${esc(it.why||'')}</textarea>`:''}${ed.alt&&ed.alt.n===it.n?altPanel():''}</li>`;
 }
@@ -10058,7 +10099,7 @@ function hrAdd(it){
   const h=ed.hr; if(h.pool.some(x=>x.n===it.n)){ toast('Already in'); return; }
   if(h.pool.length>=HR_MAX){ toast(`Up to ${HR_MAX} at a time`); return; }
   const old=ed.slots.find(x=>x&&x.n===it.n);
-  h.pool.push({n:it.n,s:it.s,why:old?old.why:''}); ed.query=''; ed.live=[]; ed.liveQ=''; haptic(); renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),20);
+  h.pool.push({n:it.n,s:it.s,...(it.b?{b:it.b}:{}),why:old?old.why:''}); ed.query=''; ed.live=[]; ed.liveQ=''; haptic(); renderEditor(); setTimeout(()=>$('#ed-q')?.focus(),20);
 }
 function hrBegin(){
   const h=ed.hr; if(h.pool.length<2){ toast('Add at least 2 to compare'); return; }
@@ -10142,7 +10183,7 @@ function addItem(it){
   if(ed.hr){ hrAdd(it); return; }
   let k=ed.slots.findIndex((s,i)=>i<5&&!s); if(k<0) k=ed.slots.findIndex((s,i)=>i>=5&&!s);
   if(k<0){ toast('Full. Remove one first.'); return; }
-  ed.slots[k]={n:it.n,s:it.s,why:''}; ed.query=''; ed.live=[]; ed.liveQ=''; haptic();
+  ed.slots[k]={n:it.n,s:it.s,...(it.b?{b:it.b}:{}),why:''}; ed.query=''; ed.live=[]; ed.liveQ=''; haptic();
   if(NAT_CATS.has(ed.cat) && !isNat(it.s) && !isNat(it.n)){
     const cat=ed.cat, slot=ed.slots[k];
     findNative(cat,it.n,it.s).then(nm=>{ if(nm && ed && ed.cat===cat && ed.slots.includes(slot) && !isNat(slot.s)){ slot.s=[nm,slot.s].filter(Boolean).join(' · '); renderEditor(); } }).catch(()=>{});
@@ -10163,8 +10204,8 @@ function addItem(it){
 function saveEditor(next){
   if(ed.weekly){ saveWeekly(); return; }
   if(ed.slots.slice(0,5).some(Boolean)) haptic('success');
-  const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:(x.why||'').trim()}));
-  const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,why:''}));
+  const top=ed.slots.slice(0,5).filter(Boolean).map(x=>({n:x.n,s:x.s,...(x.b?{b:x.b}:{}),why:(x.why||'').trim()}));
+  const hm=ed.slots.slice(5).filter(Boolean).map(x=>({n:x.n,s:x.s,...(x.b?{b:x.b}:{}),why:''}));
   if(!top.length){ toast('Add at least one pick first.'); return; }
   const c=ed.cat, flow=ed.flow, vs=ed.vs; const isNew=!state.order.includes(c), firstEver=!state.order.length; (state.shelves[c] ||= {years:{}}).years[CURRENT]={top,hm};
   if(isNew && !state.vis[c] && prefs().defVis && prefs().defVis!=='friends') state.vis[c]=prefs().defVis;
@@ -10549,6 +10590,7 @@ document.addEventListener('click',e=>{
     case 'photo': pendingPhoto={c:el.dataset.cat,n:el.dataset.n}; $('#photo-input').click(); break;
     case 'photo-rm': { const k=pkey(ed.cat, el.dataset.n); if(state.photos[k]) dropFile(state.photos[k].src); delete state.photos[k]; save(); render(); renderEditor(); break; }
     case 'pick': { const it=ed.res[+el.dataset.k]; if(it) addItem(it); break; }
+    case 'grp': { const g=el.dataset.g, open=el.getAttribute('aria-expanded')!=='true'; (ed.gst||(ed.gst={}))[g]=open; el.setAttribute('aria-expanded',open); document.querySelectorAll('#ed-results .kid').forEach(li=>{ if(li.dataset.g===g) li.hidden=!open; }); break; }
     case 'custom': { const n=ed.query.trim(); if(!n) break; addCustomChecked(ed.cat,n,el); break; }
     case 'rm': { const i=+el.dataset.i, it=ed.slots[i]; if(!it) break; const before=ed.slots.map(x=>x&&{...x}), cat=ed.cat; ed.slots[i]=null; compact(); renderEditor();
       toast(`Removed ${it.n}`,{label:'Undo',fn:()=>{ if(ed && ed.cat===cat){ ed.slots=before; renderEditor(); } }}); break; }
